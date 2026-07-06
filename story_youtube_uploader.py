@@ -1,7 +1,7 @@
 import os
 import asyncio
 import edge_tts
-from moviepy.editor import *
+from moviepy import *
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
