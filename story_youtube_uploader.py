@@ -23,6 +23,7 @@ asyncio.run(make_audio())
 print("بعمل الفيديو...")
 command = [
     'ffmpeg',
+    '-y',  # ده اللي بيخليه يمسح الفيديو القديم لو موجود
     '-f', 'lavfi', '-i', 'color=c=black:s=720x1280:d=10',
     '-i', 'story.mp3',
     '-c:v', 'libx264', '-tune', 'stillimage',
