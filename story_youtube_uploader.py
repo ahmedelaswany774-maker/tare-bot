@@ -1,7 +1,7 @@
 import os
 import asyncio
 import edge_tts
-from moviepy import *
+from moviepy.editor import *
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -25,7 +25,7 @@ asyncio.run(make_audio())
 print("بعمل الفيديو...")
 audioclip = AudioFileClip("story.mp3")
 videoclip = ColorClip(size=(1080,1920), color=(0,0,0), duration=audioclip.duration)
-videoclip = videoclip.with_audio(audioclip)  # moviepy الجديد
+videoclip = videoclip.set_audio(audioclip)  # في 1.0.3 اسمه set_audio
 videoclip.write_videofile("story.mp4", fps=24, codec="libx264")
 print("الفيديو جاهز")
 
