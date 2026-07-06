@@ -1,2 +1,5 @@
 [phases.setup]
-aptPkgs = ["ffmpeg"]
+aptPkgs = ['ffmpeg']
+
+[start]
+cmd = "python story_youtube_uploader.py"
