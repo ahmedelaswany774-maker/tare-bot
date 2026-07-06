@@ -1,0 +1,7 @@
+openai
+edge-tts
+moviepy
+google-api-python-client
+google-auth-oauthlib
+supabase
+yt-dlp
