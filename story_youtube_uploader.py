@@ -22,10 +22,12 @@ async def make_audio():
 asyncio.run(make_audio())
 
 # 3. اعمل الفيديو
+print("بعمل الفيديو...")
 audioclip = AudioFileClip("story.mp3")
 videoclip = ColorClip(size=(1080,1920), color=(0,0,0), duration=audioclip.duration)
-videoclip = videoclip.with_audio(audioclip)
-videoclip.write_videofile("story.mp4", fps=24)
+videoclip = videoclip.with_audio(audioclip)  # moviepy الجديد
+videoclip.write_videofile("story.mp4", fps=24, codec="libx264")
+print("الفيديو جاهز")
 
 # 4. ارفع على يوتيوب
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
@@ -36,10 +38,14 @@ youtube = build("youtube", "v3", credentials=credentials)
 request = youtube.videos().insert(
     part="snippet,status",
     body={
-      "snippet": {"title": "قصة قصيرة #shorts", "description": story_text},
+      "snippet": {
+          "title": "قصة قصيرة #shorts",
+          "description": story_text,
+          "tags": ["قصص", "حكايات", "shorts"]
+      },
       "status": {"privacyStatus": "public"}
     },
     media_body=MediaFileUpload("story.mp4")
 )
 response = request.execute()
-print(f"الفيديو اترفع: https://youtube.com/watch?v={response['id']}")
+print(f"مبروك الفيديو اترفع: https://youtube.com/watch?v={response['id']}")
