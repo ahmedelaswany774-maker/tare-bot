@@ -1,7 +1,9 @@
 {
   "$schema": "https://schema.railpack.com",
+  "packages": {
+    "apt": ["ffmpeg"]
+  },
   "deploy": {
-    "startCommand": "python story_youtube_uploader.py",
-    "aptPackages": ["ffmpeg"]
+    "startCommand": "python story_youtube_uploader.py"
   }
 }
