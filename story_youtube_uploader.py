@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+# غير القصة دي براحتك بعدين
 story_text = """
 كان يا مكان في قديم الزمان، كان فيه ولد شجاع اسمه علي.
 علي كان بيحب يساعد الناس وكل يوم عنده مغامرة جديدة.
@@ -19,15 +20,14 @@ async def make_audio():
 
 asyncio.run(make_audio())
 
-print("بعمل الفيديو بـ ffmpeg...")
-# ده بياخد صورة سودا + ملف الصوت ويطلع فيديو mp4 جاهز لليوتيوب
+print("بعمل الفيديو...")
 command = [
     'ffmpeg',
-    '-f', 'lavfi', '-i', 'color=c=black:s=1080x1920:d=15', # فيديو اسود 15 ثانية 1080x1920
-    '-i', 'story.mp3', # دخل ملف الصوت
-    '-c:v', 'libx264', '-tune', 'stillimage', # كودك الفيديو
-    '-c:a', 'aac', '-b:a', '192k', # كودك الصوت
-    '-pix_fmt', 'yuv420p', '-shortest', # عشان يشتغل على يوتيوب
+    '-f', 'lavfi', '-i', 'color=c=black:s=720x1280:d=10',
+    '-i', 'story.mp3',
+    '-c:v', 'libx264', '-tune', 'stillimage',
+    '-c:a', 'aac', '-b:a', '192k',
+    '-pix_fmt', 'yuv420p', '-shortest',
     'story.mp4'
 ]
 subprocess.run(command, check=True)
