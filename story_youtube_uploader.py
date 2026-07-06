@@ -1,7 +1,7 @@
 import os
 import asyncio
 import edge_tts
-from moviepy.editor import *
+import subprocess
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -19,11 +19,18 @@ async def make_audio():
 
 asyncio.run(make_audio())
 
-print("بعمل الفيديو...")
-audioclip = AudioFileClip("story.mp3")
-videoclip = ColorClip(size=(1080,1920), color=(0,0,0), duration=audioclip.duration)
-videoclip = videoclip.set_audio(audioclip)
-videoclip.write_videofile("story.mp4", fps=24, codec="libx264", audio_codec="aac")
+print("بعمل الفيديو بـ ffmpeg...")
+# ده بياخد صورة سودا + ملف الصوت ويطلع فيديو mp4 جاهز لليوتيوب
+command = [
+    'ffmpeg',
+    '-f', 'lavfi', '-i', 'color=c=black:s=1080x1920:d=15', # فيديو اسود 15 ثانية 1080x1920
+    '-i', 'story.mp3', # دخل ملف الصوت
+    '-c:v', 'libx264', '-tune', 'stillimage', # كودك الفيديو
+    '-c:a', 'aac', '-b:a', '192k', # كودك الصوت
+    '-pix_fmt', 'yuv420p', '-shortest', # عشان يشتغل على يوتيوب
+    'story.mp4'
+]
+subprocess.run(command, check=True)
 print("الفيديو جاهز")
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
