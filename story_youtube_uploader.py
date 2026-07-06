@@ -24,7 +24,7 @@ asyncio.run(make_audio())
 # 3. اعمل الفيديو
 audioclip = AudioFileClip("story.mp3")
 videoclip = ColorClip(size=(1080,1920), color=(0,0,0), duration=audioclip.duration)
-videoclip = videoclip.set_audio(audioclip)
+videoclip = videoclip.with_audio(audioclip)
 videoclip.write_videofile("story.mp4", fps=24)
 
 # 4. ارفع على يوتيوب
