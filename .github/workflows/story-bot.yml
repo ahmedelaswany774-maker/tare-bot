@@ -1,18 +1,19 @@
 name: Story Bot - 4x Daily
 
 on:
-  schedule:
-    - cron: '0 3,9,15,21 * * *'
   workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -20,7 +21,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install dependencies
-        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy gTTS edge-tts pydub
+        run: pip install -r requirements.txt
+
+      - name: Write YouTube token from secret
+        run: echo '${{ secrets.YT_TOKEN_JSON }}' > token.json
 
       - name: Run bot
         run: python story_youtube_uploader.py
