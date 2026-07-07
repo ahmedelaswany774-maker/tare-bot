@@ -126,8 +126,8 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
     json.loads(os.environ["YT_TOKEN_JSON"]), SCOPES
 )
-if creds and creds.expired and creds.refresh_token:
-    creds.refresh(Request())
+# نجبر تجديد التوكن دايمًا بدل ما نعتمد على creds.expired
+creds.refresh(Request())
 
 youtube = build("youtube", "v3", credentials=creds)
 
