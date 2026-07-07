@@ -10,19 +10,20 @@ from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GROQ_KEY = os.environ["GROQ_API_KEY"]
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 
 
 def call_gemini(prompt):
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
-    )
-    data = {"contents": [{"parts": [{"text": prompt}]}]}
-    resp = requests.post(url, json=data, timeout=120)
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {GROQ_KEY}"}
+    data = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    resp = requests.post(url, headers=headers, json=data, timeout=120)
     resp.raise_for_status()
-    return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+    return resp.json()["choices"][0]["message"]["content"].strip()
 
 
 def generate_content():
