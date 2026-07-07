@@ -20,7 +20,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install dependencies
-        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy gTTS pydub
+run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy gTTS pydub edge-tts
 
       - name: Run bot
         run: python story_youtube_uploader.py
