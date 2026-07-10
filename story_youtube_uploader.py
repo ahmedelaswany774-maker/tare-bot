@@ -10,27 +10,47 @@ from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-GROQ_KEY = os.environ["GROQ_API_KEY"]
+import random
+
+GEMINI_KEY = os.environ["GEMINI_API_KEY"]
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
+
+STORY_THEMES = [
+    "قصة رعب خفيف تجري أحداثها في بيت قديم مهجور",
+    "قصة غموض وجريمة يحاول فيها البطل حل لغز محير",
+    "قصة خيال علمي عن اكتشاف أو اختراع غريب يغيّر حياة البطل",
+    "قصة رومانسية مؤثرة بين شخصيتين تفرقهما الظروف",
+    "قصة تاريخية مستوحاة من حدث أو حقبة زمنية قديمة",
+    "قصة عن صراع إنسان مع الطبيعة أو الحيوانات البرية",
+    "قصة عن خيانة صديق مقرب واكتشاف الحقيقة",
+    "قصة عن رحلة أو سفر ينتهي بمفاجأة غير متوقعة",
+    "قصة عن شخص يواجه قرارًا أخلاقيًا صعبًا يغيّر مصيره",
+    "قصة خرافية بها عنصر خارق للطبيعة أو أسطوري",
+    "قصة عن انتقام طال انتظاره وتبعاته",
+    "قصة عن عائلة تخفي سرًا قديمًا ينكشف فجأة",
+]
 
 
 def call_gemini(prompt):
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {GROQ_KEY}"}
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
+    )
     data = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [{"role": "user", "content": prompt}],
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 1.2, "topP": 0.95},
     }
-    resp = requests.post(url, headers=headers, json=data, timeout=120)
+    resp = requests.post(url, headers={"Content-Type": "application/json"}, json=data, timeout=120)
     resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"].strip()
+    return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 
 def generate_content():
+    theme = random.choice(STORY_THEMES)
     prompt = (
-        "اكتب قصة عربية مشوقة مناسبة للسرد الصوتي في فيديو يوتيوب مدته من 2 إلى 3 دقائق "
+        f"اكتب {theme}، مناسبة للسرد الصوتي في فيديو يوتيوب مدته من 2 إلى 3 دقائق "
         "(حوالي 350 إلى 500 كلمة تقريبًا). يجب أن تكون قصة كاملة الأحداث بحبكة واضحة وبداية ووسط "
-        "ونهاية، بأسلوب سردي جذاب.\n\n"
+        "ونهاية، بأسلوب سردي جذاب ومختلف عن القصص التقليدية المكررة.\n\n"
         "أعطني أيضًا:\n"
         "- عنوان جذاب للفيديو (أقل من 90 حرف)\n"
         "- وصف قصير للفيديو (3-4 جمل)\n"
