@@ -32,7 +32,7 @@ STORY_THEMES = [
 ]
 
 
-def call_gemini(prompt, max_retries=4, base_delay=5):
+def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
@@ -42,7 +42,7 @@ def call_gemini(prompt, max_retries=4, base_delay=5):
         "generationConfig": {
             "temperature": 1.2,
             "topP": 0.95,
-            "maxOutputTokens": 8192,
+            "maxOutputTokens": max_output_tokens,
         },
     }
     for attempt in range(1, max_retries + 1):
@@ -70,27 +70,47 @@ def call_gemini(prompt, max_retries=4, base_delay=5):
             raise
 
 
-def generate_content():
-    theme = random.choice(STORY_THEMES)
+def generate_story(theme):
     prompt = (
         f"اكتب {theme}، مناسبة للسرد الصوتي في فيديو يوتيوب طويل مدته من 10 إلى 15 دقيقة "
         "(حوالي 1800 إلى 2500 كلمة تقريبًا). يجب أن تكون قصة كاملة الأحداث بحبكة متماسكة وغنية "
         "بالتفاصيل والأحداث الفرعية، ببداية تشد الانتباه من أول جملة، ووسط مليء بالتصعيد والتشويق، "
-        "ونهاية مُرضية ومؤثرة. اكتب بأسلوب سردي جذاب وغني بالوصف، ومختلف عن القصص التقليدية المكررة، "
-        "بحيث يبقى المستمع متابعًا طوال مدة الفيديو.\n\n"
-        "أعطني أيضًا:\n"
+        "ونهاية مُرضية ومؤثرة. اكتب بأسلوب سردي جذاب وغني بالوصف، ومختلف عن القصص التقليدية المكررة.\n\n"
+        "اكتب القصة فقط كنص عادي متصل، بدون أي عناوين أو تقديم أو تعليق، وبدون علامات markdown، "
+        "وبدون أي صيغة JSON — فقط متن القصة كنص سردي."
+    )
+    return call_gemini(prompt, max_output_tokens=8192).strip()
+
+
+def generate_metadata(story_text):
+    prompt = (
+        "اقرأ القصة التالية ثم أعطني معلومات عنها:\n\n"
+        f"القصة:\n{story_text[:1500]}...\n\n"
+        "أعطني:\n"
         "- عنوان جذاب للفيديو (أقل من 90 حرف)\n"
         "- وصف قصير للفيديو (3-4 جمل)\n"
         "- 8 كلمات مفتاحية بالإنجليزية تصف مشاهد بصرية مناسبة لهذه القصة (مثل: forest, night city, ocean waves)\n\n"
         "أعد الإجابة بصيغة JSON فقط بدون أي نص إضافي أو علامات markdown، بالشكل التالي:\n"
-        '{"story": "...", "title": "...", "description": "...", "visual_keywords": ["...", "..."]}'
+        '{"title": "...", "description": "...", "visual_keywords": ["...", "..."]}'
     )
-    raw = call_gemini(prompt).strip()
+    raw = call_gemini(prompt, max_output_tokens=1024).strip()
     if raw.startswith("```"):
         raw = raw.strip("`")
         if raw.lower().startswith("json"):
             raw = raw[4:]
     return json.loads(raw)
+
+
+def generate_content():
+    theme = random.choice(STORY_THEMES)
+    story_text = generate_story(theme)
+    metadata = generate_metadata(story_text)
+    return {
+        "story": story_text,
+        "title": metadata["title"],
+        "description": metadata["description"],
+        "visual_keywords": metadata["visual_keywords"],
+    }
 
 
 content = generate_content()
@@ -175,12 +195,11 @@ SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
     json.loads(os.environ["YT_TOKEN_JSON"]), SCOPES
 )
-# نجبر تجديد التوكن دايمًا بدل ما نعتمد على creds.expired
 creds.refresh(Request())
 
 youtube = build("youtube", "v3", credentials=creds)
 
-hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story", "shorts"])
+hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
 full_description = f"{description}\n\n{hashtags}"
 
 request = youtube.videos().insert(
