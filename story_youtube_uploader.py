@@ -31,7 +31,37 @@ STORY_THEMES = [
 ]
 
 
-def call_gemini(prompt):
+def call_gemini(prompt):def call_gemini(prompt, max_retries=4, base_delay=5):
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
+    )
+    data = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": 1.2, "topP": 0.95},
+    }
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.post(
+                url, headers={"Content-Type": "application/json"}, json=data, timeout=120
+            )
+            resp.raise_for_status()
+            return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except requests.exceptions.HTTPError:
+            status = resp.status_code if resp is not None else None
+            if status in (503, 500, 429) and attempt < max_retries:
+                delay = base_delay * attempt
+                print(f"⚠️ Gemini error {status}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
+                time.sleep(delay)
+                continue
+            raise
+        except requests.exceptions.RequestException as e:
+            if attempt < max_retries:
+                delay = base_delay * attempt
+                print(f"⚠️ خطأ في الشبكة: {e}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
+                time.sleep(delay)
+                continue
+            raise
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
