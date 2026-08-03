@@ -1,6 +1,7 @@
 import os
 import json
 import math
+import time
 import asyncio
 import requests
 import edge_tts
@@ -31,19 +32,24 @@ STORY_THEMES = [
 ]
 
 
-def call_gemini(prompt):def call_gemini(prompt, max_retries=4, base_delay=5):
+def call_gemini(prompt, max_retries=4, base_delay=5):
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
     )
     data = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 1.2, "topP": 0.95},
+        "generationConfig": {
+            "temperature": 1.2,
+            "topP": 0.95,
+            "maxOutputTokens": 8192,
+        },
     }
     for attempt in range(1, max_retries + 1):
+        resp = None
         try:
             resp = requests.post(
-                url, headers={"Content-Type": "application/json"}, json=data, timeout=120
+                url, headers={"Content-Type": "application/json"}, json=data, timeout=180
             )
             resp.raise_for_status()
             return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
@@ -62,25 +68,16 @@ def call_gemini(prompt):def call_gemini(prompt, max_retries=4, base_delay=5):
                 time.sleep(delay)
                 continue
             raise
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
-    )
-    data = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 1.2, "topP": 0.95},
-    }
-    resp = requests.post(url, headers={"Content-Type": "application/json"}, json=data, timeout=120)
-    resp.raise_for_status()
-    return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 
 def generate_content():
     theme = random.choice(STORY_THEMES)
     prompt = (
-        f"اكتب {theme}، مناسبة للسرد الصوتي في فيديو يوتيوب مدته من 2 إلى 3 دقائق "
-        "(حوالي 350 إلى 500 كلمة تقريبًا). يجب أن تكون قصة كاملة الأحداث بحبكة واضحة وبداية ووسط "
-        "ونهاية، بأسلوب سردي جذاب ومختلف عن القصص التقليدية المكررة.\n\n"
+        f"اكتب {theme}، مناسبة للسرد الصوتي في فيديو يوتيوب طويل مدته من 10 إلى 15 دقيقة "
+        "(حوالي 1800 إلى 2500 كلمة تقريبًا). يجب أن تكون قصة كاملة الأحداث بحبكة متماسكة وغنية "
+        "بالتفاصيل والأحداث الفرعية، ببداية تشد الانتباه من أول جملة، ووسط مليء بالتصعيد والتشويق، "
+        "ونهاية مُرضية ومؤثرة. اكتب بأسلوب سردي جذاب وغني بالوصف، ومختلف عن القصص التقليدية المكررة، "
+        "بحيث يبقى المستمع متابعًا طوال مدة الفيديو.\n\n"
         "أعطني أيضًا:\n"
         "- عنوان جذاب للفيديو (أقل من 90 حرف)\n"
         "- وصف قصير للفيديو (3-4 جمل)\n"
@@ -104,6 +101,7 @@ keywords = content["visual_keywords"]
 
 print("تم توليد القصة والعنوان:")
 print(video_title)
+print(f"عدد كلمات القصة: {len(story_text.split())}")
 
 
 async def make_audio():
@@ -122,14 +120,15 @@ def fetch_pexels_clips(keywords, need_duration):
     clips = []
     total = 0.0
     attempt = 0
-    while total < need_duration and attempt < len(keywords) * 4:
+    max_attempts = len(keywords) * 30
+    while total < need_duration and attempt < max_attempts:
         kw = keywords[attempt % len(keywords)]
         attempt += 1
         try:
             resp = requests.get(
                 "https://api.pexels.com/videos/search",
                 headers=headers,
-                params={"query": kw, "orientation": "portrait", "per_page": 5, "size": "medium"},
+                params={"query": kw, "orientation": "portrait", "per_page": 15, "size": "medium"},
                 timeout=30,
             )
             resp.raise_for_status()
