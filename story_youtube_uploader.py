@@ -214,19 +214,26 @@ def fetch_pexels_clips(keywords, need_duration):
 clip_files = fetch_pexels_clips(keywords, target_duration)
 print(f"تم تحميل {len(clip_files)} مقطع فيديو")
 
-video_clips = [VideoFileClip(f) for f in clip_files]
-final_video = concatenate_videoclips(video_clips, method="compose")
+video_clips = [VideoFileClip(f).resized(height=1280) for f in clip_files]
+final_video = concatenate_videoclips(video_clips, method="chain")
 
 if final_video.duration < target_duration:
     loops_needed = math.ceil(target_duration / final_video.duration)
-    final_video = concatenate_videoclips([final_video] * loops_needed, method="compose")
+    final_video = concatenate_videoclips([final_video] * loops_needed, method="chain")
 
 final_video = final_video.subclipped(0, target_duration)
-final_video = final_video.resized(height=1280)
 final_video = final_video.with_audio(audio_clip)
 
 print("بعمل الفيديو النهائي...")
-final_video.write_videofile("story.mp4", fps=25, codec="libx264", audio_codec="aac")
+final_video.write_videofile(
+    "story.mp4",
+    fps=25,
+    codec="libx264",
+    audio_codec="aac",
+    preset="veryfast",
+    threads=4,
+    ffmpeg_params=["-crf", "23"],
+)
 print("الفيديو جاهز")
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
