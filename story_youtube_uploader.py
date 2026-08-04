@@ -2,6 +2,8 @@ import os
 import json
 import math
 import time
+import re
+import subprocess
 import asyncio
 import requests
 import edge_tts
@@ -15,6 +17,8 @@ import random
 
 GEMINI_KEY = os.environ["GEMINI_API_KEY"]
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
+FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
+FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 
 STORY_THEMES = [
     "قصة رعب خفيف تجري أحداثها في بيت قديم مهجور",
@@ -162,11 +166,76 @@ print(video_title)
 print(f"عدد كلمات القصة: {len(story_text.split())}")
 
 
-async def make_audio():
+def _split_text_for_tts(text, max_chars=1500):
+    """Splits long text into chunks at sentence boundaries so it stays under
+    typical TTS API length limits, without cutting words/sentences mid-way."""
+    sentences = re.split(r"(?<=[.!؟?\n])\s+", text)
+    chunks, current = [], ""
+    for s in sentences:
+        if len(current) + len(s) + 1 > max_chars and current:
+            chunks.append(current.strip())
+            current = s
+        else:
+            current = f"{current} {s}".strip()
+    if current.strip():
+        chunks.append(current.strip())
+    return chunks
+
+
+def _make_audio_fish():
+    """Generate story.mp3 using Fish Audio (higher quality voice cloning/TTS).
+    Splits long text into chunks (API length limits), synthesizes each, then
+    concatenates them with ffmpeg. Raises on any failure so the caller can
+    fall back to edge-tts."""
+    from fishaudio import FishAudio
+    from fishaudio.utils import save as fish_save
+
+    if not FISH_API_KEY:
+        raise RuntimeError("FISH_API_KEY غير موجود")
+
+    client = FishAudio(api_key=FISH_API_KEY)
+    chunks = _split_text_for_tts(story_text)
+    print(f"🐟 توليد الصوت عبر Fish Audio ({len(chunks)} جزء)...")
+
+    chunk_files = []
+    for i, chunk in enumerate(chunks):
+        kwargs = {"text": chunk}
+        if FISH_VOICE_ID:
+            kwargs["reference_id"] = FISH_VOICE_ID
+        audio = client.tts.convert(**kwargs)
+        chunk_path = f"fish_chunk_{i:03d}.mp3"
+        fish_save(audio, chunk_path)
+        chunk_files.append(chunk_path)
+        print(f"   ✅ جزء {i + 1}/{len(chunks)}")
+
+    if len(chunk_files) == 1:
+        os.replace(chunk_files[0], "story.mp3")
+        return
+
+    list_path = "fish_chunks.txt"
+    with open(list_path, "w", encoding="utf-8") as f:
+        for cf in chunk_files:
+            f.write(f"file '{cf}'\n")
+    subprocess.run(
+        ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", list_path,
+         "-c", "copy", "story.mp3"],
+        check=True, capture_output=True,
+    )
+    for cf in chunk_files:
+        os.remove(cf)
+    os.remove(list_path)
+
+
+async def _make_audio_edge():
     communicate = edge_tts.Communicate(story_text, "ar-EG-ShakirNeural")
     await communicate.save("story.mp3")
 
-asyncio.run(make_audio())
+
+try:
+    _make_audio_fish()
+except Exception as e:
+    print(f"⚠️ فشل Fish Audio ({e})، هنستخدم edge-tts كبديل")
+    asyncio.run(_make_audio_edge())
 
 audio_clip = AudioFileClip("story.mp3")
 target_duration = audio_clip.duration

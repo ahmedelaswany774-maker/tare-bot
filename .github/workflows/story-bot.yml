@@ -20,7 +20,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
       - name: Install dependencies
-        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle
+        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk
 
       - name: Run bot
         env:
@@ -29,4 +29,6 @@ jobs:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
         run: python story_youtube_uploader.py
