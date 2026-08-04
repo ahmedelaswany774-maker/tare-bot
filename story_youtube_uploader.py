@@ -214,26 +214,43 @@ def fetch_pexels_clips(keywords, need_duration):
 clip_files = fetch_pexels_clips(keywords, target_duration)
 print(f"تم تحميل {len(clip_files)} مقطع فيديو")
 
-video_clips = [VideoFileClip(f).resized(height=1280) for f in clip_files]
-final_video = concatenate_videoclips(video_clips, method="chain")
+video_clips_paths = clip_files
 
-if final_video.duration < target_duration:
-    loops_needed = math.ceil(target_duration / final_video.duration)
-    final_video = concatenate_videoclips([final_video] * loops_needed, method="chain")
+try:
+    from kaggle_client import render_video_via_kaggle
+    kaggle_success = render_video_via_kaggle(
+        audio_path="story.mp3",
+        clip_files=video_clips_paths,
+        target_duration=target_duration,
+        output_path="story.mp4",
+    )
+except Exception as e:
+    print(f"⚠️ تخطي Kaggle بسبب خطأ غير متوقع: {e}")
+    kaggle_success = False
 
-final_video = final_video.subclipped(0, target_duration)
-final_video = final_video.with_audio(audio_clip)
+if not kaggle_success:
+    print("↩️ هنكمل الرندر محليًا (Kaggle مش متاح أو فشل)...")
+    video_clips = [VideoFileClip(f).resized(height=1280) for f in clip_files]
+    final_video = concatenate_videoclips(video_clips, method="chain")
 
-print("بعمل الفيديو النهائي...")
-final_video.write_videofile(
-    "story.mp4",
-    fps=25,
-    codec="libx264",
-    audio_codec="aac",
-    preset="veryfast",
-    threads=4,
-    ffmpeg_params=["-crf", "23"],
-)
+    if final_video.duration < target_duration:
+        loops_needed = math.ceil(target_duration / final_video.duration)
+        final_video = concatenate_videoclips([final_video] * loops_needed, method="chain")
+
+    final_video = final_video.subclipped(0, target_duration)
+    final_video = final_video.with_audio(audio_clip)
+
+    print("بعمل الفيديو النهائي...")
+    final_video.write_videofile(
+        "story.mp4",
+        fps=25,
+        codec="libx264",
+        audio_codec="aac",
+        preset="veryfast",
+        threads=4,
+        ffmpeg_params=["-crf", "23"],
+    )
+
 print("الفيديو جاهز")
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
