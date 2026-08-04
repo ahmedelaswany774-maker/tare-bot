@@ -82,7 +82,7 @@ def generate_story(theme):
     return call_gemini(prompt, max_output_tokens=8192).strip()
 
 
-def generate_metadata(story_text):
+def generate_metadata(story_text, max_attempts=3):
     prompt = (
         "اقرأ القصة التالية ثم أعطني معلومات عنها:\n\n"
         f"القصة:\n{story_text[:1500]}...\n\n"
@@ -93,12 +93,50 @@ def generate_metadata(story_text):
         "أعد الإجابة بصيغة JSON فقط بدون أي نص إضافي أو علامات markdown، بالشكل التالي:\n"
         '{"title": "...", "description": "...", "visual_keywords": ["...", "..."]}'
     )
-    raw = call_gemini(prompt, max_output_tokens=1024).strip()
-    if raw.startswith("```"):
-        raw = raw.strip("`")
-        if raw.lower().startswith("json"):
-            raw = raw[4:]
-    return json.loads(raw)
+
+    last_error = None
+    for attempt in range(1, max_attempts + 1):
+        # نزود الـ token budget مع كل محاولة فاشلة، لأن القطع بيحصل غالبًا
+        # لأن الرد بيتقطع قبل ما يخلص (خصوصًا مع النص العربي اللي بياخد
+        # توكنز أكتر من الإنجليزي لنفس عدد الكلمات).
+        tokens_budget = 1024 + (attempt - 1) * 1024
+        raw = call_gemini(prompt, max_output_tokens=tokens_budget).strip()
+
+        # تنظيف أي markdown fences من البداية والنهاية
+        if raw.startswith("```"):
+            raw = raw.strip("`")
+            if raw.lower().startswith("json"):
+                raw = raw[4:]
+        raw = raw.strip()
+
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError as e:
+            last_error = e
+            # محاولة إصلاح: ياخد بس من أول { لحد آخر } موجودة في النص
+            start = raw.find("{")
+            end = raw.rfind("}")
+            if start != -1 and end != -1 and end > start:
+                try:
+                    return json.loads(raw[start:end + 1])
+                except json.JSONDecodeError as e2:
+                    last_error = e2
+            print(
+                f"⚠️ رد Gemini كان JSON غير مكتمل (محاولة {attempt}/{max_attempts}), "
+                f"هنعيد المحاولة بـ token budget أكبر..."
+            )
+
+    # لو كل المحاولات فشلت، منوقعش البرنامج كله - نرجع قيم افتراضية
+    # عشان الفيديو يكمل ويتنشر بعنوان ووصف عام بدل ما الـ run كله يفشل
+    print(f"❌ فشلت كل محاولات توليد الـ metadata ({last_error}), هنستخدم قيم افتراضية")
+    return {
+        "title": "قصة مثيرة ستأخذك في رحلة لا تُنسى",
+        "description": "قصة سردية مشوقة من إعداد الذكاء الاصطناعي، استمتع بالمشاهدة.",
+        "visual_keywords": [
+            "mystery", "night", "forest", "dramatic lighting",
+            "cinematic", "storytelling", "shadows", "suspense",
+        ],
+    }
 
 
 def generate_content():
