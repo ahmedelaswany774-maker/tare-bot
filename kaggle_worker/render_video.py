@@ -39,7 +39,7 @@ print(f"وجدت {len(clip_files)} كليب")
 
 audio_clip = AudioFileClip(os.path.join(HERE, "story.mp3"))
 
-video_clips = [VideoFileClip(f).resized(height=1280) for f in clip_files]
+video_clips = [VideoFileClip(f).resized(width=1280) for f in clip_files]
 final_video = concatenate_videoclips(video_clips, method="chain")
 
 if final_video.duration < target_duration:

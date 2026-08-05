@@ -255,7 +255,7 @@ def fetch_pexels_clips(keywords, need_duration):
             resp = requests.get(
                 "https://api.pexels.com/videos/search",
                 headers=headers,
-                params={"query": kw, "orientation": "portrait", "per_page": 15, "size": "medium"},
+                params={"query": kw, "orientation": "landscape", "per_page": 15, "size": "medium"},
                 timeout=30,
             )
             resp.raise_for_status()
@@ -299,7 +299,7 @@ except Exception as e:
 
 if not kaggle_success:
     print("↩️ هنكمل الرندر محليًا (Kaggle مش متاح أو فشل)...")
-    video_clips = [VideoFileClip(f).resized(height=1280) for f in clip_files]
+    video_clips = [VideoFileClip(f).resized(width=1280) for f in clip_files]
     final_video = concatenate_videoclips(video_clips, method="chain")
 
     if final_video.duration < target_duration:
