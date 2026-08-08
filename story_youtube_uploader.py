@@ -182,29 +182,42 @@ def _split_text_for_tts(text, max_chars=1500):
     return chunks
 
 
-def _make_audio_fish():
-    """Generate story.mp3 using Fish Audio (higher quality voice cloning/TTS).
-    Splits long text into chunks (API length limits), synthesizes each, then
-    concatenates them with ffmpeg. Raises on any failure so the caller can
-    fall back to edge-tts."""
-    from fishaudio import FishAudio
-    from fishaudio.utils import save as fish_save
+FISH_TTS_URL = "https://api.fish.audio/v1/tts"
+FISH_MODEL = "s2.1-pro-free"
 
+
+def _make_audio_fish():
+    """Generate story.mp3 using Fish Audio REST API (voice cloning via
+    reference_id = صوتك المستنسخ). Splits long text into chunks (API length
+    limits), synthesizes each, then concatenates them with ffmpeg. Raises on
+    any failure so the caller can fall back to edge-tts."""
     if not FISH_API_KEY:
         raise RuntimeError("FISH_API_KEY غير موجود")
+    if not FISH_VOICE_ID:
+        raise RuntimeError("FISH_VOICE_ID غير موجود")
 
-    client = FishAudio(api_key=FISH_API_KEY)
+    headers = {
+        "Authorization": f"Bearer {FISH_API_KEY}",
+        "Content-Type": "application/json",
+        "model": FISH_MODEL,
+    }
+
     chunks = _split_text_for_tts(story_text)
     print(f"🐟 توليد الصوت عبر Fish Audio ({len(chunks)} جزء)...")
 
     chunk_files = []
     for i, chunk in enumerate(chunks):
-        kwargs = {"text": chunk}
-        if FISH_VOICE_ID:
-            kwargs["reference_id"] = FISH_VOICE_ID
-        audio = client.tts.convert(**kwargs)
+        payload = {
+            "text": chunk,
+            "reference_id": FISH_VOICE_ID,
+            "format": "mp3",
+        }
+        resp = requests.post(FISH_TTS_URL, headers=headers, json=payload, timeout=120)
+        resp.raise_for_status()
+
         chunk_path = f"fish_chunk_{i:03d}.mp3"
-        fish_save(audio, chunk_path)
+        with open(chunk_path, "wb") as f:
+            f.write(resp.content)
         chunk_files.append(chunk_path)
         print(f"   ✅ جزء {i + 1}/{len(chunks)}")
 
