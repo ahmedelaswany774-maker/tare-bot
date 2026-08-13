@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload generated video artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@e7bbb36c91d37651a2b02ecfd50ebb7bba02d9ca # v4
         with:
           name: story-${{ github.run_id }}
           path: story.mp4
