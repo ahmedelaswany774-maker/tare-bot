@@ -1,0 +1,56 @@
+name: Recover YouTube Upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Optional failed workflow run ID whose story-bundle artifact should be recovered"
+        required: false
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download failed run artifact when requested
+        if: ${{ inputs.run_id != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          mkdir -p recovery
+          gh run download "$RUN_ID" -n story-bundle -D recovery
+          test -s recovery/story.mp4
+          if [ -f recovery/story_metadata.json ]; then cp recovery/story_metadata.json story_metadata.json; fi
+          cp recovery/story.mp4 story.mp4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install YouTube dependencies
+        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
+
+      - name: Resume upload without regenerating video
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+        run: python resume_youtube_upload.py
+
+      - name: Save recovery state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-state
+          path: |
+            story.mp4
+            story_metadata.json
+            upload_state.json
+          if-no-files-found: ignore
+          retention-days: 30
