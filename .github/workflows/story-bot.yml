@@ -27,3 +27,14 @@ jobs:
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
         run: python story_youtube_uploader.py
+      - name: Verify generated video exists
+        if: always()
+        run: test -f story.mp4 && ls -lh story.mp4
+
+      - name: Upload generated video artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: story-${{ github.run_id }}
+          path: story.mp4
+          retention-days: 90
