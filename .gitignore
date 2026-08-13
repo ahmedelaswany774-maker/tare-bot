@@ -1,6 +1,14 @@
+# OAuth / secrets
 token.json
-token.json
+client_secret.json
 client_secrets.json
+*.client_secret.json
 YOUTUBE_TOKEN
+
+# Runtime state
+upload_state.json
+story_metadata.json
+
+# Python
 __pycache__/
 *.pyc
