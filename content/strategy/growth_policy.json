@@ -1,0 +1,45 @@
+{
+  "policy_id": "rowat-growth-default-v1",
+  "status": "active_until_explicit_user_change",
+  "channel": "@RowatAlwaqe",
+  "content_promise": "قصص حقيقية موثقة ضمن سلاسل مترابطة",
+  "publishing": {
+    "long_videos_per_week": 1,
+    "shorts_per_long_video": 1,
+    "require_explicit_episode_selection": true,
+    "allow_random_topics": false,
+    "allow_unreviewed_public_publish": false
+  },
+  "seo": {
+    "title_pattern": "real_case_name + clear_question_or_paradox + series_episode_number",
+    "description_must_include_sources": true,
+    "playlist_required": true,
+    "avoid_misleading_clickbait": true
+  },
+  "ctr": {
+    "thumbnail_message_words_max": 4,
+    "one_visual_idea": true,
+    "test_one_packaging_variable_at_a_time": true
+  },
+  "retention": {
+    "opening_seconds_max_before_core_event": 20,
+    "target_long_video_minutes": {"min": 25, "max": 40},
+    "measure_first_30_seconds": true
+  },
+  "measurement": {
+    "checkpoints_hours": [4, 24, 72, 168],
+    "required_metrics": [
+      "impressions",
+      "ctr",
+      "average_view_duration",
+      "first_30_seconds_retention",
+      "browse_percentage",
+      "suggested_percentage",
+      "search_percentage",
+      "returning_viewers",
+      "subscribers_gained",
+      "comments"
+    ]
+  },
+  "change_control": "Any change requires an explicit user request."
+}

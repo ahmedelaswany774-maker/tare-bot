@@ -12,6 +12,7 @@ class RecoveryContractTests(unittest.TestCase):
         self.recovery_workflow = (ROOT / ".github/workflows/recover-upload.yml").read_text(encoding="utf-8")
         self.uploader = (ROOT / "story_youtube_uploader.py").read_text(encoding="utf-8")
         self.series_manifest = json.loads((ROOT / "content/series/real_stories.json").read_text(encoding="utf-8"))
+        self.growth_policy = json.loads((ROOT / "content/strategy/growth_policy.json").read_text(encoding="utf-8"))
         self.short_uploader = (ROOT / "short_youtube_uploader.py").read_text(encoding="utf-8")
 
     def test_production_artifact_contains_recovery_files(self):
@@ -54,10 +55,20 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("playlist_title", self.uploader)
         self.assertNotIn("random.choice", self.uploader)
 
+    def test_growth_policy_is_continuous_and_non_random(self):
+        self.assertEqual(self.growth_policy["status"], "active_until_explicit_user_change")
+        self.assertFalse(self.growth_policy["publishing"]["allow_random_topics"])
+        self.assertTrue(self.growth_policy["publishing"]["require_explicit_episode_selection"])
+        self.assertEqual(self.growth_policy["publishing"]["long_videos_per_week"], 1)
+        self.assertIn("content/strategy/growth_policy.json", self.story_workflow)
+        self.assertNotIn("schedule:", self.story_workflow)
+        self.assertNotIn("0 3,9,15,21", self.story_workflow)
+
     def test_workflow_supports_explicit_episode_selection(self):
         self.assertIn("name: Story Bot - Series Publisher", self.story_workflow)
         self.assertIn("episode_number:", self.story_workflow)
         self.assertIn("type: choice", self.story_workflow)
+        self.assertIn("strategy", self.story_workflow)
         self.assertIn("publish_short:", self.story_workflow)
 
     def test_xtts_voice_backend_is_optional_and_private(self):
