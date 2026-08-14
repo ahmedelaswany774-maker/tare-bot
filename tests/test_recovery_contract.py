@@ -60,6 +60,15 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("type: choice", self.story_workflow)
         self.assertIn("publish_short:", self.story_workflow)
 
+    def test_xtts_voice_backend_is_optional_and_private(self):
+        self.assertIn("tts_backend:", self.story_workflow)
+        self.assertIn("coqui-tts", self.story_workflow)
+        self.assertIn("VOICE_REFERENCE_B64", self.story_workflow)
+        self.assertNotIn("voice_reference.wav\n            story_short.mp4", self.story_workflow)
+        self.assertIn("TTS_BACKEND", self.uploader)
+        self.assertIn("_make_audio_xtts", self.uploader)
+        self.assertIn("XTTS_LANGUAGE", self.uploader)
+
     def test_short_is_explicit_and_linked_to_long_video(self):
         self.assertIn("publish_short:", self.story_workflow)
         self.assertIn("inputs.publish_short == true", self.story_workflow)

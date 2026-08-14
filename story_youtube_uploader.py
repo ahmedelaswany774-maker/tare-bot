@@ -19,6 +19,9 @@ GEMINI_KEY = os.environ["GEMINI_API_KEY"]
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
+TTS_BACKEND = os.environ.get("TTS_BACKEND", "fish").lower()
+VOICE_REFERENCE_PATH = os.environ.get("VOICE_REFERENCE_PATH", "voice_reference.wav")
+XTTS_LANGUAGE = os.environ.get("XTTS_LANGUAGE", "ar")
 METADATA_PATH = "story_metadata.json"
 STATE_PATH = "upload_state.json"
 SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
@@ -200,6 +203,7 @@ save_json(
         "playlist_title": manifest["playlist_title"],
         "thumbnail_text": episode["thumbnail_text"],
         "opening_hook": episode["opening_hook"],
+        "tts_backend": TTS_BACKEND,
         "sources": episode["sources"],
     },
 )
@@ -223,6 +227,45 @@ def _split_text_for_tts(text, max_chars=1500):
 
 FISH_TTS_URL = "https://api.fish.audio/v1/tts"
 FISH_MODEL = "s2.1-pro-free"
+
+
+def _make_audio_xtts():
+    """Generate Arabic speech locally by cloning the user's reference voice."""
+    if not Path(VOICE_REFERENCE_PATH).exists():
+        raise FileNotFoundError(f"VOICE_REFERENCE_PATH غير موجود: {VOICE_REFERENCE_PATH}")
+    try:
+        from TTS.api import TTS
+    except ImportError as exc:
+        raise RuntimeError("ثبّت coqui-tts لاستخدام XTTS") from exc
+
+    print("🎙️ توليد الصوت محليًا عبر Coqui XTTS-v2...")
+    tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2", gpu=False)
+    chunks = _split_text_for_tts(story_text, max_chars=900)
+    chunk_files = []
+    for i, chunk in enumerate(chunks):
+        chunk_path = f"xtts_chunk_{i:03d}.wav"
+        tts.tts_to_file(
+            text=chunk,
+            file_path=chunk_path,
+            speaker_wav=VOICE_REFERENCE_PATH,
+            language=XTTS_LANGUAGE,
+            split_sentences=False,
+        )
+        chunk_files.append(chunk_path)
+        print(f"   ✅ XTTS جزء {i + 1}/{len(chunks)}")
+
+    list_path = "xtts_chunks.txt"
+    with open(list_path, "w", encoding="utf-8") as f:
+        for cf in chunk_files:
+            f.write(f"file '{cf}'\n")
+    subprocess.run(
+        ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", list_path,
+         "-ar", "24000", "-ac", "1", "story.mp3"],
+        check=True, capture_output=True,
+    )
+    for cf in chunk_files:
+        os.remove(cf)
+    os.remove(list_path)
 
 
 def _make_audio_fish():
@@ -284,9 +327,14 @@ async def _make_audio_edge():
 
 
 try:
-    _make_audio_fish()
+    if TTS_BACKEND == "xtts":
+        _make_audio_xtts()
+    elif TTS_BACKEND == "edge":
+        asyncio.run(_make_audio_edge())
+    else:
+        _make_audio_fish()
 except Exception as e:
-    print(f"⚠️ فشل Fish Audio ({e})، هنستخدم edge-tts كبديل")
+    print(f"⚠️ فشل TTS backend={TTS_BACKEND} ({e})، هنستخدم edge-tts كبديل")
     asyncio.run(_make_audio_edge())
 
 audio_clip = AudioFileClip("story.mp3")

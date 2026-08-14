@@ -19,6 +19,15 @@ on:
         required: true
         default: false
         type: boolean
+      tts_backend:
+        description: 'محرك الصوت: edge مجاني، أو xtts بصوتك، أو fish'
+        required: true
+        default: edge
+        type: choice
+        options:
+          - edge
+          - xtts
+          - fish
 jobs:
   run-bot:
     runs-on: ubuntu-latest
@@ -32,6 +41,17 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install dependencies
         run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk
+      - name: Install XTTS backend
+        if: ${{ (inputs.tts_backend || 'edge') == 'xtts' }}
+        run: pip install coqui-tts soundfile
+      - name: Decode private voice reference
+        if: ${{ (inputs.tts_backend || 'edge') == 'xtts' }}
+        env:
+          VOICE_REFERENCE_B64: ${{ secrets.VOICE_REFERENCE_B64 }}
+        run: |
+          test -n "$VOICE_REFERENCE_B64"
+          printf '%s' "$VOICE_REFERENCE_B64" | base64 --decode > voice_reference.wav
+          ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 voice_reference.wav
       - name: Run bot
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -44,6 +64,9 @@ jobs:
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
           SERIES_MANIFEST_PATH: content/series/real_stories.json
           EPISODE_NUMBER: ${{ inputs.episode_number || '1' }}
+          TTS_BACKEND: ${{ inputs.tts_backend || 'edge' }}
+          VOICE_REFERENCE_PATH: voice_reference.wav
+          XTTS_LANGUAGE: ar
         run: python story_youtube_uploader.py
       - name: Publish linked Short
         if: ${{ inputs.publish_short == true }}
