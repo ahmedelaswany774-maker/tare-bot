@@ -91,7 +91,7 @@ class RecoveryContractTests(unittest.TestCase):
 
     def test_short_is_explicit_and_linked_to_long_video(self):
         self.assertIn("publish_short:", self.story_workflow)
-        self.assertIn("inputs.publish_short == true", self.story_workflow)
+        self.assertIn("github.event_name == 'schedule' || inputs.publish_short == true", self.story_workflow)
         self.assertIn("related_long_video_id", self.short_uploader)
         self.assertIn("long video must be uploaded before publishing the Short", self.short_uploader)
         self.assertIn("#Shorts", self.short_uploader)

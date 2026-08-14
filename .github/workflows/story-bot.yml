@@ -71,7 +71,8 @@ jobs:
           PUBLISH_DELAY_MINUTES: '30'
         run: python story_youtube_uploader.py
       - name: Publish linked Short
-        if: ${{ inputs.publish_short == true }}
+        # في التشغيل المجدول ينشر الإعلان تلقائيًا؛ يدويًا يحتاج اختيار publish_short.
+        if: ${{ github.event_name == 'schedule' || inputs.publish_short == true }}
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
         run: python short_youtube_uploader.py
