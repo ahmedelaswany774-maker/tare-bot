@@ -38,6 +38,9 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertEqual([episode["episode_number"] for episode in episodes], [1, 2, 3])
         for episode in episodes:
             self.assertTrue(episode["title"])
+            self.assertTrue(episode["opening_hook"])
+            self.assertTrue(episode["thumbnail_text"])
+            self.assertLessEqual(len(episode["thumbnail_text"]), 20)
             self.assertGreaterEqual(len(episode["sources"]), 1)
             self.assertTrue(all(source["url"].startswith("https://") for source in episode["sources"]))
             self.assertGreaterEqual(episode["target_words"], 4000)
@@ -46,6 +49,9 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("SERIES_MANIFEST_PATH", self.uploader)
         self.assertIn("EPISODE_NUMBER", self.uploader)
         self.assertIn("load_episode()", self.uploader)
+        self.assertIn("opening_hook", self.uploader)
+        self.assertIn("thumbnail_text", self.uploader)
+        self.assertIn("playlist_title", self.uploader)
         self.assertNotIn("random.choice", self.uploader)
 
     def test_workflow_supports_explicit_episode_selection(self):

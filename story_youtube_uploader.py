@@ -89,6 +89,8 @@ def generate_story(manifest, episode):
         f"اكتب نصًا عربيًا طويلًا أصليًا للحلقة {episode['episode_number']} من سلسلة "
         f"«{manifest['series_title']}». موضوع الحلقة: {episode['topic']}.\n\n"
         f"العنوان التحريري الثابت: {episode['title']}\n"
+        f"افتتاحية أول 20 ثانية يجب الحفاظ على معناها: {episode['opening_hook']}\n"
+        f"رسالة الصورة المصغرة المقترحة: {episode['thumbnail_text']}\n"
         f"المصادر المسموح الاعتماد عليها:\n{sources}\n\n"
         f"اكتب نصًا مناسبًا لسرد صوتي مدته تقريبًا {manifest['target_duration_minutes']['min']} إلى "
         f"{manifest['target_duration_minutes']['max']} دقيقة، وبحدود {target_words} كلمة. "
@@ -195,6 +197,9 @@ save_json(
         "tags": keywords,
         "story_word_count": len(story_text.split()),
         "target_duration_minutes": manifest["target_duration_minutes"],
+        "playlist_title": manifest["playlist_title"],
+        "thumbnail_text": episode["thumbnail_text"],
+        "opening_hook": episode["opening_hook"],
         "sources": episode["sources"],
     },
 )
@@ -389,7 +394,7 @@ creds.refresh(Request())
 youtube = build("youtube", "v3", credentials=creds)
 
 hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
-full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\n{hashtags}"
+full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\nشاهد الحلقة التالية من قائمة التشغيل: {manifest['playlist_title']}\n\n{hashtags}"
 
 request = youtube.videos().insert(
     part="snippet,status",
