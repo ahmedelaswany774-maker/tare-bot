@@ -19,6 +19,13 @@ GEMINI_KEY = os.environ["GEMINI_API_KEY"]
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
+METADATA_PATH = "story_metadata.json"
+STATE_PATH = "upload_state.json"
+
+
+def save_json(path, payload):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
 
 STORY_THEMES = [
     "قصة رعب خفيف تجري أحداثها في بيت قديم مهجور",
@@ -164,6 +171,15 @@ keywords = content["visual_keywords"]
 print("تم توليد القصة والعنوان:")
 print(video_title)
 print(f"عدد كلمات القصة: {len(story_text.split())}")
+save_json(
+    METADATA_PATH,
+    {
+        "title": video_title,
+        "description": description,
+        "tags": keywords,
+        "story_word_count": len(story_text.split()),
+    },
+)
 
 
 def _split_text_for_tts(text, max_chars=1500):
@@ -334,6 +350,14 @@ if not kaggle_success:
     )
 
 print("الفيديو جاهز")
+save_json(
+    STATE_PATH,
+    {
+        "status": "rendered",
+        "video": "story.mp4",
+        "metadata": METADATA_PATH,
+    },
+)
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
@@ -360,4 +384,14 @@ request = youtube.videos().insert(
     media_body=MediaFileUpload("story.mp4"),
 )
 response = request.execute()
-print(f"تم رفع الفيديو: https://youtube.com/watch?v={response['id']}")
+video_id = response["id"]
+save_json(
+    STATE_PATH,
+    {
+        "status": "uploaded",
+        "youtube_video_id": video_id,
+        "video": "story.mp4",
+        "metadata": METADATA_PATH,
+    },
+)
+print(f"تم رفع الفيديو: https://youtube.com/watch?v={video_id}")
