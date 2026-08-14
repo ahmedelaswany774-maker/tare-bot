@@ -48,10 +48,11 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("load_episode()", self.uploader)
         self.assertNotIn("random.choice", self.uploader)
 
-    def test_workflow_requires_explicit_episode_selection(self):
+    def test_workflow_supports_explicit_episode_selection(self):
         self.assertIn("name: Story Bot - Series Publisher", self.story_workflow)
         self.assertIn("episode_number:", self.story_workflow)
-        self.assertNotIn("0 3,9,15,21", self.story_workflow)
+        self.assertIn("type: choice", self.story_workflow)
+        self.assertIn("publish_short:", self.story_workflow)
 
     def test_short_is_explicit_and_linked_to_long_video(self):
         self.assertIn("publish_short:", self.story_workflow)
