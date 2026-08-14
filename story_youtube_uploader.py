@@ -6,6 +6,7 @@ import re
 import subprocess
 import asyncio
 import requests
+from datetime import datetime, timedelta, timezone
 import edge_tts
 from moviepy import VideoFileClip, concatenate_videoclips, AudioFileClip
 from googleapiclient.discovery import build
@@ -22,6 +23,7 @@ FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 TTS_BACKEND = os.environ.get("TTS_BACKEND", "fish").lower()
 VOICE_REFERENCE_PATH = os.environ.get("VOICE_REFERENCE_PATH", "voice_reference.wav")
 XTTS_LANGUAGE = os.environ.get("XTTS_LANGUAGE", "ar")
+PUBLISH_DELAY_MINUTES = int(os.environ.get("PUBLISH_DELAY_MINUTES", "30"))
 METADATA_PATH = "story_metadata.json"
 STATE_PATH = "upload_state.json"
 SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
@@ -454,6 +456,14 @@ youtube = build("youtube", "v3", credentials=creds)
 hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
 full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\nشاهد الحلقة التالية من قائمة التشغيل: {manifest['playlist_title']}\n\n{hashtags}"
 
+scheduled_publish_at = None
+privacy_status = "public"
+if PUBLISH_DELAY_MINUTES > 0:
+    scheduled_publish_at = (
+        datetime.now(timezone.utc) + timedelta(minutes=PUBLISH_DELAY_MINUTES)
+    ).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    privacy_status = "private"
+
 request = youtube.videos().insert(
     part="snippet,status",
     body={
@@ -463,7 +473,11 @@ request = youtube.videos().insert(
             "tags": keywords,
             "categoryId": "24",
         },
-        "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False},
+        "status": {
+            "privacyStatus": privacy_status,
+            "selfDeclaredMadeForKids": False,
+            **({"publishAt": scheduled_publish_at} if scheduled_publish_at else {}),
+        },
     },
     media_body=MediaFileUpload("story.mp4"),
 )
@@ -479,6 +493,11 @@ save_json(
         "series_id": manifest["series_id"],
         "episode_id": episode["episode_id"],
         "episode_number": episode["episode_number"],
+        "privacy_status": privacy_status,
+        "scheduled_publish_at": scheduled_publish_at,
     },
 )
-print(f"تم رفع الفيديو: https://youtube.com/watch?v={video_id}")
+if scheduled_publish_at:
+    print(f"تم رفع الفيديو كخاص ومجدول للنشر العام: {scheduled_publish_at}")
+else:
+    print(f"تم رفع الفيديو: https://youtube.com/watch?v={video_id}")

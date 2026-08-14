@@ -68,6 +68,7 @@ jobs:
           TTS_BACKEND: ${{ inputs.tts_backend || 'edge' }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
+          PUBLISH_DELAY_MINUTES: '30'
         run: python story_youtube_uploader.py
       - name: Publish linked Short
         if: ${{ inputs.publish_short == true }}
