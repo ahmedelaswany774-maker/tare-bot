@@ -25,12 +25,17 @@ XTTS_LANGUAGE = os.environ.get("XTTS_LANGUAGE", "ar")
 METADATA_PATH = "story_metadata.json"
 STATE_PATH = "upload_state.json"
 SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
+GROWTH_POLICY_PATH = os.environ.get("GROWTH_POLICY_PATH", "content/strategy/growth_policy.json")
 EPISODE_NUMBER = int(os.environ.get("EPISODE_NUMBER", "1"))
 
 
 def save_json(path, payload):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
+
+def load_growth_policy():
+    return json.loads(Path(GROWTH_POLICY_PATH).read_text(encoding="utf-8"))
+
 
 def load_episode():
     manifest = json.loads(Path(SERIES_MANIFEST_PATH).read_text(encoding="utf-8"))
@@ -83,6 +88,7 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
 
 
 def generate_story(manifest, episode):
+    growth_policy = load_growth_policy()
     sources = "\n".join(
         f"- {source['title']} — {source['publisher']} — {source['url']}"
         for source in episode["sources"]
@@ -100,7 +106,9 @@ def generate_story(manifest, episode):
         "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
         "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
         "قسّم السرد إلى افتتاحية قوية، سياق زمني، تصاعد للأدلة، نقطة غموض أو خطر، ثم خاتمة تشرح ما نعرفه وما لا نعرفه. "
-        "أضف سؤال تفاعل واحدًا طبيعيًا قرب النهاية، واترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger.\n\n"
+        f"بعد الحدث الأساسي وليس قبل أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، أضف فاصلًا واحدًا قصيرًا وطبيعيًا يدعو المشاهد للاشتراك في القناة ويطرح سؤالًا واحدًا للتعليقات، دون قطع التوتر أو تكرار الدعوة. "
+        "في النهاية أضف فاصلًا ختاميًا قصيرًا يدعو للاشتراك ومتابعة الحلقة التالية من نفس السلسلة، دون مبالغة أو clickbait. "
+        "اترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger.\n\n"
         "أخرج متن السرد فقط، بدون Markdown أو JSON أو عناوين تقنية."
     )
     return call_gemini(prompt, max_output_tokens=12288).strip()
@@ -177,6 +185,7 @@ def generate_content():
 
 
 content = generate_content()
+growth_policy = load_growth_policy()
 manifest = content["manifest"]
 episode = content["episode"]
 story_text = content["story"]
@@ -203,6 +212,7 @@ save_json(
         "playlist_title": manifest["playlist_title"],
         "thumbnail_text": episode["thumbnail_text"],
         "opening_hook": episode["opening_hook"],
+        "cta_policy": growth_policy["cta"],
         "tts_backend": TTS_BACKEND,
         "sources": episode["sources"],
     },

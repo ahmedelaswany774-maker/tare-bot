@@ -59,10 +59,12 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertEqual(self.growth_policy["status"], "active_until_explicit_user_change")
         self.assertFalse(self.growth_policy["publishing"]["allow_random_topics"])
         self.assertTrue(self.growth_policy["publishing"]["require_explicit_episode_selection"])
-        self.assertEqual(self.growth_policy["publishing"]["long_videos_per_week"], 1)
+        self.assertEqual(self.growth_policy["publishing"]["posts_per_day"], 4)
+        self.assertEqual(self.growth_policy["publishing"]["long_videos_per_week"], 28)
+        self.assertEqual(len(self.growth_policy["publishing"]["daily_slots"]), 4)
         self.assertIn("content/strategy/growth_policy.json", self.story_workflow)
-        self.assertNotIn("schedule:", self.story_workflow)
-        self.assertNotIn("0 3,9,15,21", self.story_workflow)
+        self.assertIn("0 3,9,15,21", self.story_workflow)
+        self.assertIn("github.run_number % 3", self.story_workflow)
 
     def test_workflow_supports_explicit_episode_selection(self):
         self.assertIn("name: Story Bot - Series Publisher", self.story_workflow)

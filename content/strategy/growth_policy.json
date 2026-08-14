@@ -4,8 +4,10 @@
   "channel": "@RowatAlwaqe",
   "content_promise": "قصص حقيقية موثقة ضمن سلاسل مترابطة",
   "publishing": {
-    "long_videos_per_week": 1,
+    "posts_per_day": 4,
+    "long_videos_per_week": 28,
     "shorts_per_long_video": 1,
+    "daily_slots": ["03:00", "09:00", "15:00", "21:00"],
     "require_explicit_episode_selection": true,
     "allow_random_topics": false,
     "allow_unreviewed_public_publish": false
@@ -26,7 +28,16 @@
     "target_long_video_minutes": {"min": 25, "max": 40},
     "measure_first_30_seconds": true
   },
+  "cta": {
+    "enabled": true,
+    "midroll_count": 1,
+    "endroll_count": 1,
+    "never_before_core_hook_seconds": 20,
+    "midroll_goal": "دعوة طبيعية للاشتراك وسؤال واحد للتعليقات",
+    "endroll_goal": "دعوة للاشتراك والانتقال للحلقة التالية"
+  },
   "measurement": {
+    "primary_checkpoint_hours": 24,
     "checkpoints_hours": [4, 24, 72, 168],
     "required_metrics": [
       "impressions",
