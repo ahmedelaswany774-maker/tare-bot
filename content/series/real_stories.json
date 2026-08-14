@@ -1,0 +1,100 @@
+{
+  "series_id": "real-stories-files",
+  "series_title": "ملفات حقيقية: ألغاز ونجاة غيّرت التاريخ",
+  "language": "ar",
+  "target_duration_minutes": {
+    "min": 28,
+    "max": 38
+  },
+  "editorial_rules": [
+    "افصل بين الوقائع الموثقة والنظريات المحتملة بوضوح.",
+    "لا تخترع حوارًا أو شخصية أو دليلًا غير موجود في المصادر.",
+    "اذكر المصادر في وصف الفيديو.",
+    "لا تقدّم تفسيرًا غير محسوم باعتباره حقيقة نهائية."
+  ],
+  "episodes": [
+    {
+      "episode_id": "mary-celeste-01",
+      "episode_number": 1,
+      "title": "ماري سيليست: السفينة التي وُجدت بلا طاقم في عرض المحيط",
+      "short_title": "ماري سيليست | السفينة التي اختفى طاقمها",
+      "topic": "Mary Celeste maritime mystery",
+      "target_words": 4500,
+      "visual_keywords": [
+        "19th century sailing ship Atlantic ocean",
+        "Azores stormy sea",
+        "abandoned ship deck",
+        "maritime logbook close up",
+        "wooden lifeboat ocean",
+        "Gibraltar maritime court",
+        "historical nautical map",
+        "foggy ocean night"
+      ],
+      "description": "الحلقة الأولى من سلسلة ملفات حقيقية عن ألغاز ونجاة غيّرت التاريخ. في 5 ديسمبر 1872 عثرت سفينة Dei Gratia على ماري سيليست تبحر بلا طاقم قرب جزر الأزور، بينما بقيت الحمولة ومعظم المؤن على متنها. نعرض ما تثبته السجلات وشهادة التحقيق، ثم نفصل بين النظريات والحقائق دون اختلاق نهاية غير مؤكدة.",
+      "sources": [
+        {
+          "title": "Abandoned Ship: The Mary Celeste",
+          "url": "https://www.smithsonianmag.com/history/abandoned-ship-the-mary-celeste-174488104/",
+          "publisher": "Smithsonian Magazine"
+        },
+        {
+          "title": "The mystery of the Mary Celeste",
+          "url": "https://www.rmg.co.uk/stories/maritime-history/mystery-mary-celeste",
+          "publisher": "National Maritime Museum, Greenwich"
+        }
+      ]
+    },
+    {
+      "episode_id": "dyatlov-pass-02",
+      "episode_number": 2,
+      "title": "ممر دياتلوف: الرحلة التي خرجت من الخيمة ولم تعد",
+      "short_title": "ممر دياتلوف | لغز تسعة متسلقين",
+      "topic": "Dyatlov Pass incident 1959",
+      "target_words": 4500,
+      "visual_keywords": [
+        "Ural mountains winter",
+        "Soviet students ski expedition",
+        "snow covered tent night",
+        "old expedition diary",
+        "search party in snow",
+        "mountain blizzard",
+        "historical Soviet map",
+        "frozen mountain valley"
+      ],
+      "description": "الحلقة الثانية من سلسلة ملفات حقيقية عن ألغاز ونجاة غيّرت التاريخ. نتابع رحلة مجموعة طلابية في جبال الأورال عام 1959، وما عُثر عليه في موقع الخيمة، ثم نعرض ما توثقه اليوميات وشهادات البحث والفرضيات المتداولة مع تمييز المؤكد عن غير المحسوم.",
+      "sources": [
+        {
+          "title": "The mystery of Dyatlov Pass",
+          "url": "https://www.bbc.co.uk/news/extra/SoLiOdJyCK/mystery_of_dyatlov_pass",
+          "publisher": "BBC"
+        }
+      ]
+    },
+    {
+      "episode_id": "shackleton-endurance-03",
+      "episode_number": 3,
+      "title": "إندورانس: رحلة شاكلتون التي حاصرتها الجليد وأنقذت طاقمها",
+      "short_title": "إندورانس | ملحمة البقاء في القطب الجنوبي",
+      "topic": "Shackleton Imperial Trans-Antarctic Expedition 1914-1917",
+      "target_words": 5000,
+      "visual_keywords": [
+        "Antarctica ice expedition",
+        "Endurance ship trapped in ice",
+        "Ernest Shackleton historical portrait",
+        "polar expedition camp",
+        "lifeboat antarctic ocean",
+        "sled dogs snow expedition",
+        "historic polar map",
+        "antarctic survival night"
+      ],
+      "description": "الحلقة الثالثة من سلسلة ملفات حقيقية عن ألغاز ونجاة غيّرت التاريخ. نروي حملة شاكلتون الإمبراطورية لعبور القارة القطبية الجنوبية بين 1914 و1917، وكيف تحولت مهمة استكشاف إلى معركة بقاء موثقة وسط الجليد، مع الاعتماد على سجلات الرحلة والمصادر التاريخية.",
+      "sources": [
+        {
+          "title": "Shackleton's Endurance: The history of the Imperial Trans-Antarctic Expedition (1914-1917)",
+          "url": "https://endurance22.org/history-of-endurance",
+          "publisher": "Endurance22"
+        }
+      ]
+    }
+  ]
+}

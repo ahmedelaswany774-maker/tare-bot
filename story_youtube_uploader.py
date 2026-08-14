@@ -13,7 +13,7 @@ from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-import random
+from pathlib import Path
 
 GEMINI_KEY = os.environ["GEMINI_API_KEY"]
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
@@ -21,26 +21,24 @@ FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 METADATA_PATH = "story_metadata.json"
 STATE_PATH = "upload_state.json"
+SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
+EPISODE_NUMBER = int(os.environ.get("EPISODE_NUMBER", "1"))
 
 
 def save_json(path, payload):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-STORY_THEMES = [
-    "قصة رعب خفيف تجري أحداثها في بيت قديم مهجور",
-    "قصة غموض وجريمة يحاول فيها البطل حل لغز محير",
-    "قصة خيال علمي عن اكتشاف أو اختراع غريب يغيّر حياة البطل",
-    "قصة رومانسية مؤثرة بين شخصيتين تفرقهما الظروف",
-    "قصة تاريخية مستوحاة من حدث أو حقبة زمنية قديمة",
-    "قصة عن صراع إنسان مع الطبيعة أو الحيوانات البرية",
-    "قصة عن خيانة صديق مقرب واكتشاف الحقيقة",
-    "قصة عن رحلة أو سفر ينتهي بمفاجأة غير متوقعة",
-    "قصة عن شخص يواجه قرارًا أخلاقيًا صعبًا يغيّر مصيره",
-    "قصة خرافية بها عنصر خارق للطبيعة أو أسطوري",
-    "قصة عن انتقام طال انتظاره وتبعاته",
-    "قصة عن عائلة تخفي سرًا قديمًا ينكشف فجأة",
-]
+def load_episode():
+    manifest = json.loads(Path(SERIES_MANIFEST_PATH).read_text(encoding="utf-8"))
+    episodes = sorted(manifest["episodes"], key=lambda item: item["episode_number"])
+    episode = next((item for item in episodes if item["episode_number"] == EPISODE_NUMBER), None)
+    if episode is None:
+        available = [item["episode_number"] for item in episodes]
+        raise ValueError(f"EPISODE_NUMBER={EPISODE_NUMBER} غير موجود. المتاح: {available}")
+    if len(episode.get("sources", [])) == 0:
+        raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر موثقة")
+    return manifest, episode
 
 
 def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
@@ -81,16 +79,26 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
             raise
 
 
-def generate_story(theme):
-    prompt = (
-        f"اكتب {theme}، مناسبة للسرد الصوتي في فيديو يوتيوب طويل مدته من 10 إلى 15 دقيقة "
-        "(حوالي 1800 إلى 2500 كلمة تقريبًا). يجب أن تكون قصة كاملة الأحداث بحبكة متماسكة وغنية "
-        "بالتفاصيل والأحداث الفرعية، ببداية تشد الانتباه من أول جملة، ووسط مليء بالتصعيد والتشويق، "
-        "ونهاية مُرضية ومؤثرة. اكتب بأسلوب سردي جذاب وغني بالوصف، ومختلف عن القصص التقليدية المكررة.\n\n"
-        "اكتب القصة فقط كنص عادي متصل، بدون أي عناوين أو تقديم أو تعليق، وبدون علامات markdown، "
-        "وبدون أي صيغة JSON — فقط متن القصة كنص سردي."
+def generate_story(manifest, episode):
+    sources = "\n".join(
+        f"- {source['title']} — {source['publisher']} — {source['url']}"
+        for source in episode["sources"]
     )
-    return call_gemini(prompt, max_output_tokens=8192).strip()
+    target_words = episode.get("target_words", 4500)
+    prompt = (
+        f"اكتب نصًا عربيًا طويلًا أصليًا للحلقة {episode['episode_number']} من سلسلة "
+        f"«{manifest['series_title']}». موضوع الحلقة: {episode['topic']}.\n\n"
+        f"العنوان التحريري الثابت: {episode['title']}\n"
+        f"المصادر المسموح الاعتماد عليها:\n{sources}\n\n"
+        f"اكتب نصًا مناسبًا لسرد صوتي مدته تقريبًا {manifest['target_duration_minutes']['min']} إلى "
+        f"{manifest['target_duration_minutes']['max']} دقيقة، وبحدود {target_words} كلمة. "
+        "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
+        "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
+        "قسّم السرد إلى افتتاحية قوية، سياق زمني، تصاعد للأدلة، نقطة غموض أو خطر، ثم خاتمة تشرح ما نعرفه وما لا نعرفه. "
+        "أضف سؤال تفاعل واحدًا طبيعيًا قرب النهاية، واترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger.\n\n"
+        "أخرج متن السرد فقط، بدون Markdown أو JSON أو عناوين تقنية."
+    )
+    return call_gemini(prompt, max_output_tokens=12288).strip()
 
 
 def generate_metadata(story_text, max_attempts=3):
@@ -151,33 +159,43 @@ def generate_metadata(story_text, max_attempts=3):
 
 
 def generate_content():
-    theme = random.choice(STORY_THEMES)
-    story_text = generate_story(theme)
-    metadata = generate_metadata(story_text)
+    manifest, episode = load_episode()
+    story_text = generate_story(manifest, episode)
     return {
+        "manifest": manifest,
+        "episode": episode,
         "story": story_text,
-        "title": metadata["title"],
-        "description": metadata["description"],
-        "visual_keywords": metadata["visual_keywords"],
+        "title": episode["title"],
+        "description": episode["description"],
+        "visual_keywords": episode["visual_keywords"],
     }
 
 
 content = generate_content()
+manifest = content["manifest"]
+episode = content["episode"]
 story_text = content["story"]
 video_title = content["title"]
 description = content["description"]
 keywords = content["visual_keywords"]
 
-print("تم توليد القصة والعنوان:")
-print(video_title)
+print(f"تم اختيار السلسلة: {manifest['series_title']}")
+print(f"الحلقة {episode['episode_number']}: {video_title}")
 print(f"عدد كلمات القصة: {len(story_text.split())}")
+sources_text = "\n".join(f"{source['title']} — {source['publisher']}: {source['url']}" for source in episode['sources'])
 save_json(
     METADATA_PATH,
     {
+        "series_id": manifest["series_id"],
+        "series_title": manifest["series_title"],
+        "episode_id": episode["episode_id"],
+        "episode_number": episode["episode_number"],
         "title": video_title,
         "description": description,
         "tags": keywords,
         "story_word_count": len(story_text.split()),
+        "target_duration_minutes": manifest["target_duration_minutes"],
+        "sources": episode["sources"],
     },
 )
 
@@ -356,6 +374,9 @@ save_json(
         "status": "rendered",
         "video": "story.mp4",
         "metadata": METADATA_PATH,
+        "series_id": manifest["series_id"],
+        "episode_id": episode["episode_id"],
+        "episode_number": episode["episode_number"],
     },
 )
 
@@ -368,7 +389,7 @@ creds.refresh(Request())
 youtube = build("youtube", "v3", credentials=creds)
 
 hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
-full_description = f"{description}\n\n{hashtags}"
+full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\n{hashtags}"
 
 request = youtube.videos().insert(
     part="snippet,status",
@@ -392,6 +413,9 @@ save_json(
         "youtube_video_id": video_id,
         "video": "story.mp4",
         "metadata": METADATA_PATH,
+        "series_id": manifest["series_id"],
+        "episode_id": episode["episode_id"],
+        "episode_number": episode["episode_number"],
     },
 )
 print(f"تم رفع الفيديو: https://youtube.com/watch?v={video_id}")
