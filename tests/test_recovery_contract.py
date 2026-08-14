@@ -12,6 +12,7 @@ class RecoveryContractTests(unittest.TestCase):
         self.recovery_workflow = (ROOT / ".github/workflows/recover-upload.yml").read_text(encoding="utf-8")
         self.uploader = (ROOT / "story_youtube_uploader.py").read_text(encoding="utf-8")
         self.series_manifest = json.loads((ROOT / "content/series/real_stories.json").read_text(encoding="utf-8"))
+        self.short_uploader = (ROOT / "short_youtube_uploader.py").read_text(encoding="utf-8")
 
     def test_production_artifact_contains_recovery_files(self):
         self.assertIn("name: story-${{ github.run_id }}", self.story_workflow)
@@ -51,6 +52,13 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("name: Story Bot - Series Publisher", self.story_workflow)
         self.assertIn("episode_number:", self.story_workflow)
         self.assertNotIn("0 3,9,15,21", self.story_workflow)
+
+    def test_short_is_explicit_and_linked_to_long_video(self):
+        self.assertIn("publish_short:", self.story_workflow)
+        self.assertIn("inputs.publish_short == true", self.story_workflow)
+        self.assertIn("related_long_video_id", self.short_uploader)
+        self.assertIn("long video must be uploaded before publishing the Short", self.short_uploader)
+        self.assertIn("#Shorts", self.short_uploader)
 
     def test_uploader_writes_recovery_state(self):
         self.assertIn('METADATA_PATH = "story_metadata.json"', self.uploader)
