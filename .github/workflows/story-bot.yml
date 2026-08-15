@@ -14,11 +14,6 @@ on:
           - '1'
           - '2'
           - '3'
-      publish_short:
-        description: 'إنشاء Short تشويقي مرتبط بالفيديو الطويل'
-        required: true
-        default: false
-        type: boolean
       tts_backend:
         description: 'محرك الصوت: edge مجاني، أو xtts بصوتك، أو fish'
         required: true
@@ -68,13 +63,8 @@ jobs:
           TTS_BACKEND: ${{ inputs.tts_backend || 'edge' }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
-          PUBLISH_DELAY_MINUTES: '30'
+          PUBLISH_DELAY_MINUTES: '0'
         run: python story_youtube_uploader.py
-      - name: Publish linked Short
-        if: ${{ inputs.publish_short == true }}
-        env:
-          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
-        run: python short_youtube_uploader.py
       - name: Verify generated video exists
         if: always()
         run: test -f story.mp4 && ls -lh story.mp4
@@ -88,7 +78,5 @@ jobs:
             story_metadata.json
             upload_state.json
             content/series/real_stories.json
-            story_short.mp4
-            short_state.json
           if-no-files-found: ignore
           retention-days: 90
