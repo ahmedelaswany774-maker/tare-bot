@@ -64,7 +64,7 @@ jobs:
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
           SERIES_MANIFEST_PATH: content/series/real_stories.json
           GROWTH_POLICY_PATH: content/strategy/growth_policy.json
-          EPISODE_NUMBER: ${{ inputs.episode_number || ((github.run_number % 3) + 1) }}
+          EPISODE_NUMBER: ${{ inputs.episode_number || '1' }}
           TTS_BACKEND: ${{ inputs.tts_backend || 'edge' }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
