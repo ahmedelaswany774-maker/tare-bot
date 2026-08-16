@@ -48,7 +48,8 @@ jobs:
           VOICE_REFERENCE_B64: ${{ secrets.VOICE_REFERENCE_B64 }}
         run: |
           test -n "$VOICE_REFERENCE_B64"
-          printf '%s' "$VOICE_REFERENCE_B64" | base64 --decode > voice_reference.wav
+          printf '%s' "$VOICE_REFERENCE_B64" | base64 --decode > voice_reference.ogg
+          ffmpeg -y -i voice_reference.ogg -ac 1 -ar 24000 -c:a pcm_s16le voice_reference.wav
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 voice_reference.wav
       - name: Run bot
         env:
