@@ -41,7 +41,7 @@ jobs:
         run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk
       - name: Install XTTS backend
         if: ${{ (inputs.tts_backend || 'edge') == 'xtts' }}
-        run: pip install coqui-tts soundfile
+        run: pip install torch torchaudio torchcodec 'transformers==4.57.1' coqui-tts soundfile
       - name: Decode private voice reference
         if: ${{ (inputs.tts_backend || 'edge') == 'xtts' }}
         env:
@@ -68,7 +68,7 @@ jobs:
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '30'
-        run: python story_youtube_uploader.py
+        run: yes y | python story_youtube_uploader.py
       - name: Publish linked Short
         if: ${{ inputs.publish_short == true }}
         env:
