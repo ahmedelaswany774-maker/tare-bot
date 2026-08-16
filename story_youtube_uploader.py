@@ -252,7 +252,8 @@ def _make_audio_xtts():
 
     print("🎙️ توليد الصوت محليًا عبر Coqui XTTS-v2...")
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2", gpu=False)
-    chunks = _split_text_for_tts(story_text, max_chars=900)
+    # XTTS-v2 has a hard limit of 400 tokens; keep Arabic chunks well below it.
+    chunks = _split_text_for_tts(story_text, max_chars=350)
     chunk_files = []
     for i, chunk in enumerate(chunks):
         chunk_path = f"xtts_chunk_{i:03d}.wav"

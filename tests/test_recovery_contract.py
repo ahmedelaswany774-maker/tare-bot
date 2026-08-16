@@ -96,7 +96,7 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn('"privacyStatus": privacy_status', self.uploader)
         self.assertIn('"publishAt": scheduled_publish_at', self.uploader)
         self.assertIn('"scheduled_publish_at": scheduled_publish_at', self.uploader)
-        self.assertLess(self.story_workflow.index("run: python story_youtube_uploader.py"), self.story_workflow.index("run: python short_youtube_uploader.py"))
+        self.assertLess(self.story_workflow.index("python story_youtube_uploader.py"), self.story_workflow.index("python short_youtube_uploader.py"))
 
     def test_short_is_explicit_and_linked_to_long_video(self):
         self.assertIn("publish_short:", self.story_workflow)
