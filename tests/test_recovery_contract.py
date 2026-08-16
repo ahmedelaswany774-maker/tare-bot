@@ -63,8 +63,15 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertEqual(self.growth_policy["publishing"]["long_videos_per_week"], 28)
         self.assertEqual(len(self.growth_policy["publishing"]["daily_slots"]), 4)
         self.assertIn("content/strategy/growth_policy.json", self.story_workflow)
-        self.assertIn("0 3,9,15,21", self.story_workflow)
-        self.assertIn("github.run_number % 3", self.story_workflow)
+        self.assertNotIn("schedule:", self.story_workflow)
+        self.assertNotIn("github.run_number % 3", self.story_workflow)
+
+    def test_workflow_requires_explicit_episode_and_has_no_schedule(self):
+        self.assertIn("workflow_dispatch:", self.story_workflow)
+        self.assertIn("EPISODE_NUMBER: ${{ inputs.episode_number }}", self.story_workflow)
+        self.assertNotIn("schedule:", self.story_workflow)
+        self.assertNotIn("github.run_number %", self.story_workflow)
+        self.assertNotIn("event_name == 'schedule'", self.story_workflow)
 
     def test_workflow_supports_explicit_episode_selection(self):
         self.assertIn("name: Story Bot - Series Publisher", self.story_workflow)
@@ -91,7 +98,8 @@ class RecoveryContractTests(unittest.TestCase):
 
     def test_short_is_explicit_and_linked_to_long_video(self):
         self.assertIn("publish_short:", self.story_workflow)
-        self.assertIn("github.event_name == 'schedule' || inputs.publish_short == true", self.story_workflow)
+        self.assertIn("inputs.publish_short == true", self.story_workflow)
+        self.assertNotIn("event_name == 'schedule'", self.story_workflow)
         self.assertIn("related_long_video_id", self.short_uploader)
         self.assertIn("long video must be uploaded before publishing the Short", self.short_uploader)
         self.assertIn("#Shorts", self.short_uploader)
