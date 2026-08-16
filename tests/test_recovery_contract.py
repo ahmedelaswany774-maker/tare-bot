@@ -88,6 +88,8 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("TTS_BACKEND", self.uploader)
         self.assertIn("_make_audio_xtts", self.uploader)
         self.assertIn("XTTS_LANGUAGE", self.uploader)
+        self.assertIn("if TTS_BACKEND == \"xtts\":", self.uploader)
+        self.assertIn("سيتم إيقاف التشغيل حتى لا نرفع فيديو بصوت مختلف", self.uploader)
 
     def test_short_precedes_scheduled_long_video(self):
         self.assertIn("PUBLISH_DELAY_MINUTES: '30'", self.story_workflow)

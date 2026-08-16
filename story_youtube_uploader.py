@@ -346,6 +346,9 @@ try:
     else:
         _make_audio_fish()
 except Exception as e:
+    if TTS_BACKEND == "xtts":
+        print(f"❌ فشل XTTS، سيتم إيقاف التشغيل حتى لا نرفع فيديو بصوت مختلف: {e}")
+        raise
     print(f"⚠️ فشل TTS backend={TTS_BACKEND} ({e})، هنستخدم edge-tts كبديل")
     asyncio.run(_make_audio_edge())
 
