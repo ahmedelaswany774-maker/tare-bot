@@ -21,7 +21,7 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install XTTS dependencies
-        run: pip install coqui-tts soundfile
+        run: pip install torch torchaudio torchcodec 'transformers==4.57.1' coqui-tts soundfile
       - name: Decode private voice reference
         env:
           VOICE_REFERENCE_B64: ${{ secrets.VOICE_REFERENCE_B64 }}
