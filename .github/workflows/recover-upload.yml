@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       run_id:
-        description: "Optional failed workflow run ID whose story-bundle artifact should be recovered"
+        description: "Optional failed workflow run ID whose story-${run_id} artifact should be recovered"
         required: false
         type: string
 
