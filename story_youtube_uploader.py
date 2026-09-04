@@ -17,11 +17,14 @@ from google.auth.transport.requests import Request
 from pathlib import Path
 
 GEMINI_KEY = os.environ["GEMINI_API_KEY"]
-GEMINI_MODELS = tuple(filter(None, os.environ.get("GEMINI_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite").split(",")))
+GEMINI_MODELS = tuple(model.strip() for model in os.environ.get(
+    "GEMINI_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite"
+).split(",") if model.strip())
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 TTS_BACKEND = os.environ.get("TTS_BACKEND", "fish").lower()
+PREVIEW_ONLY = os.environ.get("PREVIEW_ONLY", "true").lower() != "false"
 VOICE_REFERENCE_PATH = os.environ.get("VOICE_REFERENCE_PATH", "voice_reference.wav")
 XTTS_LANGUAGE = os.environ.get("XTTS_LANGUAGE", "ar")
 PUBLISH_DELAY_MINUTES = int(os.environ.get("PUBLISH_DELAY_MINUTES", "30"))
@@ -29,7 +32,7 @@ METADATA_PATH = "story_metadata.json"
 STATE_PATH = "upload_state.json"
 SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
 GROWTH_POLICY_PATH = os.environ.get("GROWTH_POLICY_PATH", "content/strategy/growth_policy.json")
-EPISODE_NUMBER = int(os.environ.get("EPISODE_NUMBER", "1"))
+EPISODE_SELECTOR = os.environ.get("EPISODE_NUMBER", "1").strip().lower()
 
 
 def save_json(path, payload):
@@ -43,16 +46,29 @@ def load_growth_policy():
 def load_episode():
     manifest = json.loads(Path(SERIES_MANIFEST_PATH).read_text(encoding="utf-8"))
     episodes = sorted(manifest["episodes"], key=lambda item: item["episode_number"])
-    episode = next((item for item in episodes if item["episode_number"] == EPISODE_NUMBER), None)
-    if episode is None:
-        available = [item["episode_number"] for item in episodes]
-        raise ValueError(f"EPISODE_NUMBER={EPISODE_NUMBER} غير موجود. المتاح: {available}")
+    if EPISODE_SELECTOR == "next":
+        episode = next((item for item in episodes if not item.get("published", False)), None)
+        if episode is None:
+            raise ValueError("لا توجد حلقات غير منشورة في السلسلة")
+    else:
+        try:
+            requested_number = int(EPISODE_SELECTOR)
+        except ValueError as exc:
+            raise ValueError("EPISODE_NUMBER يجب أن يكون رقم حلقة أو next") from exc
+        episode = next((item for item in episodes if item["episode_number"] == requested_number), None)
+        if episode is None:
+            available = [item["episode_number"] for item in episodes]
+            raise ValueError(f"EPISODE_NUMBER={requested_number} غير موجود. المتاح: {available}")
+        if episode.get("published", False):
+            raise ValueError(f"الحلقة {requested_number} مسجلة كمنشورة بالفعل؛ أوقفنا التشغيل لمنع التكرار")
     if len(episode.get("sources", [])) == 0:
-        raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر موثقة")
+        raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر/مراجع استمرارية")
     return manifest, episode
 
 
 def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
+    if not GEMINI_MODELS:
+        raise ValueError("GEMINI_MODELS لا يحتوي على نماذج")
     data = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -65,19 +81,22 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
     for model in GEMINI_MODELS:
         url = (
             "https://generativelanguage.googleapis.com/v1beta/models/"
-            f"{model}:generateContent?key={GEMINI_KEY}"
+            f"{model}:generateContent"
         )
         for attempt in range(1, max_retries + 1):
             resp = None
             try:
                 resp = requests.post(
-                    url, headers={"Content-Type": "application/json"}, json=data, timeout=180
+                    url, headers={"Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY}, json=data, timeout=180
                 )
                 resp.raise_for_status()
-                result = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                candidates = resp.json().get("candidates", [])
+                parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
+                result = "\n".join(part.get("text", "") for part in parts if not part.get("thought")).strip()
                 if result:
                     return result
-                raise RuntimeError(f"{model} لم يُرجع محتوى")
+                errors.append(f"{model}: لم يُرجع محتوى")
+                break
             except requests.exceptions.HTTPError as exc:
                 status = resp.status_code if resp is not None else None
                 errors.append(f"{model}: HTTP {status}")
@@ -90,14 +109,16 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
                     )
                     time.sleep(delay)
                     continue
-                print(f"⚠️ تعذر استخدام {model}: {exc}")
+                if status in (400, 401, 403):
+                    raise RuntimeError(f"Gemini رفض الطلب: HTTP {status}. راجع إعدادات الطلب والمفتاح.") from None
+                print(f"⚠️ تعذر استخدام {model}: HTTP {status}")
                 break
             except requests.exceptions.RequestException as exc:
-                errors.append(f"{model}: {exc}")
+                errors.append(f"{model}: {type(exc).__name__}")
                 if attempt < max_retries:
                     delay = min(60, base_delay * (2 ** (attempt - 1)))
                     print(
-                        f"⚠️ خطأ شبكة مع {model}: {exc}, إعادة محاولة بعد {delay} ثانية "
+                        f"⚠️ خطأ شبكة مع {model}: {type(exc).__name__}, إعادة محاولة بعد {delay} ثانية "
                         f"(محاولة {attempt}/{max_retries})..."
                     )
                     time.sleep(delay)
@@ -113,6 +134,21 @@ def generate_story(manifest, episode):
         for source in episode["sources"]
     )
     target_words = episode.get("target_words", 4500)
+    fiction = manifest.get("content_type") == "fiction"
+    editorial_rules = "\n".join(manifest.get("editorial_rules", []))
+    story_rules = (
+        "هذه رواية خيالية. استكمل حبكة الحلقة والافتتاحية المحددتين، مع الحفاظ على الشخصيات "
+        "واستمرارية الأحداث. يمكن ابتكار حوار وتفاصيل خيالية منسجمة، دون وصف عنف تفصيلي. "
+        f"قواعد السلسلة:\n{editorial_rules}\n"
+        if fiction else
+        "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
+        "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
+    )
+    ending = (
+        "هذه الحلقة الأخيرة: أغلق الحبكة بنهاية واضحة، ولا تعد بحلقة تالية. "
+        if episode["episode_number"] == max(item["episode_number"] for item in manifest["episodes"]) and fiction
+        else "اترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger. "
+    )
     prompt = (
         f"اكتب نصًا عربيًا طويلًا أصليًا للحلقة {episode['episode_number']} من سلسلة "
         f"«{manifest['series_title']}». موضوع الحلقة: {episode['topic']}.\n\n"
@@ -122,12 +158,11 @@ def generate_story(manifest, episode):
         f"المصادر المسموح الاعتماد عليها:\n{sources}\n\n"
         f"اكتب نصًا مناسبًا لسرد صوتي مدته تقريبًا {manifest['target_duration_minutes']['min']} إلى "
         f"{manifest['target_duration_minutes']['max']} دقيقة، وبحدود {target_words} كلمة. "
-        "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
-        "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
+        f"{story_rules}"
         "قسّم السرد إلى افتتاحية قوية، سياق زمني، تصاعد للأدلة، نقطة غموض أو خطر، ثم خاتمة تشرح ما نعرفه وما لا نعرفه. "
         f"بعد الحدث الأساسي وليس قبل أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، أضف فاصلًا واحدًا قصيرًا وطبيعيًا يدعو المشاهد للاشتراك في القناة ويطرح سؤالًا واحدًا للتعليقات، دون قطع التوتر أو تكرار الدعوة. "
-        "في النهاية أضف فاصلًا ختاميًا قصيرًا يدعو للاشتراك ومتابعة الحلقة التالية من نفس السلسلة، دون مبالغة أو clickbait. "
-        "اترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger.\n\n"
+        "في النهاية أضف دعوة قصيرة للاشتراك، دون مبالغة أو clickbait. "
+        f"{ending}\n\n"
         "أخرج متن السرد فقط، بدون Markdown أو JSON أو عناوين تقنية."
     )
     return call_gemini(prompt, max_output_tokens=12288).strip()
@@ -208,6 +243,7 @@ growth_policy = load_growth_policy()
 manifest = content["manifest"]
 episode = content["episode"]
 story_text = content["story"]
+Path("story.txt").write_text(story_text, encoding="utf-8")
 video_title = content["title"]
 description = content["description"]
 keywords = content["visual_keywords"]
@@ -466,6 +502,10 @@ save_json(
     },
 )
 
+if PREVIEW_ONLY:
+    print("اكتملت المعاينة: story.mp4. لم يتم الاتصال بيوتيوب أو تغيير حالة الحلقة.")
+    raise SystemExit(0)
+
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
     json.loads(os.environ["YT_TOKEN_JSON"]), SCOPES
@@ -504,6 +544,10 @@ request = youtube.videos().insert(
 )
 response = request.execute()
 video_id = response["id"]
+episode["published"] = True
+episode["youtube_video_id"] = video_id
+episode["published_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+save_json(SERIES_MANIFEST_PATH, manifest)
 save_json(
     STATE_PATH,
     {
