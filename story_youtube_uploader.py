@@ -28,7 +28,7 @@ METADATA_PATH = "story_metadata.json"
 STATE_PATH = "upload_state.json"
 SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
 GROWTH_POLICY_PATH = os.environ.get("GROWTH_POLICY_PATH", "content/strategy/growth_policy.json")
-EPISODE_NUMBER = int(os.environ.get("EPISODE_NUMBER", "1"))
+EPISODE_SELECTOR = os.environ.get("EPISODE_NUMBER", "1").strip().lower()
 
 
 def save_json(path, payload):
@@ -42,12 +42,23 @@ def load_growth_policy():
 def load_episode():
     manifest = json.loads(Path(SERIES_MANIFEST_PATH).read_text(encoding="utf-8"))
     episodes = sorted(manifest["episodes"], key=lambda item: item["episode_number"])
-    episode = next((item for item in episodes if item["episode_number"] == EPISODE_NUMBER), None)
-    if episode is None:
-        available = [item["episode_number"] for item in episodes]
-        raise ValueError(f"EPISODE_NUMBER={EPISODE_NUMBER} غير موجود. المتاح: {available}")
+    if EPISODE_SELECTOR == "next":
+        episode = next((item for item in episodes if not item.get("published", False)), None)
+        if episode is None:
+            raise ValueError("لا توجد حلقات غير منشورة في السلسلة")
+    else:
+        try:
+            requested_number = int(EPISODE_SELECTOR)
+        except ValueError as exc:
+            raise ValueError("EPISODE_NUMBER يجب أن يكون رقم حلقة أو next") from exc
+        episode = next((item for item in episodes if item["episode_number"] == requested_number), None)
+        if episode is None:
+            available = [item["episode_number"] for item in episodes]
+            raise ValueError(f"EPISODE_NUMBER={requested_number} غير موجود. المتاح: {available}")
+        if episode.get("published", False):
+            raise ValueError(f"الحلقة {requested_number} مسجلة كمنشورة بالفعل؛ أوقفنا التشغيل لمنع التكرار")
     if len(episode.get("sources", [])) == 0:
-        raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر موثقة")
+        raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر/مراجع استمرارية")
     return manifest, episode
 
 
@@ -487,6 +498,10 @@ request = youtube.videos().insert(
 )
 response = request.execute()
 video_id = response["id"]
+episode["published"] = True
+episode["youtube_video_id"] = video_id
+episode["published_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+save_json(SERIES_MANIFEST_PATH, manifest)
 save_json(
     STATE_PATH,
     {
