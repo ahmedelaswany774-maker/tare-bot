@@ -16,7 +16,7 @@ from google.auth.transport.requests import Request
 
 from pathlib import Path
 
-GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODELS = tuple(model.strip() for model in os.environ.get(
     "GEMINI_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite"
 ).split(",") if model.strip())
@@ -227,7 +227,15 @@ def generate_metadata(story_text, max_attempts=3):
 
 def generate_content():
     manifest, episode = load_episode()
-    story_text = generate_story(manifest, episode)
+    if episode.get("script_path"):
+        story_text = Path(episode["script_path"]).read_text(encoding="utf-8").strip()
+        if not story_text:
+            raise ValueError("ملف نص الحلقة فارغ")
+        print(f"استخدام النص المحفوظ للحلقة {episode['episode_number']}")
+    else:
+        if not GEMINI_KEY:
+            raise ValueError("الحلقة تحتاج script_path أو GEMINI_API_KEY")
+        story_text = generate_story(manifest, episode)
     return {
         "manifest": manifest,
         "episode": episode,
@@ -433,10 +441,13 @@ def fetch_pexels_clips(keywords, need_duration):
                 continue
             video = videos[attempt % len(videos)]
             files = [f for f in video["video_files"] if f.get("width")]
+            if not files:
+                continue
             files.sort(key=lambda f: f["width"])
             chosen = next((f for f in files if 480 <= f["width"] <= 1080), files[-1])
             fname = f"clip_{len(clips)}.mp4"
             r = requests.get(chosen["link"], timeout=60)
+            r.raise_for_status()
             with open(fname, "wb") as f:
                 f.write(r.content)
             c = VideoFileClip(fname)
@@ -455,14 +466,21 @@ print(f"تم تحميل {len(clip_files)} مقطع فيديو")
 video_clips_paths = clip_files
 
 try:
-    from kaggle_client import render_video_via_kaggle
-    kaggle_success = render_video_via_kaggle(
-        audio_path="story.mp3",
-        clip_files=video_clips_paths,
-        target_duration=target_duration,
-        output_path="story.mp4",
-    )
+    if os.environ.get("RENDER_BACKEND") == "ffmpeg":
+        from render_ffmpeg import render_story
+        render_story("story.mp3", video_clips_paths, "story.mp4")
+        kaggle_success = True
+    else:
+        from kaggle_client import render_video_via_kaggle
+        kaggle_success = render_video_via_kaggle(
+            audio_path="story.mp3",
+            clip_files=video_clips_paths,
+            target_duration=target_duration,
+            output_path="story.mp4",
+        )
 except Exception as e:
+    if os.environ.get("RENDER_BACKEND") == "ffmpeg":
+        raise
     print(f"⚠️ تخطي Kaggle بسبب خطأ غير متوقع: {e}")
     kaggle_success = False
 
@@ -540,9 +558,13 @@ request = youtube.videos().insert(
             **({"publishAt": scheduled_publish_at} if scheduled_publish_at else {}),
         },
     },
-    media_body=MediaFileUpload("story.mp4"),
+    media_body=MediaFileUpload("story.mp4", chunksize=8 * 1024 * 1024, resumable=True),
 )
-response = request.execute()
+response = None
+while response is None:
+    progress, response = request.next_chunk(num_retries=5)
+    if progress:
+        print(f"رفع YouTube: {progress.progress() * 100:.0f}%", flush=True)
 video_id = response["id"]
 episode["published"] = True
 episode["youtube_video_id"] = video_id

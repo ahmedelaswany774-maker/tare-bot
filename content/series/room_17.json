@@ -53,7 +53,8 @@
           "url": "https://www.youtube.com/watch?v=vaKjE1ozohY",
           "publisher": "قناة قصص واقعية"
         }
-      ]
+      ],
+      "script_path": "content/scripts/room-17-part-04.txt"
     },
     {
       "episode_id": "room-17-part-05",
