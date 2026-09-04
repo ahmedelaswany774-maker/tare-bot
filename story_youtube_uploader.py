@@ -17,6 +17,7 @@ from google.auth.transport.requests import Request
 from pathlib import Path
 
 GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GEMINI_MODELS = tuple(filter(None, os.environ.get("GEMINI_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite").split(",")))
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
@@ -52,10 +53,6 @@ def load_episode():
 
 
 def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
-    )
     data = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -64,29 +61,49 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
             "maxOutputTokens": max_output_tokens,
         },
     }
-    for attempt in range(1, max_retries + 1):
-        resp = None
-        try:
-            resp = requests.post(
-                url, headers={"Content-Type": "application/json"}, json=data, timeout=180
-            )
-            resp.raise_for_status()
-            return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-        except requests.exceptions.HTTPError:
-            status = resp.status_code if resp is not None else None
-            if status in (503, 500, 429) and attempt < max_retries:
-                delay = base_delay * attempt
-                print(f"⚠️ Gemini error {status}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
-                time.sleep(delay)
-                continue
-            raise
-        except requests.exceptions.RequestException as e:
-            if attempt < max_retries:
-                delay = base_delay * attempt
-                print(f"⚠️ خطأ في الشبكة: {e}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
-                time.sleep(delay)
-                continue
-            raise
+    errors = []
+    for model in GEMINI_MODELS:
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model}:generateContent?key={GEMINI_KEY}"
+        )
+        for attempt in range(1, max_retries + 1):
+            resp = None
+            try:
+                resp = requests.post(
+                    url, headers={"Content-Type": "application/json"}, json=data, timeout=180
+                )
+                resp.raise_for_status()
+                result = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if result:
+                    return result
+                raise RuntimeError(f"{model} لم يُرجع محتوى")
+            except requests.exceptions.HTTPError as exc:
+                status = resp.status_code if resp is not None else None
+                errors.append(f"{model}: HTTP {status}")
+                retryable = status in (429, 500, 502, 503, 504)
+                if retryable and attempt < max_retries:
+                    delay = min(60, base_delay * (2 ** (attempt - 1)))
+                    print(
+                        f"⚠️ {model} error {status}, إعادة محاولة بعد {delay} ثانية "
+                        f"(محاولة {attempt}/{max_retries})..."
+                    )
+                    time.sleep(delay)
+                    continue
+                print(f"⚠️ تعذر استخدام {model}: {exc}")
+                break
+            except requests.exceptions.RequestException as exc:
+                errors.append(f"{model}: {exc}")
+                if attempt < max_retries:
+                    delay = min(60, base_delay * (2 ** (attempt - 1)))
+                    print(
+                        f"⚠️ خطأ شبكة مع {model}: {exc}, إعادة محاولة بعد {delay} ثانية "
+                        f"(محاولة {attempt}/{max_retries})..."
+                    )
+                    time.sleep(delay)
+                    continue
+                break
+    raise RuntimeError("فشل كل نماذج Gemini: " + " | ".join(errors[-8:]))
 
 
 def generate_story(manifest, episode):
