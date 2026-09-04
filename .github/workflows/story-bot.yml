@@ -51,10 +51,13 @@ jobs:
           printf '%s' "$VOICE_REFERENCE_B64" | base64 --decode > voice_reference.ogg
           ffmpeg -y -i voice_reference.ogg -ac 1 -ar 24000 -c:a pcm_s16le voice_reference.wav
           ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 voice_reference.wav
+      - name: Remove stale generated outputs
+        run: rm -f story.mp3 story.mp4 story_metadata.json upload_state.json story_short.mp4 short_state.json
       - name: Run bot
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODELS: gemini-2.5-flash,gemini-2.5-flash-lite
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
@@ -76,7 +79,7 @@ jobs:
         run: python short_youtube_uploader.py
       - name: Verify generated video exists
         if: always()
-        run: test -f story.mp4 && ls -lh story.mp4
+        run: test -f story.mp4 && test -f story_metadata.json && test -f upload_state.json && ls -lh story.mp4
       - name: Upload generated video artifact
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
