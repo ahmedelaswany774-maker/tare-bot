@@ -1,0 +1,29 @@
+name: Story Bot - Tests
+on:
+  push:
+    branches:
+      - fix/provider-fallback
+    paths:
+      - '**.py'
+      - content/**
+      - .github/workflows/**
+  pull_request:
+    paths:
+      - '**.py'
+      - content/**
+      - .github/workflows/**
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+        with:
+          python-version: '3.11'
+      - name: Test retries, episode selection, and preview isolation
+        run: python -m unittest discover -s tests -v
+      - name: Check Python syntax
+        run: python -m compileall -q story_youtube_uploader.py short_youtube_uploader.py resume_youtube_upload.py

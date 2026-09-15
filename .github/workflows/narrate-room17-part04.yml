@@ -1,0 +1,60 @@
+name: Room 17 - Part 4 - Owner voice
+on:
+  push:
+    branches:
+      - fix/provider-fallback
+    paths:
+      - .github/workflows/narrate-room17-part04.yml
+jobs:
+  narrate:
+    if: github.event.head_commit.message == 'Narrate Room 17 part 4 with the owner voice'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    concurrency:
+      group: room17-part04-owner-voice
+      cancel-in-progress: false
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+        with:
+          python-version: '3.11'
+      - name: Install local voice engine
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          # Coqui XTTS works with PyTorch 2.2+, while TorchAudio 2.9+ routes audio I/O through TorchCodec.
+          # Pin 2.8 CPU builds here to keep the local XTTS path independent of CUDA/TorchCodec.
+          python -m pip install 'torch==2.8.0+cpu' 'torchaudio==2.8.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'transformers==4.57.1' coqui-tts soundfile
+          python - <<'PY'
+          import torch, torchaudio
+          print(f"torch={torch.__version__}")
+          print(f"torchaudio={torchaudio.__version__}")
+          PY
+      - name: Decode owner's voice reference
+        env:
+          VOICE_REFERENCE_B64: ${{ secrets.VOICE_REFERENCE_B64 }}
+        run: |
+          test -n "$VOICE_REFERENCE_B64"
+          printf '%s' "$VOICE_REFERENCE_B64" | base64 --decode > voice_reference.ogg
+          ffmpeg -v error -y -i voice_reference.ogg -ac 1 -ar 24000 -c:a pcm_s16le voice_reference.wav
+      - name: Narrate episode 4 locally with the owner's voice
+        run: yes y | python -u scripts/narrate_episode.py content/scripts/room-17-part-04.txt
+      - name: Validate narration
+        run: ffprobe -v error -show_entries format=duration,size -of default=nw=1 room-17-part-04-voice.mp3
+      - name: Save generated narration
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: room17-part04-owner-voice-${{ github.run_id }}
+          path: |
+            room-17-part-04-voice.mp3
+            episode_voice_chunks/*.wav
+            content/scripts/room-17-part-04.txt
+          retention-days: 90
+      - name: Clean private reference
+        if: always()
+        run: rm -f voice_reference.wav voice_reference.ogg

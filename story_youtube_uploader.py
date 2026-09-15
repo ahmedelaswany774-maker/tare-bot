@@ -16,11 +16,15 @@ from google.auth.transport.requests import Request
 
 from pathlib import Path
 
-GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODELS = tuple(model.strip() for model in os.environ.get(
+    "GEMINI_MODELS", "gemini-2.5-flash,gemini-2.5-flash-lite"
+).split(",") if model.strip())
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
 TTS_BACKEND = os.environ.get("TTS_BACKEND", "fish").lower()
+PREVIEW_ONLY = os.environ.get("PREVIEW_ONLY", "true").lower() != "false"
 VOICE_REFERENCE_PATH = os.environ.get("VOICE_REFERENCE_PATH", "voice_reference.wav")
 XTTS_LANGUAGE = os.environ.get("XTTS_LANGUAGE", "ar")
 PUBLISH_DELAY_MINUTES = int(os.environ.get("PUBLISH_DELAY_MINUTES", "30"))
@@ -63,10 +67,8 @@ def load_episode():
 
 
 def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
-    )
+    if not GEMINI_MODELS:
+        raise ValueError("GEMINI_MODELS لا يحتوي على نماذج")
     data = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -75,29 +77,54 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
             "maxOutputTokens": max_output_tokens,
         },
     }
-    for attempt in range(1, max_retries + 1):
-        resp = None
-        try:
-            resp = requests.post(
-                url, headers={"Content-Type": "application/json"}, json=data, timeout=180
-            )
-            resp.raise_for_status()
-            return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-        except requests.exceptions.HTTPError:
-            status = resp.status_code if resp is not None else None
-            if status in (503, 500, 429) and attempt < max_retries:
-                delay = base_delay * attempt
-                print(f"⚠️ Gemini error {status}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
-                time.sleep(delay)
-                continue
-            raise
-        except requests.exceptions.RequestException as e:
-            if attempt < max_retries:
-                delay = base_delay * attempt
-                print(f"⚠️ خطأ في الشبكة: {e}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
-                time.sleep(delay)
-                continue
-            raise
+    errors = []
+    for model in GEMINI_MODELS:
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model}:generateContent"
+        )
+        for attempt in range(1, max_retries + 1):
+            resp = None
+            try:
+                resp = requests.post(
+                    url, headers={"Content-Type": "application/json", "x-goog-api-key": GEMINI_KEY}, json=data, timeout=180
+                )
+                resp.raise_for_status()
+                candidates = resp.json().get("candidates", [])
+                parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
+                result = "\n".join(part.get("text", "") for part in parts if not part.get("thought")).strip()
+                if result:
+                    return result
+                errors.append(f"{model}: لم يُرجع محتوى")
+                break
+            except requests.exceptions.HTTPError as exc:
+                status = resp.status_code if resp is not None else None
+                errors.append(f"{model}: HTTP {status}")
+                retryable = status in (429, 500, 502, 503, 504)
+                if retryable and attempt < max_retries:
+                    delay = min(60, base_delay * (2 ** (attempt - 1)))
+                    print(
+                        f"⚠️ {model} error {status}, إعادة محاولة بعد {delay} ثانية "
+                        f"(محاولة {attempt}/{max_retries})..."
+                    )
+                    time.sleep(delay)
+                    continue
+                if status in (400, 401, 403):
+                    raise RuntimeError(f"Gemini رفض الطلب: HTTP {status}. راجع إعدادات الطلب والمفتاح.") from None
+                print(f"⚠️ تعذر استخدام {model}: HTTP {status}")
+                break
+            except requests.exceptions.RequestException as exc:
+                errors.append(f"{model}: {type(exc).__name__}")
+                if attempt < max_retries:
+                    delay = min(60, base_delay * (2 ** (attempt - 1)))
+                    print(
+                        f"⚠️ خطأ شبكة مع {model}: {type(exc).__name__}, إعادة محاولة بعد {delay} ثانية "
+                        f"(محاولة {attempt}/{max_retries})..."
+                    )
+                    time.sleep(delay)
+                    continue
+                break
+    raise RuntimeError("فشل كل نماذج Gemini: " + " | ".join(errors[-8:]))
 
 
 def generate_story(manifest, episode):
@@ -107,6 +134,21 @@ def generate_story(manifest, episode):
         for source in episode["sources"]
     )
     target_words = episode.get("target_words", 4500)
+    fiction = manifest.get("content_type") == "fiction"
+    editorial_rules = "\n".join(manifest.get("editorial_rules", []))
+    story_rules = (
+        "هذه رواية خيالية. استكمل حبكة الحلقة والافتتاحية المحددتين، مع الحفاظ على الشخصيات "
+        "واستمرارية الأحداث. يمكن ابتكار حوار وتفاصيل خيالية منسجمة، دون وصف عنف تفصيلي. "
+        f"قواعد السلسلة:\n{editorial_rules}\n"
+        if fiction else
+        "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
+        "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
+    )
+    ending = (
+        "هذه الحلقة الأخيرة: أغلق الحبكة بنهاية واضحة، ولا تعد بحلقة تالية. "
+        if episode["episode_number"] == max(item["episode_number"] for item in manifest["episodes"]) and fiction
+        else "اترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger. "
+    )
     prompt = (
         f"اكتب نصًا عربيًا طويلًا أصليًا للحلقة {episode['episode_number']} من سلسلة "
         f"«{manifest['series_title']}». موضوع الحلقة: {episode['topic']}.\n\n"
@@ -116,12 +158,11 @@ def generate_story(manifest, episode):
         f"المصادر المسموح الاعتماد عليها:\n{sources}\n\n"
         f"اكتب نصًا مناسبًا لسرد صوتي مدته تقريبًا {manifest['target_duration_minutes']['min']} إلى "
         f"{manifest['target_duration_minutes']['max']} دقيقة، وبحدود {target_words} كلمة. "
-        "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
-        "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
+        f"{story_rules}"
         "قسّم السرد إلى افتتاحية قوية، سياق زمني، تصاعد للأدلة، نقطة غموض أو خطر، ثم خاتمة تشرح ما نعرفه وما لا نعرفه. "
         f"بعد الحدث الأساسي وليس قبل أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، أضف فاصلًا واحدًا قصيرًا وطبيعيًا يدعو المشاهد للاشتراك في القناة ويطرح سؤالًا واحدًا للتعليقات، دون قطع التوتر أو تكرار الدعوة. "
-        "في النهاية أضف فاصلًا ختاميًا قصيرًا يدعو للاشتراك ومتابعة الحلقة التالية من نفس السلسلة، دون مبالغة أو clickbait. "
-        "اترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger.\n\n"
+        "في النهاية أضف دعوة قصيرة للاشتراك، دون مبالغة أو clickbait. "
+        f"{ending}\n\n"
         "أخرج متن السرد فقط، بدون Markdown أو JSON أو عناوين تقنية."
     )
     return call_gemini(prompt, max_output_tokens=12288).strip()
@@ -186,7 +227,15 @@ def generate_metadata(story_text, max_attempts=3):
 
 def generate_content():
     manifest, episode = load_episode()
-    story_text = generate_story(manifest, episode)
+    if episode.get("script_path"):
+        story_text = Path(episode["script_path"]).read_text(encoding="utf-8").strip()
+        if not story_text:
+            raise ValueError("ملف نص الحلقة فارغ")
+        print(f"استخدام النص المحفوظ للحلقة {episode['episode_number']}")
+    else:
+        if not GEMINI_KEY:
+            raise ValueError("الحلقة تحتاج script_path أو GEMINI_API_KEY")
+        story_text = generate_story(manifest, episode)
     return {
         "manifest": manifest,
         "episode": episode,
@@ -202,6 +251,7 @@ growth_policy = load_growth_policy()
 manifest = content["manifest"]
 episode = content["episode"]
 story_text = content["story"]
+Path("story.txt").write_text(story_text, encoding="utf-8")
 video_title = content["title"]
 description = content["description"]
 keywords = content["visual_keywords"]
@@ -391,10 +441,13 @@ def fetch_pexels_clips(keywords, need_duration):
                 continue
             video = videos[attempt % len(videos)]
             files = [f for f in video["video_files"] if f.get("width")]
+            if not files:
+                continue
             files.sort(key=lambda f: f["width"])
             chosen = next((f for f in files if 480 <= f["width"] <= 1080), files[-1])
             fname = f"clip_{len(clips)}.mp4"
             r = requests.get(chosen["link"], timeout=60)
+            r.raise_for_status()
             with open(fname, "wb") as f:
                 f.write(r.content)
             c = VideoFileClip(fname)
@@ -413,14 +466,21 @@ print(f"تم تحميل {len(clip_files)} مقطع فيديو")
 video_clips_paths = clip_files
 
 try:
-    from kaggle_client import render_video_via_kaggle
-    kaggle_success = render_video_via_kaggle(
-        audio_path="story.mp3",
-        clip_files=video_clips_paths,
-        target_duration=target_duration,
-        output_path="story.mp4",
-    )
+    if os.environ.get("RENDER_BACKEND") == "ffmpeg":
+        from render_ffmpeg import render_story
+        render_story("story.mp3", video_clips_paths, "story.mp4")
+        kaggle_success = True
+    else:
+        from kaggle_client import render_video_via_kaggle
+        kaggle_success = render_video_via_kaggle(
+            audio_path="story.mp3",
+            clip_files=video_clips_paths,
+            target_duration=target_duration,
+            output_path="story.mp4",
+        )
 except Exception as e:
+    if os.environ.get("RENDER_BACKEND") == "ffmpeg":
+        raise
     print(f"⚠️ تخطي Kaggle بسبب خطأ غير متوقع: {e}")
     kaggle_success = False
 
@@ -460,6 +520,10 @@ save_json(
     },
 )
 
+if PREVIEW_ONLY:
+    print("اكتملت المعاينة: story.mp4. لم يتم الاتصال بيوتيوب أو تغيير حالة الحلقة.")
+    raise SystemExit(0)
+
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
     json.loads(os.environ["YT_TOKEN_JSON"]), SCOPES
@@ -494,9 +558,13 @@ request = youtube.videos().insert(
             **({"publishAt": scheduled_publish_at} if scheduled_publish_at else {}),
         },
     },
-    media_body=MediaFileUpload("story.mp4"),
+    media_body=MediaFileUpload("story.mp4", chunksize=8 * 1024 * 1024, resumable=True),
 )
-response = request.execute()
+response = None
+while response is None:
+    progress, response = request.next_chunk(num_retries=5)
+    if progress:
+        print(f"رفع YouTube: {progress.progress() * 100:.0f}%", flush=True)
 video_id = response["id"]
 episode["published"] = True
 episode["youtube_video_id"] = video_id

@@ -96,7 +96,7 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn('"privacyStatus": privacy_status', self.uploader)
         self.assertIn('"publishAt": scheduled_publish_at', self.uploader)
         self.assertIn('"scheduled_publish_at": scheduled_publish_at', self.uploader)
-        self.assertLess(self.story_workflow.index("python story_youtube_uploader.py"), self.story_workflow.index("python short_youtube_uploader.py"))
+        self.assertLess(self.story_workflow.index("story_youtube_uploader.py"), self.story_workflow.index("short_youtube_uploader.py"))
 
     def test_short_is_explicit_and_linked_to_long_video(self):
         self.assertIn("publish_short:", self.story_workflow)
@@ -105,6 +105,20 @@ class RecoveryContractTests(unittest.TestCase):
         self.assertIn("related_long_video_id", self.short_uploader)
         self.assertIn("long video must be uploaded before publishing the Short", self.short_uploader)
         self.assertIn("#Shorts", self.short_uploader)
+
+    def test_gemini_has_transient_model_fallback(self):
+        self.assertIn("GEMINI_MODELS", self.uploader)
+        self.assertIn("gemini-2.5-flash-lite", self.uploader)
+        self.assertIn("status in (429, 500, 502, 503, 504)", self.uploader)
+        self.assertIn("فشل كل نماذج Gemini", self.uploader)
+
+    def test_workflow_removes_and_rejects_stale_outputs(self):
+        self.assertIn("Remove stale generated outputs", self.story_workflow)
+        self.assertIn("rm -f story.mp3 story.mp4 story_metadata.json upload_state.json", self.story_workflow)
+        self.assertIn(
+            "test -f story.mp4 && test -f story_metadata.json && test -f upload_state.json",
+            self.story_workflow,
+        )
 
     def test_uploader_writes_recovery_state(self):
         self.assertIn('METADATA_PATH = "story_metadata.json"', self.uploader)
