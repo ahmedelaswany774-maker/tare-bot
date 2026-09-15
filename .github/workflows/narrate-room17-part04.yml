@@ -24,8 +24,15 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
-          python -m pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
-          python -m pip install torchcodec 'transformers==4.57.1' coqui-tts soundfile
+          # Coqui XTTS works with PyTorch 2.2+, while TorchAudio 2.9+ routes audio I/O through TorchCodec.
+          # Pin 2.8 CPU builds here to keep the local XTTS path independent of CUDA/TorchCodec.
+          python -m pip install 'torch==2.8.0+cpu' 'torchaudio==2.8.0+cpu' --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install 'transformers==4.57.1' coqui-tts soundfile
+          python - <<'PY'
+          import torch, torchaudio
+          print(f"torch={torch.__version__}")
+          print(f"torchaudio={torchaudio.__version__}")
+          PY
       - name: Decode owner's voice reference
         env:
           VOICE_REFERENCE_B64: ${{ secrets.VOICE_REFERENCE_B64 }}
@@ -39,6 +46,7 @@ jobs:
         run: ffprobe -v error -show_entries format=duration,size -of default=nw=1 room-17-part-04-voice.mp3
       - name: Save generated narration
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: room17-part04-owner-voice-${{ github.run_id }}
