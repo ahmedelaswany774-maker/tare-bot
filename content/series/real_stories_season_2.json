@@ -1,0 +1,95 @@
+{
+  "series_id": "real-stories-turning-points-01",
+  "series_title": "لحظات فاصلة: نجاة وقرارات غيّرت المصير",
+  "language": "ar",
+  "target_duration_minutes": {"min": 28, "max": 38},
+  "editorial_rules": [
+    "افصل بين الوقائع الموثقة والتحليل أو التفسير.",
+    "لا تخترع حوارًا أو شخصية أو دليلًا غير موجود في المصادر.",
+    "اذكر المصادر في وصف الفيديو.",
+    "لا تقدّم تفسيرًا غير محسوم باعتباره حقيقة نهائية.",
+    "ابدأ الحلقة بالحدث المركزي خلال أول 20 ثانية.",
+    "استخدم Thumbnail برسالة واحدة لا تتجاوز 4 كلمات."
+  ],
+  "playlist_title": "لحظات فاصلة | نجاة وقرارات غيّرت المصير",
+  "episodes": [
+    {
+      "episode_id": "apollo-13-01",
+      "episode_number": 1,
+      "title": "أبولو 13: المهمة التي تحولت من هبوط على القمر إلى سباق للعودة",
+      "short_title": "أبولو 13 | كيف عادوا من الفضاء؟",
+      "thumbnail_text": "العودة مستحيلة؟",
+      "opening_hook": "بعد أيام من إطلاق أبولو 13 نحو القمر، تحولت المهمة من رحلة هبوط إلى سباق لإنقاذ ثلاثة رواد فضاء والعودة بهم إلى الأرض.",
+      "topic": "Apollo 13 mission 1970",
+      "target_words": 4500,
+      "visual_keywords": ["Apollo 13 spacecraft space", "NASA mission control 1970", "Saturn V launch historical", "lunar module Aquarius", "spacecraft Earth return", "Moon trajectory diagram", "NASA engineers mission control", "Pacific Ocean splashdown"],
+      "description": "الحلقة الأولى من سلسلة لحظات فاصلة. نتابع مهمة أبولو 13 كما توثقها ناسا: الإطلاق، العطل الذي وقع في الطريق إلى القمر، قرارات الطاقم وفرق الأرض، ثم العودة الآمنة إلى الأرض. نفصل بين ما توثقه تقارير المهمة وما أضافته الروايات اللاحقة.",
+      "sources": [
+        {"title": "Apollo 13", "url": "https://www.nasa.gov/mission/apollo-13/", "publisher": "NASA"},
+        {"title": "Apollo 13: Mission Details", "url": "https://www.nasa.gov/missions/apollo/apollo-13-mission-details/", "publisher": "NASA"}
+      ]
+    },
+    {
+      "episode_id": "hudson-1549-02",
+      "episode_number": 2,
+      "title": "رحلة نهر هدسون: كيف تحولت دقائق قليلة إلى هبوط اضطراري ناجح",
+      "short_title": "رحلة 1549 | الهبوط على النهر",
+      "thumbnail_text": "ثواني حاسمة",
+      "opening_hook": "بعد دقائق من إقلاعها من مطار لاغوارديا، فقدت رحلة US Airways 1549 معظم قوة محركيها، وأصبح أمام الطاقم وقت محدود لاتخاذ قرار الهبوط.",
+      "topic": "US Airways Flight 1549 Hudson River 2009",
+      "target_words": 4300,
+      "visual_keywords": ["Airbus A320 Hudson River", "LaGuardia Airport runway", "New York skyline winter", "aircraft cockpit recreation", "Hudson River rescue boats", "aviation investigation documents", "aircraft emergency landing", "New York ferry rescue"],
+      "description": "الحلقة الثانية من سلسلة لحظات فاصلة. نعتمد على تقرير المجلس الوطني لسلامة النقل NTSB لعرض تسلسل حادث رحلة 1549، سبب فقدان الدفع، قرار الهبوط على نهر هدسون، وعوامل النجاة والاستجابة الطارئة، دون إعادة تمثيل تفاصيل غير موثقة.",
+      "sources": [
+        {"title": "DCA09MA026 — Loss of Thrust in Both Engines and Ditching on the Hudson River", "url": "https://www.ntsb.gov/investigations/Pages/DCA09MA026.aspx", "publisher": "NTSB"},
+        {"title": "Aviation Accident Report 10/03", "url": "https://www.ntsb.gov/investigations/accidentreports/reports/aar1003.pdf", "publisher": "NTSB"}
+      ]
+    },
+    {
+      "episode_id": "franklin-expedition-03",
+      "episode_number": 3,
+      "title": "بعثة فرانكلين: السفينتان اللتان اختفتا في الجليد",
+      "short_title": "بعثة فرانكلين | لغز القطب الشمالي",
+      "thumbnail_text": "اختفوا في الجليد",
+      "opening_hook": "في عام 1845 أبحرت بعثة فرانكلين بحثًا عن الممر الشمالي الغربي، ثم حاصر الجليد سفينتيها واختفت البعثة من السجل لسنوات طويلة.",
+      "topic": "Franklin Expedition 1845 Erebus Terror",
+      "target_words": 4500,
+      "visual_keywords": ["Arctic expedition 1845", "HMS Erebus historical illustration", "HMS Terror ice", "King William Island Arctic", "Victorian expedition map", "polar exploration artifacts", "Arctic sea ice", "Royal Navy expedition documents"],
+      "description": "الحلقة الثالثة من سلسلة لحظات فاصلة. نعرض هدف بعثة فرانكلين، مسارها الأول، حصار الجليد، وما بقي من السجلات والآثار، مع التمييز بين الأدلة التاريخية وما بقي غير محسوم.",
+      "sources": [
+        {"title": "Relics from Sir John Franklin's last expedition", "url": "https://www.rmg.co.uk/collections/our-collections-relics-sir-john-franklins-last-expedition", "publisher": "Royal Museums Greenwich"}
+      ]
+    },
+    {
+      "episode_id": "boston-molasses-04",
+      "episode_number": 4,
+      "title": "فيضان بوسطن الغريب: كيف تحولت خزانة ضخمة إلى كارثة في دقائق",
+      "short_title": "فيضان العسل الأسود | بوسطن 1919",
+      "thumbnail_text": "كارثة في دقائق",
+      "opening_hook": "في 15 يناير 1919 انهار خزان ضخم في شمال بوسطن، وتحولت مادة صناعية لزجة إلى موجة اجتاحت عدة شوارع خلال وقت قصير.",
+      "topic": "Great Boston Molasses Flood 1919",
+      "target_words": 4300,
+      "visual_keywords": ["Boston 1919 historical street", "molasses tank Boston historical", "North End Boston 1919", "historic newspaper Boston", "industrial tank engineering", "Boston rescue workers 1919", "vintage city map", "historic courtroom documents"],
+      "description": "الحلقة الرابعة من سلسلة لحظات فاصلة. نعيد بناء أحداث فيضان العسل الأسود في بوسطن عام 1919 من المصادر التاريخية، ثم نوضح كيف تناولت التحقيقات والدعاوى القضائية أسباب انهيار الخزان ومسؤولية التصميم والفحص.",
+      "sources": [
+        {"title": "Without Warning, Molasses Surged Over Boston 100 Years Ago", "url": "https://www.smithsonianmag.com/history/without-warning-molasses-january-surged-over-boston-180971251/", "publisher": "Smithsonian Magazine"},
+        {"title": "The Sticky Science Behind the Deadly Boston Molasses Disaster", "url": "https://www.smithsonianmag.com/smart-news/why-boston-molasses-disaster-was-so-deadly-180961209/", "publisher": "Smithsonian Magazine"}
+      ]
+    },
+    {
+      "episode_id": "fremont-winter-expedition-05",
+      "episode_number": 5,
+      "title": "بعثة فريمونت الشتوية: الطريق الذي تحول إلى اختبار للبقاء",
+      "short_title": "بعثة فريمونت | عندما أخطأ الطريق",
+      "thumbnail_text": "الطريق الخطأ",
+      "opening_hook": "في شتاء 1848 قادت محاولة عبور جبال كولورادو فريق فريمونت إلى ظروف أقسى مما توقعوه، فتحولت مهمة رسم طريق إلى رحلة بقاء وإنقاذ.",
+      "topic": "John Fremont 1848 Colorado expedition",
+      "target_words": 4200,
+      "visual_keywords": ["Colorado Rocky Mountains winter", "John C Fremont historical portrait", "19th century expedition map", "snow covered mountain pass", "American west expedition camp", "historic survey instruments", "San Juan Mountains winter", "frontier expedition illustration"],
+      "description": "الحلقة الخامسة من سلسلة لحظات فاصلة. نتتبع بعثة جون فريمونت عام 1848 كما توثقها خدمة المتنزهات الوطنية، من هدف العثور على مسار للسكك الحديدية إلى ظروف الشتاء القاسية وجهود الإنقاذ، مع فصل الوقائع عن السرديات اللاحقة.",
+      "sources": [
+        {"title": "John Fremont Expeditions 1848 and 1853", "url": "https://www.nps.gov/grsa/learn/historyculture/john-fremont-expeditions-1848-and-1853.htm", "publisher": "National Park Service"}
+      ]
+    }
+  ]
+}
