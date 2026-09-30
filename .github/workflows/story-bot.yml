@@ -46,6 +46,19 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install dependencies
         run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk
+      - name: Select resilient Gemini model
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("story_youtube_uploader.py")
+          text = p.read_text(encoding="utf-8")
+          old = "gemini-2.5-flash:generateContent"
+          new = "gemini-2.5-flash-lite:generateContent"
+          if old not in text:
+              raise SystemExit("Expected Gemini model string was not found; refusing to run with an unknown configuration")
+          p.write_text(text.replace(old, new), encoding="utf-8")
+          print("Using Gemini 2.5 Flash-Lite for higher availability on scheduled runs")
+          PY
       - name: Run bot
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
