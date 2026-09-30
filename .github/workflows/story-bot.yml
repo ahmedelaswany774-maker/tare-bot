@@ -25,12 +25,19 @@ on:
         default: true
         type: boolean
 
+permissions:
+  contents: write
+
+concurrency:
+  group: story-bot-publisher
+  cancel-in-progress: false
+
 jobs:
   run-bot:
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b163c90ea73d27597364c9af683 # v4.2.2
       - name: Set up Python
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
         with:
@@ -57,14 +64,50 @@ jobs:
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '30'
         run: yes y | python story_youtube_uploader.py
+
+      - name: Mark episode published in series manifest
+        if: ${{ success() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest_path = Path("content/series/real_stories_season_2.json")
+          metadata_path = Path("story_metadata.json")
+          if not metadata_path.exists():
+              raise SystemExit("story_metadata.json not found; refusing to advance episode state")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+          episode_id = metadata.get("episode_id")
+          if not episode_id:
+              raise SystemExit("episode_id missing from story_metadata.json; refusing to advance state")
+          found = False
+          for episode in manifest["episodes"]:
+              if episode.get("episode_id") == episode_id:
+                  episode["published"] = True
+                  episode["published_at"] = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
+                  found = True
+                  break
+          if not found:
+              raise SystemExit(f"Episode {episode_id} not found in manifest")
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/series/real_stories_season_2.json
+          git diff --cached --quiet && echo "No episode state change needed" || (git commit -m "chore: mark published episode" && git push)
+
       - name: Publish linked Short
-        if: ${{ github.event_name == 'schedule' || inputs.publish_short == true }}
+        if: ${{ success() && (github.event_name == 'schedule' || inputs.publish_short == true) }}
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
         run: python short_youtube_uploader.py
+
       - name: Verify generated video exists
         if: always()
         run: test -f story.mp4 && ls -lh story.mp4
+
       - name: Save run outputs
         if: always()
         continue-on-error: true
