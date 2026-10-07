@@ -53,11 +53,11 @@ jobs:
           p = Path("story_youtube_uploader.py")
           text = p.read_text(encoding="utf-8")
           old = "gemini-2.5-flash:generateContent"
-          new = "gemini-2.5-flash-lite:generateContent"
+          new = "gemini-3.1-flash-lite:generateContent"
           if old not in text:
               raise SystemExit("Expected Gemini model string was not found; refusing to run with an unknown configuration")
           p.write_text(text.replace(old, new), encoding="utf-8")
-          print("Using Gemini 2.5 Flash-Lite for higher availability on scheduled runs")
+          print("Using Gemini 3.1 Flash-Lite for higher availability on scheduled runs")
           PY
       - name: Run bot
         env:
