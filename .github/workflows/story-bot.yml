@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tts_backend:
-        description: 'ظ…ط­ط±ظƒ ط§ظ„طµظˆطھ: edge ظ…ط¬ط§ظ†ظٹطŒ ط£ظˆ xtts ط¨طµظˆطھظƒطŒ ط£ظˆ fish'
+        description: 'محرك الصوت: edge مجاني، أو xtts بصوتك، أو fish'
         required: false
         default: edge
         type: choice
@@ -15,7 +15,7 @@ on:
           - xtts
           - fish
       publish_short:
-        description: 'ظ†ط´ط± ط§ظ„ظ€Short ط§ظ„ظ…ط±طھط¨ط· ط¨ط¹ط¯ طھط¬ظ‡ظٹط² ط§ظ„ظپظٹط¯ظٹظˆ ط§ظ„ط·ظˆظٹظ„'
+        description: 'نشر الـShort المرتبط بعد تجهيز الفيديو الطويل'
         required: false
         default: true
         type: boolean
@@ -53,7 +53,7 @@ jobs:
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
           GEMINI_MODEL: gemini-3.1-flash-lite
           GEMINI_FALLBACK_MODELS: gemini-3.5-flash
-          STORY_TARGET_WORDS: '2500'
+          STORY_TARGET_WORDS: '1800'
           HISTORY_PATH: content/published_stories.json
           TTS_BACKEND: ${{ github.event_name == 'workflow_dispatch' && inputs.tts_backend || 'edge' }}
           VOICE_REFERENCE_PATH: voice_reference.wav
