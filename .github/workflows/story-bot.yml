@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tts_backend:
-        description: 'محرك الصوت: edge مجاني، أو xtts بصوتك، أو fish'
+        description: 'ظ…ط­ط±ظƒ ط§ظ„طµظˆطھ: edge ظ…ط¬ط§ظ†ظٹطŒ ط£ظˆ xtts ط¨طµظˆطھظƒطŒ ط£ظˆ fish'
         required: false
         default: edge
         type: choice
@@ -15,7 +15,7 @@ on:
           - xtts
           - fish
       publish_short:
-        description: 'نشر الـShort المرتبط بعد تجهيز الفيديو الطويل'
+        description: 'ظ†ط´ط± ط§ظ„ظ€Short ط§ظ„ظ…ط±طھط¨ط· ط¨ط¹ط¯ طھط¬ظ‡ظٹط² ط§ظ„ظپظٹط¯ظٹظˆ ط§ظ„ط·ظˆظٹظ„'
         required: false
         default: true
         type: boolean
