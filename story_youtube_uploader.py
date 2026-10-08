@@ -1,31 +1,27 @@
-def main():
-    history = load_history()
-    print(f"عدد القصص المنشورة سابقًا في السجل: {len(history)}")
+import os
+import json
+import math
+import time
+import re
+import random
+import subprocess
+import asyncio
+import requests
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-    topic_info = pick_topic(history)
-    topic = topic_info["topic"]
-    print(f"الفئة: {topic_info['category']}")
-    print(f"الموضوع: {topic}")
+import edge_tts
+from moviepy import VideoFileClip, concatenate_videoclips, AudioFileClip
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
 
-    story_text = generate_story(topic_info)
-    word_count = len(story_text.split())
-    print(f"عدد كلمات القصة: {word_count}")
-    min_words = max(600, STORY_TARGET_WORDS // 3)
-    if word_count < min_words:
-        raise RuntimeError(
-            f"القصة قصيرة جدًا ({word_count} كلمة، المطلوب على الأقل {min_words}) — أوقفنا التشغيل بدل رفع فيديو ناقص"
-        )
-
-    meta = generate_metadata(story_text, topic)
-    video_title = str(meta.get("title") or topic).strip()
-    description = str(meta.get("description") or topic).strip()
-    keywords = [str(k).strip() for k in (meta.get("visual_keywords") or []) if str(k).strip()]
-    if not keywords:
-        keywords = list(DEFAULT_KEYWORDS)
-    print(f"العنوان: {video_title}")
-
-    created_at = datetime.now(timezone.utc).replace(microsecond=0)
-    story_id = created_at.strftime("%Y%m%d-%H%M%S")
-
-    save_json(
-        METADATA_PATH,
+GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+PEXELS_KEY = os.environ["PEXELS_API_KEY"]
+FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
+FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
+TTS_BACKEND = os.environ.get("TTS_BACKEND", "fish").lower()
+VOICE_REFERENCE_PATH = os.environ.get("VOICE_REFERENCE_PATH", "voice_reference.wav")
+XTTS_LANGUAGE = os.environ.get("XTTS_LANGUAGE", "ar")
+PUBLISH_DELAY_MINUTES = int(os.environ.get("PUBLISH_DELAY_MINUTES", "30"))
