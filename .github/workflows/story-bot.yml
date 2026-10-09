@@ -55,6 +55,7 @@ jobs:
           GEMINI_FALLBACK_MODELS: gemini-3.5-flash
           STORY_TARGET_WORDS: '1800'
           HISTORY_PATH: content/published_stories.json
+          EPISODE_NUMBER: next
           TTS_BACKEND: ${{ github.event_name == 'workflow_dispatch' && inputs.tts_backend || 'edge' }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
@@ -68,6 +69,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add content/published_stories.json
+            git add content/series/real_stories.json
             if git diff --cached --quiet; then
               echo "No story history change"
             else
@@ -76,7 +78,18 @@ jobs:
               git push
             fi
           else
-            echo "No story history file yet"
+            if [ -f content/series/real_stories.json ]; then
+              git config user.name "github-actions[bot]"
+              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+              git add content/series/real_stories.json
+              if ! git diff --cached --quiet; then
+                git commit -m "chore: record published series episode"
+                git pull --rebase origin "${GITHUB_REF_NAME}"
+                git push
+              fi
+            else
+              echo "No story history or series manifest file"
+            fi
           fi
 
       - name: Publish linked Short
