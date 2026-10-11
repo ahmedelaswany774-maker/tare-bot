@@ -42,6 +42,7 @@ jobs:
       - name: Install dependencies
         run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk pillow arabic-reshaper python-bidi
       - name: Run bot
+        id: run_bot
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -66,35 +67,24 @@ jobs:
         if: ${{ always() }}
         continue-on-error: true
         run: |
-          if [ -f content/published_stories.json ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add content/published_stories.json
-            git add content/series/real_stories.json
-            if git diff --cached --quiet; then
-              echo "No story history change"
-            else
-              git commit -m "chore: record published story"
-              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
-              git push
-            fi
-          else
-            if [ -f content/series/real_stories.json ]; then
-              git config user.name "github-actions[bot]"
-              git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-              git add content/series/real_stories.json
-              if ! git diff --cached --quiet; then
-                git commit -m "chore: record published series episode"
-                git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
-                git push
-              fi
-            else
-              echo "No story history or series manifest file"
-            fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/published_stories.json content/series/real_stories.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: record published story history"
           fi
+          # Preserve any other tracked changes made during generation while syncing.
+          git stash push -m "preserve generated working-tree changes" || true
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git stash pop || true
+          git add content/published_stories.json content/series/real_stories.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: reconcile generated story history"
+          fi
+          git push
 
       - name: Publish linked Short
-        if: ${{ success() && (github.event_name == 'schedule' || inputs.publish_short == true) }}
+        if: ${{ steps.run_bot.outcome == 'success' && (github.event_name == 'schedule' || inputs.publish_short == true) }}
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
         run: python short_youtube_uploader.py
