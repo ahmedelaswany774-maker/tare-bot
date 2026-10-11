@@ -220,8 +220,26 @@ def generate_teaser_script(manifest, episode, story_text):
         f"نص القصة للاستناد إلى وقائعه فقط:\\n{story_text[:10000]}"
     )
     teaser = call_gemini(prompt, max_output_tokens=1200).strip()
-    if len(teaser.split()) < 35:
-        raise ValueError("نص الريلز المولّد أقصر من المطلوب؛ إيقاف النشر لمنع ريلز ضعيف")
+    word_count = len(teaser.split())
+
+    # Gemini may occasionally return a short answer despite the requested length.
+    # Retry once with an explicit minimum; do not publish a weak teaser.
+    if word_count < 35:
+        retry_prompt = (
+            prompt
+            + "\\nمهم جدًا: إجابتك السابقة كانت قصيرة أكثر من اللازم. أعد كتابة النص كاملًا "
+            + "في 80 إلى 100 كلمة عربية فعلية، مع 2-3 تفاصيل موثقة ونداء واضح لمشاهدة الحلقة الكاملة. "
+            + "أخرج التعليق الصوتي فقط، دون مقدمة أو شرح."
+        )
+        teaser = call_gemini(retry_prompt, max_output_tokens=1600).strip()
+        word_count = len(teaser.split())
+
+    if word_count < 35:
+        raise ValueError(
+            f"نص الريلز أقصر من الحد الآمن بعد إعادة المحاولة ({word_count} كلمة)؛ "
+            "تم إيقاف النشر لتجنب رفع ريلز ضعيف."
+        )
+    print(f"تم إنشاء نص الريلز التشويقي ({word_count} كلمة).")
     return teaser
 
 
