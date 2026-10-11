@@ -74,7 +74,7 @@ jobs:
               echo "No story history change"
             else
               git commit -m "chore: record published story"
-              git pull --rebase origin "${GITHUB_REF_NAME}"
+              git pull --rebase --autostash origin "${GITHUB_REF_NAME}"
               git push
             fi
           else
