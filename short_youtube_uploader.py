@@ -64,7 +64,11 @@ def render_teaser(teaser):
         await edge_tts.Communicate(teaser, "ar-EG-ShakirNeural").save(str(VOICE_FILE))
     asyncio.run(make_voice())
     voice = AudioFileClip(str(VOICE_FILE))
-    duration = min(float(MAX_SECONDS), voice.duration)
+    duration = float(voice.duration)
+    if duration > MAX_SECONDS:
+        source.close()
+        voice.close()
+        raise ValueError(f"Teaser narration is {duration:.1f}s; shorten teaser_script to {MAX_SECONDS}s instead of cutting off the call to action")
     source = VideoFileClip(str(SOURCE_VIDEO))
     if source.duration < duration:
         raise ValueError("Source story video is shorter than the teaser narration")
@@ -137,11 +141,15 @@ def main():
         f"المصادر:\n{source_lines}\n\n#قصص_واقعية #قصص_حقيقية #Shorts"
     )
     scheduled = long_state.get("scheduled_publish_at")
+    short_scheduled = None
     status = {"privacyStatus": "public", "selfDeclaredMadeForKids": False}
     if scheduled:
         dt = datetime.fromisoformat(scheduled.replace("Z", "+00:00"))
-        if dt > datetime.now(timezone.utc):
-            status = {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "publishAt": scheduled}
+        # Let the full episode become public first, then release its teaser 15 minutes later.
+        teaser_dt = dt + __import__("datetime").timedelta(minutes=15)
+        if teaser_dt > datetime.now(timezone.utc):
+            short_scheduled = teaser_dt.replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            status = {"privacyStatus": "private", "selfDeclaredMadeForKids": False, "publishAt": short_scheduled}
 
     response = youtube.videos().insert(
         part="snippet,status",
@@ -157,7 +165,7 @@ def main():
         "status": "uploaded", "short_video_id": short_id,
         "related_long_video_id": long_video_id, "episode_id": metadata.get("episode_id"),
         "episode_number": metadata.get("episode_number"), "video": str(SHORT_VIDEO),
-        "scheduled_publish_at": scheduled if status["privacyStatus"] == "private" else None,
+        "scheduled_publish_at": short_scheduled if status["privacyStatus"] == "private" else None,
         "teaser_script": teaser,
     })
     print(f"تم رفع الريلز التشويقي: https://youtube.com/shorts/{short_id}")
