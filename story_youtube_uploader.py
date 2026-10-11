@@ -204,7 +204,29 @@ episode = content["episode"]
 story_text = content["story"]
 video_title = content["title"]
 description = content["description"]
+
+def generate_teaser_script(manifest, episode, story_text):
+    """Create an original short-form teaser from the selected episode, not a raw crop."""
+    prompt = (
+        "اكتب نص تعليق صوتي عربي مصري طبيعي لريلز ترويجي مدته 30 إلى 50 ثانية "
+        "عن القصة الحقيقية التالية. افتح بسؤال أو مفارقة قوية خلال أول ثانيتين، "
+        "ثم اذكر 2-3 تفاصيل موثقة من النص، وصعّد التشويق دون كشف الخاتمة. "
+        "اختم بدعوة واضحة: شاهد القصة الكاملة على قناة قصص واقعيه. "
+        "لا تخترع أي معلومة أو حوار أو نتيجة، ولا تكتب عنوانًا أو تعليمات تصوير أو روابط. "
+        "أخرج التعليق الصوتي فقط، في حدود 75-105 كلمات.\\n"
+        f"عنوان الحلقة: {episode['title']}\\n"
+        f"الافتتاحية المعتمدة: {episode['opening_hook']}\\n"
+        f"المصادر: " + "; ".join(s['title'] + " (" + s['publisher'] + ")" for s in episode['sources']) + "\\n"
+        f"نص القصة للاستناد إلى وقائعه فقط:\\n{story_text[:10000]}"
+    )
+    teaser = call_gemini(prompt, max_output_tokens=1200).strip()
+    if len(teaser.split()) < 35:
+        raise ValueError("نص الريلز المولّد أقصر من المطلوب؛ إيقاف النشر لمنع ريلز ضعيف")
+    return teaser
+
+
 keywords = content["visual_keywords"]
+teaser_script = generate_teaser_script(manifest, episode, story_text)
 
 print(f"تم اختيار السلسلة: {manifest['series_title']}")
 print(f"الحلقة {episode['episode_number']}: {video_title}")
@@ -225,6 +247,7 @@ save_json(
         "playlist_title": manifest["playlist_title"],
         "thumbnail_text": episode["thumbnail_text"],
         "opening_hook": episode["opening_hook"],
+        "teaser_script": teaser_script,
         "cta_policy": growth_policy["cta"],
         "tts_backend": TTS_BACKEND,
         "sources": episode["sources"],
