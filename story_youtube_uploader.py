@@ -240,6 +240,7 @@ save_json(
         "episode_id": episode["episode_id"],
         "episode_number": episode["episode_number"],
         "title": video_title,
+        "short_title": episode.get("short_title", video_title),
         "description": description,
         "tags": keywords,
         "story_word_count": len(story_text.split()),
