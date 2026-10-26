@@ -235,9 +235,21 @@ def generate_teaser_script(manifest, episode, story_text):
         word_count = len(teaser.split())
 
     if word_count < 35:
+        # Last-resort local fallback: build a factual teaser from the approved hook
+        # and the generated story itself, instead of failing the entire episode.
+        story_sentences = re.split(r"(?<=[.!؟?])\\s+", story_text.strip())
+        grounded_details = " ".join(s.strip() for s in story_sentences[:5] if s.strip())
+        teaser = (
+            f"{episode['opening_hook']} "
+            f"في هذه الحلقة من «{manifest['series_title']}»، نراجع ما تقوله المصادر "
+            f"ونفصل بين الوقائع المؤكدة والتفسيرات التي ما زالت محل نقاش. "
+            f"{grounded_details} "
+            "ما التفسير الأقرب للأدلة؟ شاهد القصة كاملة على قناة قصص واقعيه."
+        )
+        word_count = len(teaser.split())
+    if word_count < 35:
         raise ValueError(
-            f"نص الريلز أقصر من الحد الآمن بعد إعادة المحاولة ({word_count} كلمة)؛ "
-            "تم إيقاف النشر لتجنب رفع ريلز ضعيف."
+            f"تعذر إنشاء نص ريلز صالح حتى بالصياغة الاحتياطية ({word_count} كلمة)."
         )
     print(f"تم إنشاء نص الريلز التشويقي ({word_count} كلمة).")
     return teaser
