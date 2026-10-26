@@ -93,17 +93,3 @@ jobs:
       - name: Verify generated video exists
         if: always()
         run: test -f story.mp4 && ls -lh story.mp4
-
-      - name: Save run outputs
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: story-${{ github.run_id }}
-          path: |
-            story.mp4
-            story_metadata.json
-            upload_state.json
-            short_state.json
-          if-no-files-found: ignore
-          retention-days: 7
