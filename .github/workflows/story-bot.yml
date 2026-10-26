@@ -2,7 +2,8 @@ name: Story Bot - Series Publisher
 
 on:
   schedule:
-    - cron: '0 17 * * 5'
+    # Four daily runs (UTC): 06:00, 11:00, 16:00, 21:00.
+    - cron: '0 6,11,16,21 * * *'
   workflow_dispatch:
     inputs:
       tts_backend:
