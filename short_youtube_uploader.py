@@ -66,9 +66,8 @@ def render_teaser(teaser):
     voice = AudioFileClip(str(VOICE_FILE))
     duration = float(voice.duration)
     if duration > MAX_SECONDS:
-        source.close()
         voice.close()
-        raise ValueError(f"Teaser narration is {duration:.1f}s; shorten teaser_script to {MAX_SECONDS}s instead of cutting off the call to action")
+        raise ValueError(f"Teaser narration is {duration:.1f}s; teaser must be regenerated within {MAX_SECONDS}s")
     source = VideoFileClip(str(SOURCE_VIDEO))
     if source.duration < duration:
         raise ValueError("Source story video is shorter than the teaser narration")
