@@ -57,7 +57,7 @@ def load_episode():
             raise ValueError(f"EPISODE_NUMBER={requested_number} غير موجود. المتاح: {available}")
         if episode.get("published", False):
             raise ValueError(f"الحلقة {requested_number} مسجلة كمنشورة بالفعل؛ أوقفنا التشغيل لمنع التكرار")
-    if len(episode.get("sources", [])) == 0:
+    if manifest.get("content_type") != "fictional_social_drama" and len(episode.get("sources", [])) == 0:
         raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر/مراجع استمرارية")
     return manifest, episode
 
@@ -104,20 +104,24 @@ def generate_story(manifest, episode):
     growth_policy = load_growth_policy()
     sources = "\n".join(
         f"- {source['title']} — {source['publisher']} — {source['url']}"
-        for source in episode["sources"]
-    )
+        for source in episode.get("sources", [])
+    ) or "لا توجد مصادر؛ هذه قصة خيالية أصلية وليست واقعة حقيقية."
     target_words = episode.get("target_words", 4500)
     prompt = (
         f"اكتب نصًا عربيًا طويلًا أصليًا للحلقة {episode['episode_number']} من سلسلة "
         f"«{manifest['series_title']}». موضوع الحلقة: {episode['topic']}.\n\n"
+        + ("هذه دراما اجتماعية خيالية بالكامل. اكتب باللهجة المصرية البيضاء، وابتكر حوارًا طبيعيًا وشخصيات ودوافع متماسكة، وحافظ بدقة على استمرارية الأجزاء السابقة. لا تقل إنها قصة حقيقية ولا تنسبها لأشخاص حقيقيين. اجعلها مشوقة وواقعية في تفاصيل الحياة اليومية، مع تصاعد درامي ونهاية تمهد للجزء التالي. لا تضع مصادر أو ادعاءات توثيقية.\n\n"
+           if manifest.get("content_type") == "fictional_social_drama" else "")
         f"العنوان التحريري الثابت: {episode['title']}\n"
         f"افتتاحية أول 20 ثانية يجب الحفاظ على معناها: {episode['opening_hook']}\n"
         f"رسالة الصورة المصغرة المقترحة: {episode['thumbnail_text']}\n"
         f"المصادر المسموح الاعتماد عليها:\n{sources}\n\n"
         f"اكتب نصًا مناسبًا لسرد صوتي مدته تقريبًا {manifest['target_duration_minutes']['min']} إلى "
         f"{manifest['target_duration_minutes']['max']} دقيقة، وبحدود {target_words} كلمة. "
-        "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
-        "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. "
+        ("هذه قصة خيالية؛ حافظ على منطق الأحداث واستمرارية الشخصيات ولا تقدمها كحقيقة. "
+         if manifest.get("content_type") == "fictional_social_drama"
+         else "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
+              "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. ")
         "قسّم السرد إلى افتتاحية قوية، سياق زمني، تصاعد للأدلة، نقطة غموض أو خطر، ثم خاتمة تشرح ما نعرفه وما لا نعرفه. "
         f"بعد الحدث الأساسي وليس قبل أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، أضف فاصلًا واحدًا قصيرًا وطبيعيًا يدعو المشاهد للاشتراك في القناة ويطرح سؤالًا واحدًا للتعليقات، دون قطع التوتر أو تكرار الدعوة. "
         "في النهاية أضف فاصلًا ختاميًا قصيرًا يدعو للاشتراك ومتابعة الحلقة التالية من نفس السلسلة، دون مبالغة أو clickbait. "
