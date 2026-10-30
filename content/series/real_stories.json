@@ -106,7 +106,9 @@
           "url": "https://endurance22.org/history-of-endurance",
           "publisher": "Endurance22"
         }
-      ]
+      ],
+      "published": true,
+      "published_note": "A long video was successfully uploaded and scheduled by GitHub Actions run 41055109164 on 2026-10-30; Shorts rendering failed. Do not regenerate this episode."
     }
   ]
 }
