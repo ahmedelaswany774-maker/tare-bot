@@ -234,20 +234,29 @@ def generate_teaser_script(manifest, episode, story_text):
         teaser = call_gemini(retry_prompt, max_output_tokens=1600).strip()
         word_count = len(teaser.split())
 
-    if word_count < 35:
-        # Last-resort local fallback: build a factual teaser from the approved hook
-        # and the generated story itself, instead of failing the entire episode.
-        story_sentences = re.split(r"(?<=[.!؟?])\\s+", story_text.strip())
-        grounded_details = " ".join(s.strip() for s in story_sentences[:5] if s.strip())
-        teaser = (
-            f"{episode['opening_hook']} "
-            f"في هذه الحلقة من «{manifest['series_title']}»، نراجع ما تقوله المصادر "
-            f"ونفصل بين الوقائع المؤكدة والتفسيرات التي ما زالت محل نقاش. "
-            f"{grounded_details} "
-            "ما التفسير الأقرب للأدلة؟ شاهد القصة كاملة على قناة قصص واقعيه."
-        )
+    if word_count < 35 or word_count > 110:
+        # Never pass a full episode script to the Shorts renderer. Build a compact,
+        # grounded teaser from the approved hook and story, capped at 100 words.
+        sentences = re.split(r"(?<=[.!؟?])\\s+", story_text.strip())
+        selected = [episode["opening_hook"].strip()]
+        count = len(selected[0].split())
+        for sentence in sentences:
+            sentence = sentence.strip()
+            if not sentence:
+                continue
+            n = len(sentence.split())
+            if count + n > 88:
+                continue
+            selected.append(sentence)
+            count += n
+            if count >= 72:
+                break
+        teaser = " ".join(selected) + " شاهد القصة كاملة على قناة قصص واقعيه."
+        words = teaser.split()
+        if len(words) > 100:
+            teaser = " ".join(words[:94]) + " شاهد القصة كاملة على قناة قصص واقعيه."
         word_count = len(teaser.split())
-    if word_count < 35:
+    if word_count < 35 or word_count > 110:
         raise ValueError(
             f"تعذر إنشاء نص ريلز صالح حتى بالصياغة الاحتياطية ({word_count} كلمة)."
         )
