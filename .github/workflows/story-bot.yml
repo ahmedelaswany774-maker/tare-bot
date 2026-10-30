@@ -1,9 +1,7 @@
 name: Story Bot - Series Publisher
 
 on:
-  schedule:
-    # Four daily runs (UTC): 06:00, 11:00, 16:00, 21:00.
-    - cron: '0 6,11,16,21 * * *'
+  # Automatic schedule paused to prevent duplicate uploads.
   workflow_dispatch:
     inputs:
       tts_backend:
