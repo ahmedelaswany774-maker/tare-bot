@@ -1,20 +1,21 @@
 {
-  "series_id": "real-stories-files",
-  "series_title": "ملفات حقيقية: ألغاز ونجاة غيّرت التاريخ",
+  "series_id": "social-drama-stories",
+  "series_title": "حكايات من البيوت: أسرار وقرارات غيّرت المصير",
   "language": "ar",
   "target_duration_minutes": {
     "min": 10,
     "max": 14
   },
   "editorial_rules": [
-    "افصل بين الوقائع الموثقة والنظريات المحتملة بوضوح.",
-    "لا تخترع حوارًا أو شخصية أو دليلًا غير موجود في المصادر.",
-    "اذكر المصادر في وصف الفيديو.",
-    "لا تقدّم تفسيرًا غير محسوم باعتباره حقيقة نهائية.",
-    "ابدأ الحلقة بالحدث المركزي خلال أول 20 ثانية.",
-    "استخدم Thumbnail برسالة واحدة لا تتجاوز 4 كلمات."
+    "دراما اجتماعية خيالية بالكامل، ولا يجوز وصفها بأنها قصة حقيقية أو واقعة موثقة.",
+    "شخصيات وأسماء وأحداث خيالية أصلية، مع منع تكرار الحبكات والمواقف.",
+    "السرد باللهجة المصرية البيضاء المفهومة عربيًا وبأسلوب روائي طويل ومشوق.",
+    "ابدأ بمشهد درامي قوي، ثم ابنِ الأحداث تدريجيًا مع دوافع واضحة للشخصيات.",
+    "حافظ على استمرارية الشخصيات والأحداث بين أجزاء كل حكاية.",
+    "اختم كل جزء بتطور يشجع على متابعة الجزء التالي.",
+    "عبارة الصورة المصغرة لا تتجاوز 4 كلمات."
   ],
-  "playlist_title": "ملفات حقيقية | ألغاز ونجاة غيّرت التاريخ",
+  "playlist_title": "حكايات من البيوت | قصص اجتماعية درامية",
   "episodes": [
     {
       "episode_id": "mary-celeste-01",
@@ -48,7 +49,8 @@
           "publisher": "National Maritime Museum, Greenwich"
         }
       ],
-      "published": true
+      "published": true,
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
     },
     {
       "episode_id": "dyatlov-pass-02",
@@ -78,7 +80,7 @@
         }
       ],
       "published": true,
-      "published_note": "Marked published based on user's YouTube Studio screenshot on 2026-10-17; verify exact video ID before further edits."
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
     },
     {
       "episode_id": "shackleton-endurance-03",
@@ -108,7 +110,7 @@
         }
       ],
       "published": true,
-      "published_note": "A long video was successfully uploaded and scheduled by GitHub Actions run 41055109164 on 2026-10-30; Shorts rendering failed. Do not regenerate this episode."
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
     },
     {
       "episode_id": "shackleton-ice-prison-04",
@@ -144,7 +146,9 @@
           "url": "https://nzhistory.govt.nz/media/interactive/shackleton-sea-parties",
           "publisher": "New Zealand History"
         }
-      ]
+      ],
+      "published": true,
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
     },
     {
       "episode_id": "shackleton-endurance-sinks-05",
@@ -179,7 +183,9 @@
           "url": "https://nzhistory.govt.nz/media/interactive/shackleton-sea-parties",
           "publisher": "New Zealand History"
         }
-      ]
+      ],
+      "published": true,
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
     },
     {
       "episode_id": "shackleton-elephant-island-06",
@@ -214,7 +220,9 @@
           "url": "https://www.amnh.org/learn-teach/curriculum-collections/antarctica/exploration/the-voyage-of-the-james-caird",
           "publisher": "American Museum of Natural History"
         }
-      ]
+      ],
+      "published": true,
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
     },
     {
       "episode_id": "shackleton-james-caird-07",
@@ -249,7 +257,626 @@
           "url": "https://endurance22.org/the-expedition",
           "publisher": "Endurance22"
         }
-      ]
+      ],
+      "published": true,
+      "published_note": "تم إيقاف السلسلة القديمة عند التحويل للمحتوى الاجتماعي؛ لا تعِد نشرها."
+    },
+    {
+      "episode_id": "social-08",
+      "episode_number": 8,
+      "title": "رجعت بعد غياب سنين لتطالب بحقها في الميراث",
+      "short_title": "رجعت بعد غياب سنين لتطالب بحقها في الميراث",
+      "thumbnail_text": "البيت مش للبيع",
+      "opening_hook": "تعود ندى إلى بيت العائلة بعد غياب طويل عقب وفاة والدها، وتكتشف أن إخوتها اتخذوا قرارات بشأن الميراث دون إخبارها.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: عودة الابنة الغائبة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-09",
+      "episode_number": 9,
+      "title": "الخطاب الذي أخفاه الأب سنوات",
+      "short_title": "الخطاب الذي أخفاه الأب سنوات",
+      "thumbnail_text": "سر الخطاب",
+      "opening_hook": "تعثر ندى على خطاب قديم يغيّر فهمها لخلاف العائلة، لكنه يفتح أسئلة جديدة حول من أخفى الحقيقة ولماذا.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: رسالة من الماضي. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-10",
+      "episode_number": 10,
+      "title": "الشاهد الذي ظهر ليلة تقسيم الميراث",
+      "short_title": "الشاهد الذي ظهر ليلة تقسيم الميراث",
+      "thumbnail_text": "ظهر الشاهد",
+      "opening_hook": "يجتمع أفراد الأسرة لحسم النزاع، ويظهر جار قديم يحمل رواية مختلفة عن السنوات الأخيرة للأب.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: شهادة قلبت المجلس. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-11",
+      "episode_number": 11,
+      "title": "القرار الذي فرّق الإخوة ثم جمعهم",
+      "short_title": "القرار الذي فرّق الإخوة ثم جمعهم",
+      "thumbnail_text": "قرار صعب",
+      "opening_hook": "تصل الأسرة إلى مفترق طرق، وتختار ندى بين حقها والحفاظ على روابط العائلة.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: الاختيار الأخير. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-12",
+      "episode_number": 12,
+      "title": "أسرار غرفة الأب المغلقة",
+      "short_title": "أسرار غرفة الأب المغلقة",
+      "thumbnail_text": "ممنوع الاقتراب",
+      "opening_hook": "يكتشف الإخوة مفتاحًا لغرفة ظلت مغلقة، وتظهر تفاصيل لم يكن أي منهم مستعدًا لسماعها.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: الغرفة المقفولة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-13",
+      "episode_number": 13,
+      "title": "اعتراف الأم الذي تأخر عشرين عامًا",
+      "short_title": "اعتراف الأم الذي تأخر عشرين عامًا",
+      "thumbnail_text": "الحقيقة أخيرًا",
+      "opening_hook": "تقرر الأم أن تتكلم، لكن اعترافها يضع الجميع أمام مسؤولياتهم.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: اعتراف متأخر. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-14",
+      "episode_number": 14,
+      "title": "ليلة الصلح الأخير",
+      "short_title": "ليلة الصلح الأخير",
+      "thumbnail_text": "هل يسامحون؟",
+      "opening_hook": "تجتمع الأسرة للمرة الأخيرة قبل اتخاذ قرار نهائي، وتختبر معنى التسامح والعدل.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: آخر فرصة للعيلة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-15",
+      "episode_number": 15,
+      "title": "وافقت على العريس لإرضاء أهلها ثم ظهر ماضيه",
+      "short_title": "وافقت على العريس لإرضاء أهلها ثم ظهر ماضيه",
+      "thumbnail_text": "مين العريس؟",
+      "opening_hook": "تدخل سلمى خطوبة تقليدية تحت ضغط الأسرة، ثم تلاحظ تناقضات في حكايات خطيبها.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: خطوبة على حافة السر. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-16",
+      "episode_number": 16,
+      "title": "صديقتها تعرف سرًا لم تقله العائلة",
+      "short_title": "صديقتها تعرف سرًا لم تقله العائلة",
+      "thumbnail_text": "سر صاحبتها",
+      "opening_hook": "تصل إلى سلمى رسالة من صديقة قديمة تكشف جانبًا آخر من حياة العريس.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: الصديقة والشهادة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-17",
+      "episode_number": 17,
+      "title": "جلسة التعارف التي قلبت كل التوقعات",
+      "short_title": "جلسة التعارف التي قلبت كل التوقعات",
+      "thumbnail_text": "كلام اتكشف",
+      "opening_hook": "تواجه سلمى خطيبها بحقائق متفرقة في جلسة عائلية، لكن رد فعله يكشف أزمة أعمق.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: مواجهة أمام الجميع. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-18",
+      "episode_number": 18,
+      "title": "الأم بين خوفها على ابنتها وخوفها من كلام الناس",
+      "short_title": "الأم بين خوفها على ابنتها وخوفها من كلام الناس",
+      "thumbnail_text": "اختاري نفسك",
+      "opening_hook": "تكتشف الأم أن ضغطها على ابنتها كان جزءًا من المشكلة، وتحاول إصلاح ما أفسدته.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: الأم والحيرة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-19",
+      "episode_number": 19,
+      "title": "يوم الفرح الذي لم يبدأ",
+      "short_title": "يوم الفرح الذي لم يبدأ",
+      "thumbnail_text": "قبل الزفة",
+      "opening_hook": "تتخذ سلمى قرارًا مصيريًا قبل الزفاف بساعات، وتواجه العائلتين بعواقب الصمت.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: الفرح اتأجل. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-20",
+      "episode_number": 20,
+      "title": "الحقيقة الكاملة من الطرف الآخر",
+      "short_title": "الحقيقة الكاملة من الطرف الآخر",
+      "thumbnail_text": "اسمعوا منه",
+      "opening_hook": "يظهر منظور جديد للأحداث، وتضطر سلمى إلى التمييز بين الخطأ وسوء الفهم.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: الحكاية الناقصة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-21",
+      "episode_number": 21,
+      "title": "اختارت طريقها ودفعت ثمن القرار",
+      "short_title": "اختارت طريقها ودفعت ثمن القرار",
+      "thumbnail_text": "قرارها الأخير",
+      "opening_hook": "تغلق سلمى صفحة الخطوبة وتبدأ حياة أكثر استقلالًا، مع تصالح تدريجي مع أسرتها.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة على باب الجواز: بداية جديدة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-22",
+      "episode_number": 22,
+      "title": "الأخ الذي عاد بعد غياب وطلب أن يسكن معهم",
+      "short_title": "الأخ الذي عاد بعد غياب وطلب أن يسكن معهم",
+      "thumbnail_text": "رجع فجأة",
+      "opening_hook": "يعود كريم إلى منزل أخته بعد سنوات من الغياب، ويطلب فرصة جديدة دون أن يشرح سبب عودته.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: ضيف تقيل. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-23",
+      "episode_number": 23,
+      "title": "زوجة الأخ ترفض وجوده في البيت",
+      "short_title": "زوجة الأخ ترفض وجوده في البيت",
+      "thumbnail_text": "مش هينفع",
+      "opening_hook": "تتصاعد الخلافات بين الزوجة والزوج حول حدود المساعدة العائلية وحقوق كل طرف.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: البيت له حدود. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-24",
+      "episode_number": 24,
+      "title": "دفتر قديم يكشف من كان ينفق على الأسرة",
+      "short_title": "دفتر قديم يكشف من كان ينفق على الأسرة",
+      "thumbnail_text": "مين كان بيدفع؟",
+      "opening_hook": "يكشف دفتر حسابات قديم تضحيات غير معلنة، ويعيد ترتيب صورة كل فرد داخل الأسرة.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: دفتر المصاريف. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-25",
+      "episode_number": 25,
+      "title": "الابن الصغير يسمع ما لم يكن يجب أن يسمعه",
+      "short_title": "الابن الصغير يسمع ما لم يكن يجب أن يسمعه",
+      "thumbnail_text": "سمع كل حاجة",
+      "opening_hook": "تؤثر الخلافات على طفل في الأسرة، فيدرك الكبار أن نزاعهم تجاوز حدودهم الشخصية.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: كلام الأطفال. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-26",
+      "episode_number": 26,
+      "title": "قرار بيع الشقة يشعل الخلاف",
+      "short_title": "قرار بيع الشقة يشعل الخلاف",
+      "thumbnail_text": "مين يبيع؟",
+      "opening_hook": "يطرح أحد أفراد الأسرة بيع الشقة لحل أزمة مالية، بينما يرى الآخرون أن القرار يهدد استقرار الجميع.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: الشقة في خطر. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-27",
+      "episode_number": 27,
+      "title": "كريم يواجه نتيجة اختفائه القديم",
+      "short_title": "كريم يواجه نتيجة اختفائه القديم",
+      "thumbnail_text": "لازم يواجه",
+      "opening_hook": "يشرح كريم أسباب ابتعاده، لكن تفسيره لا يمحو أثر السنوات التي ترك فيها أسرته.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: سنين الغياب. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-28",
+      "episode_number": 28,
+      "title": "اتفاق جديد بشروط واضحة",
+      "short_title": "اتفاق جديد بشروط واضحة",
+      "thumbnail_text": "بشروطهم",
+      "opening_hook": "تضع الأسرة قواعد جديدة للمساعدة والعيش المشترك، وتبدأ اختبار الثقة من جديد.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة ورث من غير فلوس: فرصة أخيرة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-29",
+      "episode_number": 29,
+      "title": "الجار الجديد يعرف تفاصيل لا يعرفها أحد",
+      "short_title": "الجار الجديد يعرف تفاصيل لا يعرفها أحد",
+      "thumbnail_text": "مين الراجل ده؟",
+      "opening_hook": "ينتقل شخص جديد إلى العمارة، وتبدأ إشاعات الجيران في التأثير على حياة أسرة هادئة.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: الساكن الجديد. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-30",
+      "episode_number": 30,
+      "title": "صوت الخلاف خلف الباب يصل إلى العمارة كلها",
+      "short_title": "صوت الخلاف خلف الباب يصل إلى العمارة كلها",
+      "thumbnail_text": "الحيطان لها ودان",
+      "opening_hook": "يسمع أحد الجيران جزءًا من خلاف عائلي ويظن أنه فهم القصة، فتنتشر رواية ناقصة.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: السر اللي اتسمع. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-31",
+      "episode_number": 31,
+      "title": "الرسالة التي وصلت إلى الشقة الخطأ",
+      "short_title": "الرسالة التي وصلت إلى الشقة الخطأ",
+      "thumbnail_text": "رسالة بالغلط",
+      "opening_hook": "تصل رسالة خاصة إلى أسرة أخرى، وتكشف سوء فهم يهدد علاقة قديمة بين جارين.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: جواب مش ليهم. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-32",
+      "episode_number": 32,
+      "title": "بنت الجيران ترفض أن تكون كبش فداء",
+      "short_title": "بنت الجيران ترفض أن تكون كبش فداء",
+      "thumbnail_text": "كفاية اتهامات",
+      "opening_hook": "ترفض مريم تحمل مسؤولية مشكلة لم تصنعها، وتبدأ في جمع الحقائق بهدوء.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: مش هسكت. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-33",
+      "episode_number": 33,
+      "title": "صاحب العمارة يعلن قرارًا يهدد الجميع",
+      "short_title": "صاحب العمارة يعلن قرارًا يهدد الجميع",
+      "thumbnail_text": "الكل مهدد",
+      "opening_hook": "يفاجأ السكان بقرار يغير حياتهم، ويضطر المختلفون إلى التعاون لحماية مصالحهم.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: قرار المالك. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-34",
+      "episode_number": 34,
+      "title": "الحقيقة تظهر في اجتماع السكان",
+      "short_title": "الحقيقة تظهر في اجتماع السكان",
+      "thumbnail_text": "مين كان السبب؟",
+      "opening_hook": "تتكشف تفاصيل متضاربة في اجتماع السكان، ويعترف أحدهم بأنه ساهم في انتشار الإشاعة.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: اجتماع العمارة. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
+    },
+    {
+      "episode_id": "social-35",
+      "episode_number": 35,
+      "title": "الشارع كله يتعلم درسًا من الحكاية",
+      "short_title": "الشارع كله يتعلم درسًا من الحكاية",
+      "thumbnail_text": "الحقيقة انتصرت",
+      "opening_hook": "تنتهي الأزمة بتفاهم عملي، لكن العلاقات لا تعود كما كانت إلا بعد اعتذارات صريحة.",
+      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة جيران آخر الشارع: الصلح الكبير. حافظ على استمرارية الشخصيات والأحداث.",
+      "target_words": 1800,
+      "visual_keywords": [
+        "cinematic Egyptian family home",
+        "Arab family drama scene",
+        "Cairo apartment interior",
+        "emotional conversation living room",
+        "dramatic close up portrait",
+        "Egyptian neighborhood street"
+      ],
+      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
+      "sources": [],
+      "published": false,
+      "content_type": "fictional"
     }
-  ]
+  ],
+  "content_type": "fictional_social_drama"
 }
