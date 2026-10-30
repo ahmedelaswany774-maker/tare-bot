@@ -3,8 +3,8 @@
   "series_title": "ملفات حقيقية: ألغاز ونجاة غيّرت التاريخ",
   "language": "ar",
   "target_duration_minutes": {
-    "min": 28,
-    "max": 38
+    "min": 10,
+    "max": 14
   },
   "editorial_rules": [
     "افصل بين الوقائع الموثقة والنظريات المحتملة بوضوح.",
@@ -109,6 +109,147 @@
       ],
       "published": true,
       "published_note": "A long video was successfully uploaded and scheduled by GitHub Actions run 41055109164 on 2026-10-30; Shorts rendering failed. Do not regenerate this episode."
+    },
+    {
+      "episode_id": "shackleton-ice-prison-04",
+      "episode_number": 4,
+      "title": "شاكلتون في سجن الجليد: تسعة أشهر على متن إندورانس",
+      "short_title": "سجن الجليد | شاكلتون وطاقمه",
+      "thumbnail_text": "تسعة أشهر من الجليد",
+      "opening_hook": "في يناير 1915 توقفت إندورانس وسط جليد بحر ويديل، ولم يكن أمام شاكلتون وطاقمه سوى الانتظار ومحاولة إبقاء السفينة حية.",
+      "topic": "Endurance trapped in Weddell Sea January to October 1915, crew life aboard, drift in pack ice",
+      "target_words": 1600,
+      "visual_keywords": [
+        "Endurance trapped in Weddell Sea ice 1915",
+        "Antarctic pack ice aerial",
+        "Shackleton expedition crew historic photographs",
+        "Frank Hurley expedition photography",
+        "Antarctic ice floe camp",
+        "polar ship frozen winter"
+      ],
+      "description": "الجزء الرابع من السلسلة المتصلة عن بعثة شاكلتون. نتابع كيف حاصر الجليد سفينة إندورانس، وكيف عاش أفراد الطاقم شهورًا فوق بحر متجمد بينما كانت السفينة تنجرف مع الكتل الجليدية.",
+      "sources": [
+        {
+          "title": "Endurance Expedition timeline and history",
+          "url": "https://endurance22.org/uploads/2022/01/Endurance22_IEE.pdf",
+          "publisher": "Falklands Maritime Heritage Trust / Endurance22"
+        },
+        {
+          "title": "Shackleton expedition timeline",
+          "url": "https://www.rgs.org/media/ev4lehtv/wseshackletonexpeditiontimeline.pdf",
+          "publisher": "Royal Geographical Society"
+        },
+        {
+          "title": "Endurance expedition parties",
+          "url": "https://nzhistory.govt.nz/media/interactive/shackleton-sea-parties",
+          "publisher": "New Zealand History"
+        }
+      ]
+    },
+    {
+      "episode_id": "shackleton-endurance-sinks-05",
+      "episode_number": 5,
+      "title": "إندورانس تتحطم: اليوم الذي فقد فيه شاكلتون سفينته",
+      "short_title": "تحطم إندورانس | السفينة تختفي",
+      "thumbnail_text": "السفينة انتهت",
+      "opening_hook": "في أكتوبر 1915 صدر قرار التخلي عن إندورانس، وبعد أسابيع ابتلع بحر ويديل السفينة التي حملت أحلام البعثة.",
+      "topic": "Abandonment and sinking of Endurance October-November 1915, Ocean Camp and survival plans",
+      "target_words": 1600,
+      "visual_keywords": [
+        "Endurance ship crushed by Antarctic ice",
+        "Endurance sinking 1915 Frank Hurley photograph",
+        "Ocean Camp Antarctic expedition",
+        "Shackleton crew abandoned ship historic",
+        "Weddell Sea ice floe"
+      ],
+      "description": "الجزء الخامس من رحلة شاكلتون. من قرار إخلاء إندورانس إلى غرقها في نوفمبر 1915، نتابع انتقال الطاقم من سفينة محاصرة إلى معسكر فوق الجليد، وما الذي جعل النجاة أصعب.",
+      "sources": [
+        {
+          "title": "Endurance Expedition timeline and history",
+          "url": "https://endurance22.org/uploads/2022/01/Endurance22_IEE.pdf",
+          "publisher": "Falklands Maritime Heritage Trust / Endurance22"
+        },
+        {
+          "title": "Endurance timeline",
+          "url": "https://interactives.rgs.org/endurance-22/",
+          "publisher": "Royal Geographical Society"
+        },
+        {
+          "title": "Endurance expedition parties",
+          "url": "https://nzhistory.govt.nz/media/interactive/shackleton-sea-parties",
+          "publisher": "New Zealand History"
+        }
+      ]
+    },
+    {
+      "episode_id": "shackleton-elephant-island-06",
+      "episode_number": 6,
+      "title": "رحلة القوارب إلى جزيرة الفيل: آخر طريق إلى اليابسة",
+      "short_title": "جزيرة الفيل | رحلة القوارب",
+      "thumbnail_text": "اليابسة أخيرًا",
+      "opening_hook": "عندما بدأ الجليد يتشقق تحت أقدامهم، اضطر رجال شاكلتون إلى ترك المعسكر والاعتماد على ثلاثة قوارب صغيرة للوصول إلى اليابسة.",
+      "topic": "April 1916 lifeboat journey from ice floe to Elephant Island, landing and survival camp",
+      "target_words": 1600,
+      "visual_keywords": [
+        "James Caird lifeboat Antarctic ocean",
+        "Elephant Island Antarctica coast",
+        "Shackleton crew lifeboats 1916",
+        "Antarctic storm small boat",
+        "Cape Wild Elephant Island historic expedition"
+      ],
+      "description": "الجزء السادس من السلسلة. بعد شهور فوق الجليد، حملت القوارب الثلاثة رجال إندورانس نحو جزيرة الفيل. نروي الرحلة البحرية والوصول إلى أرض صلبة، ولماذا لم يكن الوصول نهاية الخطر.",
+      "sources": [
+        {
+          "title": "Shackleton expedition timeline",
+          "url": "https://www.rgs.org/media/ev4lehtv/wseshackletonexpeditiontimeline.pdf",
+          "publisher": "Royal Geographical Society"
+        },
+        {
+          "title": "Endurance expedition parties",
+          "url": "https://nzhistory.govt.nz/media/interactive/shackleton-sea-parties",
+          "publisher": "New Zealand History"
+        },
+        {
+          "title": "The Voyage of the James Caird",
+          "url": "https://www.amnh.org/learn-teach/curriculum-collections/antarctica/exploration/the-voyage-of-the-james-caird",
+          "publisher": "American Museum of Natural History"
+        }
+      ]
+    },
+    {
+      "episode_id": "shackleton-james-caird-07",
+      "episode_number": 7,
+      "title": "جيمس كيرد: قارب صغير في مواجهة محيط هائج",
+      "short_title": "جيمس كيرد | رحلة النجدة",
+      "thumbnail_text": "800 ميل في قارب",
+      "opening_hook": "ترك شاكلتون معظم رجاله في جزيرة الفيل، وانطلق مع خمسة رفاق في قارب صغير نحو جورجيا الجنوبية طلبًا للنجدة.",
+      "topic": "James Caird voyage April-May 1916, navigation by Frank Worsley, crossing South Georgia and rescue attempts through August 1916",
+      "target_words": 1800,
+      "visual_keywords": [
+        "James Caird boat voyage South Georgia 1916",
+        "Frank Worsley navigation sextant",
+        "South Georgia mountain glacier crossing",
+        "Elephant Island rescue Yelcho 1916",
+        "Shackleton expedition rescue historical photograph"
+      ],
+      "description": "الجزء السابع من السلسلة. رحلة جيمس كيرد التي قادها شاكلتون ومعه خمسة رجال إلى جورجيا الجنوبية، ثم عبور الجزيرة وسباق محاولات إنقاذ بقية الطاقم حتى عودتهم في أغسطس 1916.",
+      "sources": [
+        {
+          "title": "Shackleton expedition timeline",
+          "url": "https://www.rgs.org/media/ev4lehtv/wseshackletonexpeditiontimeline.pdf",
+          "publisher": "Royal Geographical Society"
+        },
+        {
+          "title": "The Voyage of the James Caird",
+          "url": "https://www.amnh.org/learn-teach/curriculum-collections/antarctica/exploration/the-voyage-of-the-james-caird",
+          "publisher": "American Museum of Natural History"
+        },
+        {
+          "title": "The Expedition",
+          "url": "https://endurance22.org/the-expedition",
+          "publisher": "Endurance22"
+        }
+      ]
     }
   ]
 }
