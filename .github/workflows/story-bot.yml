@@ -64,7 +64,6 @@ jobs:
 
       - name: Save story history
         if: ${{ always() }}
-        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -72,14 +71,9 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "chore: record published story history"
           fi
-          # Preserve any other tracked changes made during generation while syncing.
-          git stash push -m "preserve generated working-tree changes" || true
+          # Do not hide history-save failures: a failed push must fail the run
+          # so the same episode is never silently selected again.
           git pull --rebase origin "${GITHUB_REF_NAME}"
-          git stash pop || true
-          git add content/published_stories.json content/series/real_stories.json 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: reconcile generated story history"
-          fi
           git push
 
       - name: Publish linked Short
