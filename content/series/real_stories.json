@@ -22,31 +22,31 @@
     {
       "episode_id": "social-09",
       "episode_number": 9,
-      "title": "اكتشاف مقبرة توت عنخ آمون: ما الذي تكشفه الوثائق؟",
-      "short_title": "اكتشاف مقبرة توت عنخ آمون",
-      "thumbnail_text": "اكتشاف 1922",
-      "opening_hook": "في نوفمبر 1922، قاد درج صغير في وادي الملوك إلى واحد من أشهر الاكتشافات الأثرية في التاريخ. لكن ماذا تقول سجلات الحفر الأصلية؟",
-      "topic": "قصة تاريخية موثقة لاكتشاف مقبرة توت عنخ آمون في وادي الملوك عام 1922، مع التركيز على يوميات هوارد كارتر، سجلات الحفريات، دور العاملين المصريين، والتوثيق الأثري. تجنب الأساطير غير المثبتة ونسب الاكتشاف لفرد واحد دون توضيح فريق العمل.",
-      "target_words": 1500,
+      "title": "بنت عايزة تلعب كورة.. وأم قررت تكسر القيود",
+      "short_title": "أم ساندت حلم بنتها في الكورة",
+      "thumbnail_text": "حلمها مش عيب",
+      "opening_hook": "مريم كانت بتحب كرة القدم، لكن صاحبتها ماكانتش مسموحلها تلعب.. فبدل ما تكتفي بالتعاطف، قررت تتحرك مع أمها وفريقها.",
+      "topic": "قصة اجتماعية مصرية معاصرة عن مريم ووالدتها نادية، ودعم الأسرة لحق الفتيات في ممارسة الرياضة، وكيف تحولت مساندة صديقة إلى حوار مع أسرتها. ركز على الفجوة بين جيلين وتغير النظرة المجتمعية، دون اختلاق حوار أو تفاصيل خارج المصدر.",
+      "target_words": 1400,
       "visual_keywords": [
-        "Valley of the Kings Luxor Egypt landscape",
-        "Tutankhamun excavation archival photographs",
-        "Howard Carter excavation diary archival documents",
-        "ancient Egyptian tomb archaeological objects",
-        "Luxor archaeological excavation early 20th century",
-        "Egyptian workers archaeology historical archive"
+        "Egyptian mother and teenage daughter talking at home",
+        "girls football training in Cairo community field",
+        "Egyptian family supportive conversation living room",
+        "teen girls football team practicing together",
+        "Cairo neighborhood street everyday life",
+        "mother encouraging daughter sports school"
       ],
-      "description": "حلقة تاريخية عن اكتشاف مقبرة توت عنخ آمون عام 1922، اعتمادًا على أرشيف معهد غريفيث بجامعة أكسفورد ومرجع متخصص من معهد Getty للحفاظ على التراث. نعرض التسلسل الزمني وما تثبته سجلات الحفريات، مع الإشارة إلى دور الفريق المصري وحدود الروايات الاستعمارية القديمة.",
+      "description": "قصة اجتماعية من مصر نشرتها اليونيسف عن مريم ووالدتها نادية: أم واجهت قيودًا اجتماعية في شبابها، ثم اختارت أن تمنح ابنتها مساحة لتحقيق حلمها في كرة القدم. وتكشف القصة كيف يمكن للدعم الأسري والتضامن بين الأصدقاء أن يساعدا في تغيير الأفكار داخل المجتمع.",
       "sources": [
         {
-          "title": "1st Season (1922–1923) – Tutankhamun Spatial Archive",
-          "publisher": "Griffith Institute, University of Oxford",
-          "url": "https://tutankhamun.griffith.ox.ac.uk/seasons/1st-season-1922-1923"
+          "title": "It Runs in the Family – From One Generation to the Next",
+          "publisher": "UNICEF Egypt",
+          "url": "https://www.unicef.org/egypt/stories/it-runs-family"
         },
         {
-          "title": "The Conservation and Management of the Tomb of Tutankhamen (KV 62): A Project Bibliography",
-          "publisher": "Getty Conservation Institute",
-          "url": "https://www.getty.edu/conservation/publications_resources/pdf_publications/pdf/tut_bibliography.pdf"
+          "title": "Dawwie – Empowering girls and promoting their participation",
+          "publisher": "UNICEF Egypt",
+          "url": "https://www.unicef.org/egypt/dawwie"
         }
       ],
       "published": false,
@@ -54,11 +54,11 @@
       "disabled": false,
       "disabled_reason": "",
       "verified_facts": [
-        "توضح سجلات معهد غريفيث أن هوارد كارتر وصل إلى الأقصر في 28 أكتوبر 1922، وبدأت أعمال الحفر في 1 نوفمبر.",
-        "في 4 نوفمبر 1922 عُثر على أعلى درجة في درج محفور بالصخر، ثم ظهر مدخل مختوم في 5 نوفمبر.",
-        "وصل اللورد كارنارفون إلى الأقصر في 23 نوفمبر، وفُتح المدخل الداخلي في 26 نوفمبر 1922، وفق تسلسل الموسم الأول في أرشيف أكسفورد.",
-        "تؤكد جامعة أكسفورد أن فريق الحفر وثّق أكثر من خمسة آلاف قطعة على مدى السنوات التالية، وأن السرد التاريخي ينبغي ألا يمحو مساهمة المصريين العاملين في الموقع.",
-        "يجب التمييز بين يوم العثور على الدرج في 4 نوفمبر، ورسالة كارتر في 5 نوفمبر، وفتح المدخل الداخلي في 26 نوفمبر؛ لا تخلط بينها."
+        "نشرت اليونيسف مصر القصة في 6 مارس 2025، وذكرت أن مريم فتاة مصرية عمرها 15 عامًا تطمح إلى ممارسة كرة القدم.",
+        "تقول المادة إن والدتها نادية تعمل معالجة نفسية ومدافعة عن الصحة النفسية.",
+        "تروي اليونيسف أن نادية واجهت قيودًا اجتماعية في طفولتها ومراهقتها، وأن شقيقها الأكبر دعمها في استكمال دراستها الجامعية.",
+        "بحسب القصة، ساعدت مريم وفريقها ومدربها ووالدتها في زيارة أسرة صديقة لها لإقناع والدها بالسماح لها بممارسة كرة القدم.",
+        "تُعرض هذه الوقائع باعتبارها ما نشرته اليونيسف عن الأسرة، ولا تُضاف مشاهد أو حوارات أو دوافع غير واردة في المادة."
       ]
     },
     {
