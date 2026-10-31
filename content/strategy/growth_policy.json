@@ -53,12 +53,9 @@
     "compare_retention_by_story_category": true
   },
   "cta": {
-    "enabled": true,
-    "midroll_count": 1,
-    "endroll_count": 1,
     "never_before_core_hook_seconds": 20,
-    "midroll_goal": "دعوة طبيعية للاشتراك وسؤال واحد للتعليقات",
-    "endroll_goal": "دعوة للاشتراك والانتقال للحلقة التالية"
+    "midroll_goal": "موضع إعلاني طبيعي بين أجزاء القصة",
+    "endroll_goal": "دعوة للحلقة التالية"
   },
   "measurement": {
     "primary_checkpoints_hours": [
