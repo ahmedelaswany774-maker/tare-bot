@@ -22,31 +22,31 @@
     {
       "episode_id": "social-09",
       "episode_number": 9,
-      "title": "ريا وسكينة: ما الذي تثبته وثائق القضية؟",
-      "short_title": "قضية ريا وسكينة كما وثقتها الصحافة",
-      "thumbnail_text": "وثائق القضية",
-      "opening_hook": "بعد مرور أكثر من قرن، ما الذي نعرفه من الوثائق والدراسات عن القضية التي شغلت الإسكندرية ومصر؟",
-      "topic": "قضية تاريخية موثقة في الإسكندرية خلال 1920 و1921. زاوية الحلقة: التسلسل القضائي والتغطية الصحفية وكيف تشكلت الذاكرة العامة للقضية، دون مشاهد عنف أو وصف تفصيلي للجرائم.",
+      "title": "اكتشاف مقبرة توت عنخ آمون: ما الذي تكشفه الوثائق؟",
+      "short_title": "اكتشاف مقبرة توت عنخ آمون",
+      "thumbnail_text": "اكتشاف 1922",
+      "opening_hook": "في نوفمبر 1922، قاد درج صغير في وادي الملوك إلى واحد من أشهر الاكتشافات الأثرية في التاريخ. لكن ماذا تقول سجلات الحفر الأصلية؟",
+      "topic": "قصة تاريخية موثقة لاكتشاف مقبرة توت عنخ آمون في وادي الملوك عام 1922، مع التركيز على يوميات هوارد كارتر، سجلات الحفريات، دور العاملين المصريين، والتوثيق الأثري. تجنب الأساطير غير المثبتة ونسب الاكتشاف لفرد واحد دون توضيح فريق العمل.",
       "target_words": 1500,
       "visual_keywords": [
-        "Alexandria Egypt historic street 1920s",
-        "historic Egyptian newspaper archive",
-        "old Alexandria architecture archival style",
-        "Egyptian National Library historical documents",
-        "early twentieth century Alexandria street",
-        "vintage newspaper printing press"
+        "Valley of the Kings Luxor Egypt landscape",
+        "Tutankhamun excavation archival photographs",
+        "Howard Carter excavation diary archival documents",
+        "ancient Egyptian tomb archaeological objects",
+        "Luxor archaeological excavation early 20th century",
+        "Egyptian workers archaeology historical archive"
       ],
-      "description": "حلقة تاريخية تستعرض قضية ريا وسكينة من خلال التغطية الصحفية والدراسة الأكاديمية والوثائق المشار إليها. نميّز بين الوقائع التي تؤيدها المصادر وبين الصورة الشعبية التي تشكلت لاحقًا، دون إعادة تمثيل أو تفاصيل عنيفة.",
+      "description": "حلقة تاريخية عن اكتشاف مقبرة توت عنخ آمون عام 1922، اعتمادًا على أرشيف معهد غريفيث بجامعة أكسفورد ومرجع متخصص من معهد Getty للحفاظ على التراث. نعرض التسلسل الزمني وما تثبته سجلات الحفريات، مع الإشارة إلى دور الفريق المصري وحدود الروايات الاستعمارية القديمة.",
       "sources": [
         {
-          "title": "توثيق سيرة ريا وسكينة",
-          "publisher": "الجزيرة نت – الجزيرة الوثائقية",
-          "url": "https://www.aljazeera.net/arts/2009/5/14/%D8%AA%D9%88%D8%AB%D9%8A%D9%82-%D8%B3%D9%8A%D8%B1%D8%A9-%D8%B1%D9%8A%D8%A7-%D9%88%D8%B3%D9%83%D9%8A%D9%86%D8%A9"
+          "title": "1st Season (1922–1923) – Tutankhamun Spatial Archive",
+          "publisher": "Griffith Institute, University of Oxford",
+          "url": "https://tutankhamun.griffith.ox.ac.uk/seasons/1st-season-1922-1923"
         },
         {
-          "title": "Building a national case in interwar Egypt: Raya and Sakina's crimes through the pages of al-Ahrām (Fall 1920)",
-          "publisher": "Elena Chiti, History Compass / Wiley Online Library (2020)",
-          "url": "https://doi.org/10.1111/hic3.12607"
+          "title": "The Conservation and Management of the Tomb of Tutankhamen (KV 62): A Project Bibliography",
+          "publisher": "Getty Conservation Institute",
+          "url": "https://www.getty.edu/conservation/publications_resources/pdf_publications/pdf/tut_bibliography.pdf"
         }
       ],
       "published": false,
@@ -54,11 +54,11 @@
       "disabled": false,
       "disabled_reason": "",
       "verified_facts": [
-        "تتناول الدراسة الأكاديمية تغطية صحيفة الأهرام للقضية في خريف 1920، وتذكر اعتقال ريا وسكينة وآخرين في نوفمبر 1920.",
-        "تذكر الدراسة أن المحاكمة جرت في مايو 1921 وأن ستة من أفراد المجموعة حُكم عليهم بالإعدام.",
-        "تذكر الجزيرة أن القضية هزت المجتمع السكندري عام 1921 وأن ملف ذاكرة مصر المعاصرة يضم وثائق وصورًا وتقارير مرتبطة بالقضية.",
-        "تذكر الجزيرة أن تنفيذ أحكام الإعدام كان في الإسكندرية يومي 21 و22 ديسمبر 1921.",
-        "يجب عدم تقديم التفاصيل المتنازع عليها أو الأساطير الشعبية كحقائق؛ والتركيز على التغطية الصحفية والسياق التاريخي والإجراءات القضائية."
+        "توضح سجلات معهد غريفيث أن هوارد كارتر وصل إلى الأقصر في 28 أكتوبر 1922، وبدأت أعمال الحفر في 1 نوفمبر.",
+        "في 4 نوفمبر 1922 عُثر على أعلى درجة في درج محفور بالصخر، ثم ظهر مدخل مختوم في 5 نوفمبر.",
+        "وصل اللورد كارنارفون إلى الأقصر في 23 نوفمبر، وفُتح المدخل الداخلي في 26 نوفمبر 1922، وفق تسلسل الموسم الأول في أرشيف أكسفورد.",
+        "تؤكد جامعة أكسفورد أن فريق الحفر وثّق أكثر من خمسة آلاف قطعة على مدى السنوات التالية، وأن السرد التاريخي ينبغي ألا يمحو مساهمة المصريين العاملين في الموقع.",
+        "يجب التمييز بين يوم العثور على الدرج في 4 نوفمبر، ورسالة كارتر في 5 نوفمبر، وفتح المدخل الداخلي في 26 نوفمبر؛ لا تخلط بينها."
       ]
     },
     {
