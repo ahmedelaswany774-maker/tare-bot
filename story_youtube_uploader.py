@@ -42,10 +42,22 @@ def load_growth_policy():
 def load_episode():
     manifest = json.loads(Path(SERIES_MANIFEST_PATH).read_text(encoding="utf-8"))
     episodes = sorted(manifest["episodes"], key=lambda item: item["episode_number"])
+    eligible = [
+        item for item in episodes
+        if not item.get("published", False)
+        and not item.get("disabled", False)
+        and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
+        and len(item.get("sources", [])) >= 2
+        and all(source.get("title") and source.get("publisher") and source.get("url", "").startswith("https://")
+                for source in item.get("sources", []))
+    ]
     if EPISODE_SELECTOR == "next":
-        episode = next((item for item in episodes if not item.get("published", False)), None)
+        episode = next((item for item in eligible), None)
         if episode is None:
-            raise ValueError("لا توجد حلقات غير منشورة في السلسلة")
+            raise ValueError(
+                "لا توجد حلقة مؤهلة للنشر: أضف حلقة verified_real_story بمصدرين موثوقين على الأقل "
+                "واجعلها غير منشورة وغير معطلة. تم إيقاف الحلقات الخيالية لمنع تقديمها كوقائع."
+            )
     else:
         try:
             requested_number = int(EPISODE_SELECTOR)
@@ -53,12 +65,12 @@ def load_episode():
             raise ValueError("EPISODE_NUMBER يجب أن يكون رقم حلقة أو next") from exc
         episode = next((item for item in episodes if item["episode_number"] == requested_number), None)
         if episode is None:
-            available = [item["episode_number"] for item in episodes]
-            raise ValueError(f"EPISODE_NUMBER={requested_number} غير موجود. المتاح: {available}")
-        if episode.get("published", False):
-            raise ValueError(f"الحلقة {requested_number} مسجلة كمنشورة بالفعل؛ أوقفنا التشغيل لمنع التكرار")
-    if manifest.get("content_type") != "fictional_social_drama" and len(episode.get("sources", [])) == 0:
-        raise ValueError(f"الحلقة {episode['episode_id']} بلا مصادر/مراجع استمرارية")
+            raise ValueError(f"الحلقة {requested_number} غير موجودة")
+        if episode not in eligible:
+            raise ValueError(
+                f"الحلقة {requested_number} غير مؤهلة: يجب أن تكون قصة حقيقية موثقة بمصدرين على الأقل "
+                "وغير منشورة أو معطلة."
+            )
     return manifest, episode
 
 
@@ -102,33 +114,27 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
 
 def generate_story(manifest, episode):
     growth_policy = load_growth_policy()
-    sources = "\n".join(
+    sources = "\\n".join(
         f"- {source['title']} — {source['publisher']} — {source['url']}"
-        for source in episode.get("sources", [])
-    ) or "لا توجد مصادر؛ هذه قصة خيالية أصلية وليست واقعة حقيقية."
-    target_words = episode.get("target_words", 4500)
-    prompt = (
-        f"اكتب نصًا عربيًا طويلًا أصليًا للحلقة {episode['episode_number']} من سلسلة "
-        f"«{manifest['series_title']}». موضوع الحلقة: {episode['topic']}.\n\n"
-        + ("هذه دراما اجتماعية خيالية بالكامل. اكتب باللهجة المصرية البيضاء، وابتكر حوارًا طبيعيًا وشخصيات ودوافع متماسكة، وحافظ بدقة على استمرارية الأجزاء السابقة. لا تقل إنها قصة حقيقية ولا تنسبها لأشخاص حقيقيين. اجعلها مشوقة وواقعية في تفاصيل الحياة اليومية، مع تصاعد درامي ونهاية تمهد للجزء التالي. لا تضع مصادر أو ادعاءات توثيقية.\n\n"
-           if manifest.get("content_type") == "fictional_social_drama" else "")
-        f"العنوان التحريري الثابت: {episode['title']}\n"
-        f"افتتاحية أول 20 ثانية يجب الحفاظ على معناها: {episode['opening_hook']}\n"
-        f"رسالة الصورة المصغرة المقترحة: {episode['thumbnail_text']}\n"
-        f"المصادر المسموح الاعتماد عليها:\n{sources}\n\n"
-        f"اكتب نصًا مناسبًا لسرد صوتي مدته تقريبًا {manifest['target_duration_minutes']['min']} إلى "
-        f"{manifest['target_duration_minutes']['max']} دقيقة، وبحدود {target_words} كلمة. "
-        ("هذه قصة خيالية؛ حافظ على منطق الأحداث واستمرارية الشخصيات ولا تقدمها كحقيقة. "
-         if manifest.get("content_type") == "fictional_social_drama"
-         else "التزم بالوقائع الموجودة في المصادر فقط. لا تخترع حوارات أو أدلة أو أسماء أو تواريخ. "
-              "إذا كانت واقعة أو نتيجة غير محسومة، قل بوضوح إنها نظرية أو رواية غير مؤكدة، واعرض أكثر من تفسير عند الحاجة. ")
-        "قسّم السرد إلى افتتاحية قوية، سياق زمني، تصاعد للأدلة، نقطة غموض أو خطر، ثم خاتمة تشرح ما نعرفه وما لا نعرفه. "
-        f"بعد الحدث الأساسي وليس قبل أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، أضف فاصلًا واحدًا قصيرًا وطبيعيًا يدعو المشاهد للاشتراك في القناة ويطرح سؤالًا واحدًا للتعليقات، دون قطع التوتر أو تكرار الدعوة. "
-        "في النهاية أضف فاصلًا ختاميًا قصيرًا يدعو للاشتراك ومتابعة الحلقة التالية من نفس السلسلة، دون مبالغة أو clickbait. "
-        "اترك وعدًا واضحًا بالحلقة التالية دون اختلاق cliffhanger.\n\n"
-        "أخرج متن السرد فقط، بدون Markdown أو JSON أو عناوين تقنية."
+        for source in episode["sources"]
     )
-    return call_gemini(prompt, max_output_tokens=12288).strip()
+    target_words = episode.get("target_words", 1800)
+    prompt_parts = [
+        f"اكتب نصًا عربيًا أصليًا للحلقة {episode['episode_number']} من سلسلة «{manifest['series_title']}».",
+        f"الموضوع: {episode['topic']}",
+        f"العنوان التحريري: {episode['title']}",
+        f"الافتتاحية: {episode['opening_hook']}",
+        "نوع المحتوى: قصة واقعية موثقة. لا تستخدم إلا الوقائع التي تدعمها المصادر أدناه.",
+        "ممنوع اختلاق حوار أو مشاهد خاصة أو دوافع أو أسماء أو تواريخ أو أرقام أو نتائج.",
+        "لا تنقل صياغة المصادر حرفيًا؛ اكتب شرحًا وسردًا أصليًا مع ذكر المصدر في الوصف.",
+        "إذا تعارضت المصادر أو لم تثبت معلومة، وضّح عدم اليقين ولا تعرضها كحقيقة.",
+        "احمِ خصوصية الأشخاص غير المعروفين؛ لا تضف بيانات تعريفية أو تفاصيل شخصية غير منشورة وضرورية.",
+        f"المصادر المعتمدة:\\n{sources}",
+        f"الطول المستهدف نحو {target_words} كلمة، والسرد باللهجة المصرية البيضاء.",
+        f"ضع دعوة واحدة طبيعية بعد أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، ثم خاتمة موجزة.",
+        "أخرج متن السرد فقط دون Markdown أو JSON أو عناوين تقنية."
+    ]
+    return call_gemini("\\n\\n".join(prompt_parts), max_output_tokens=12288).strip()
 
 
 def generate_metadata(story_text, max_attempts=3):
@@ -213,7 +219,7 @@ def generate_teaser_script(manifest, episode, story_text):
     """Create an original short-form teaser from the selected episode, not a raw crop."""
     prompt = (
         "اكتب نص تعليق صوتي عربي مصري طبيعي لريلز ترويجي مدته 30 إلى 50 ثانية "
-        "عن القصة الحقيقية التالية. افتح بسؤال أو مفارقة قوية خلال أول ثانيتين، "
+        "عن القصة الموثقة التالية. افتح بسؤال أو مفارقة قوية خلال أول ثانيتين، "
         "ثم اذكر 2-3 تفاصيل موثقة من النص، وصعّد التشويق دون كشف الخاتمة. "
         "اختم بدعوة واضحة: شاهد القصة الكاملة على قناة قصص واقعيه. "
         "لا تخترع أي معلومة أو حوار أو نتيجة، ولا تكتب عنوانًا أو تعليمات تصوير أو روابط. "
@@ -526,6 +532,12 @@ save_json(
         "episode_number": episode["episode_number"],
     },
 )
+
+if os.environ.get("ALLOW_UNREVIEWED_PUBLISH", "false").lower() != "true":
+    raise RuntimeError(
+        "تم إيقاف الرفع التلقائي: راجع النص والفيديو والمصادر وحقوق المواد، "
+        "ثم فعّل ALLOW_UNREVIEWED_PUBLISH=true يدويًا بعد الموافقة."
+    )
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
