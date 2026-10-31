@@ -1,22 +1,23 @@
 {
-  "series_id": "social-drama-stories",
-  "series_title": "ملفات واقعية موثقة",
+  "series_id": "verified-real-stories",
+  "series_title": "قصص واقعية موثقة",
   "language": "ar",
   "target_duration_minutes": {
     "min": 10,
     "max": 14
   },
   "editorial_rules": [
-    "لا تُنشر أي حلقة إلا إذا كانت واقعة حقيقية تدعمها مصادر موثوقة قابلة للتحقق.",
-    "يشترط وجود مصدرين مستقلين على الأقل لكل حلقة، مع مراجعة بشرية للمصادر والوقائع.",
-    "يُكتب النص بصياغة أصلية ولا تُنسخ المقالات أو الكتب أو نصوص الفيديوهات.",
-    "لا تُختلق حوارات أو مشاهد أو تفاصيل أو دوافع أو نتائج غير مثبتة.",
-    "تُعرض النظريات والوقائع غير المحسومة بصفتها غير مؤكدة.",
-    "تُحمى خصوصية الأفراد غير المعروفين ولا تُكشف بياناتهم التعريفية.",
-    "تُستخدم مواد مرئية وصوتية أصلية أو مرخصة بوضوح فقط.",
+    "كل حلقة يجب أن تتناول واقعة حقيقية محددة، لا حبكة خيالية أو قصة مركبة.",
+    "لا تُفعّل الحلقة إلا بعد إضافة مصدرين مستقلين موثوقين على الأقل، مع عنوان الناشر ورابط HTTPS لكل مصدر.",
+    "يجب أن تدعم المصادر الوقائع الأساسية المذكورة في النص؛ وجود روابط شكلية لا يكفي.",
+    "يُكتب النص بصياغة أصلية، دون نسخ المقالات أو الكتب أو نصوص الفيديوهات.",
+    "يُمنع اختلاق الحوارات أو المشاهد أو الدوافع أو الأسماء أو التواريخ أو النتائج.",
+    "يجب توضيح ما هو مؤكد وما هو مختلف عليه أو غير محسوم.",
+    "تُحمى خصوصية الأشخاص غير المعروفين ولا تُكشف بيانات تعريفية غير ضرورية.",
+    "تُستخدم صور ومقاطع وموسيقى أصلية أو مرخصة للاستخدام المقصود.",
     "لا يتم الرفع قبل مراجعة بشرية للنص والفيديو والمصادر وحقوق الاستخدام."
   ],
-  "playlist_title": "حكايات من البيوت | قصص اجتماعية درامية",
+  "playlist_title": "قصص واقعية موثقة | قصص من مصادر مستقلة",
   "episodes": [
     {
       "episode_id": "social-09",
@@ -38,9 +39,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-10",
@@ -62,9 +63,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-11",
@@ -86,9 +87,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-12",
@@ -110,9 +111,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-13",
@@ -134,9 +135,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-14",
@@ -158,9 +159,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-15",
@@ -182,9 +183,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-16",
@@ -206,9 +207,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-17",
@@ -230,9 +231,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-18",
@@ -254,9 +255,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-19",
@@ -278,9 +279,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-20",
@@ -302,9 +303,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-21",
@@ -326,9 +327,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان على باب الجواز. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-22",
@@ -350,9 +351,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-23",
@@ -374,9 +375,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-24",
@@ -398,9 +399,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-25",
@@ -422,9 +423,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-26",
@@ -446,9 +447,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-27",
@@ -470,9 +471,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-28",
@@ -494,9 +495,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان ورث من غير فلوس. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-29",
@@ -518,9 +519,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-30",
@@ -542,9 +543,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-31",
@@ -566,9 +567,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-32",
@@ -590,9 +591,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-33",
@@ -614,9 +615,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-34",
@@ -638,9 +639,9 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     },
     {
       "episode_id": "social-35",
@@ -662,10 +663,11 @@
       "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان جيران آخر الشارع. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional",
+      "content_type": "fictional_archive",
       "disabled": true,
-      "disabled_reason": "محتوى خيالي قديم؛ معطل ولا يجوز تقديمه كقصة حقيقية."
+      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
     }
   ],
-  "content_type": "verified_real_story"
+  "content_type": "verified_real_story",
+  "workflow_status": "awaiting_verified_episode_9"
 }
