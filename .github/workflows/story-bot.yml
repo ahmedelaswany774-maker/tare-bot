@@ -62,10 +62,11 @@ jobs:
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '30'
+          ALLOW_UNREVIEWED_PUBLISH: 'false'
         run: yes y | python story_youtube_uploader.py
 
       - name: Save story history
-        if: ${{ always() }}
+        if: ${{ steps.run_bot.outcome == 'success' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -87,5 +88,5 @@ jobs:
         run: python short_youtube_uploader.py
 
       - name: Verify generated video exists
-        if: always()
-        run: test -f story.mp4 && ls -lh story.mp4
+        if: ${{ steps.run_bot.outcome == 'success' }}
+        run: test -s story.mp4 && test -s story.mp3 && ls -lh story.mp4 story.mp3
