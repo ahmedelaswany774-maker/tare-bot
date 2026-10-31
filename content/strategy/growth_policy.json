@@ -1,28 +1,38 @@
 {
-  "policy_id": "rowat-growth-default-v1",
+  "policy_id": "rowat-growth-90day-v2",
   "status": "active_until_explicit_user_change",
   "channel": "قصص واقعيه",
-  "content_promise": "قصص واقعية موثقة بمصادر قابلة للتحقق",
+  "content_promise": "قصص اجتماعية وأسرية واقعية موثقة من المجتمع المصري والعربي، بسرد أصلي يحترم الضحايا ويفصل بين الوقائع والاتهامات.",
   "publishing": {
-    "posts_per_day": 4,
-    "long_videos_per_week": 28,
-    "shorts_per_long_video": 1,
-    "daily_slots": [
-      "03:00",
-      "09:00",
-      "15:00",
-      "21:00"
+    "long_videos_per_week": 4,
+    "target_duration_minutes": {
+      "min": 20,
+      "max": 30
+    },
+    "max_daily_long_videos": 1,
+    "planned_release_days": [
+      "Monday",
+      "Wednesday",
+      "Friday",
+      "Saturday"
     ],
+    "planned_release_time_local": "19:00",
+    "timezone": "Africa/Cairo",
+    "shorts_per_long_video": 1,
     "require_explicit_episode_selection": true,
     "allow_random_topics": false,
     "allow_unreviewed_public_publish": false,
-    "require_human_review_before_upload": true
+    "require_human_review_before_upload": true,
+    "workflow_mode": "manual_draft_only_until_reviewed"
   },
   "seo": {
-    "title_pattern": "real_case_name + clear_question_or_paradox + series_episode_number",
+    "title_pattern": "قضية أو سؤال اجتماعي واضح + عنصر تشويق غير مضلل",
     "description_must_include_sources": true,
     "playlist_required": true,
-    "avoid_misleading_clickbait": true
+    "avoid_misleading_clickbait": true,
+    "thumbnail_message_words_max": 4,
+    "one_visual_idea": true,
+    "test_one_packaging_variable_at_a_time": true
   },
   "ctr": {
     "thumbnail_message_words_max": 4,
@@ -32,10 +42,15 @@
   "retention": {
     "opening_seconds_max_before_core_event": 20,
     "target_long_video_minutes": {
-      "min": 25,
-      "max": 40
+      "min": 20,
+      "max": 30
     },
-    "measure_first_30_seconds": true
+    "checkpoints_seconds": [
+      30,
+      60,
+      180
+    ],
+    "compare_retention_by_story_category": true
   },
   "cta": {
     "enabled": true,
@@ -46,9 +61,7 @@
     "endroll_goal": "دعوة للاشتراك والانتقال للحلقة التالية"
   },
   "measurement": {
-    "primary_checkpoint_hours": 24,
-    "checkpoints_hours": [
-      4,
+    "primary_checkpoints_hours": [
       24,
       72,
       168
@@ -57,14 +70,55 @@
       "impressions",
       "ctr",
       "average_view_duration",
+      "average_percentage_viewed",
       "first_30_seconds_retention",
       "browse_percentage",
       "suggested_percentage",
-      "search_percentage",
       "returning_viewers",
       "subscribers_gained",
-      "comments"
+      "estimated_revenue",
+      "rpm",
+      "limited_ads_count"
     ]
   },
-  "change_control": "Any change requires an explicit user request."
+  "change_control": "Any change requires an explicit user request.",
+  "content_mix": [
+    {
+      "category": "خلافات الميراث والأسرة",
+      "share_percent": 30
+    },
+    {
+      "category": "الزواج والخلافات الزوجية والعائلية",
+      "share_percent": 25
+    },
+    {
+      "category": "النصب والطمع والخداع داخل الأسرة",
+      "share_percent": 20
+    },
+    {
+      "category": "قضايا جنائية مرتبطة بخلافات أسرية",
+      "share_percent": 15
+    },
+    {
+      "category": "قصص إنسانية واجتماعية",
+      "share_percent": 10
+    }
+  ],
+  "editorial_gates": [
+    "كل قصة واقعة محددة وليست حبكة مركبة.",
+    "يلزم مصدران مستقلان على الأقل من ناشرين مختلفين يدعمان الوقائع الأساسية.",
+    "لا تُعرض الاتهامات باعتبارها أحكامًا قضائية.",
+    "لا اختلاق للحوار أو المشاهد أو الدوافع أو النتائج.",
+    "تجنب التفاصيل الدموية والصور الصادمة واحترام خصوصية الضحايا.",
+    "لا رفع عام قبل مراجعة بشرية للنص والصوت والصورة والمصادر وحقوق الاستخدام."
+  ],
+  "revenue": {
+    "primary": "youtube_ads",
+    "secondary_candidates": [
+      "eligible_own_products",
+      "direct_sponsorships"
+    ],
+    "shopping_status": "not_enabled_pending_channel_eligibility_check",
+    "no_affiliate_revenue_assumption_for_egypt": true
+  }
 }
