@@ -22,26 +22,44 @@
     {
       "episode_id": "social-09",
       "episode_number": 9,
-      "title": "الخطاب الذي أخفاه الأب سنوات",
-      "short_title": "الخطاب الذي أخفاه الأب سنوات",
-      "thumbnail_text": "سر الخطاب",
-      "opening_hook": "تعثر ندى على خطاب قديم يغيّر فهمها لخلاف العائلة، لكنه يفتح أسئلة جديدة حول من أخفى الحقيقة ولماذا.",
-      "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: رسالة من الماضي. حافظ على استمرارية الشخصيات والأحداث.",
-      "target_words": 1800,
+      "title": "ريا وسكينة: ما الذي تثبته وثائق القضية؟",
+      "short_title": "قضية ريا وسكينة كما وثقتها الصحافة",
+      "thumbnail_text": "وثائق القضية",
+      "opening_hook": "بعد مرور أكثر من قرن، ما الذي نعرفه من الوثائق والدراسات عن القضية التي شغلت الإسكندرية ومصر؟",
+      "topic": "قضية تاريخية موثقة في الإسكندرية خلال 1920 و1921. زاوية الحلقة: التسلسل القضائي والتغطية الصحفية وكيف تشكلت الذاكرة العامة للقضية، دون مشاهد عنف أو وصف تفصيلي للجرائم.",
+      "target_words": 1500,
       "visual_keywords": [
-        "cinematic Egyptian family home",
-        "Arab family drama scene",
-        "Cairo apartment interior",
-        "emotional conversation living room",
-        "dramatic close up portrait",
-        "Egyptian neighborhood street"
+        "Alexandria Egypt historic street 1920s",
+        "historic Egyptian newspaper archive",
+        "old Alexandria architecture archival style",
+        "Egyptian National Library historical documents",
+        "early twentieth century Alexandria street",
+        "vintage newspaper printing press"
       ],
-      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
-      "sources": [],
+      "description": "حلقة تاريخية تستعرض قضية ريا وسكينة من خلال التغطية الصحفية والدراسة الأكاديمية والوثائق المشار إليها. نميّز بين الوقائع التي تؤيدها المصادر وبين الصورة الشعبية التي تشكلت لاحقًا، دون إعادة تمثيل أو تفاصيل عنيفة.",
+      "sources": [
+        {
+          "title": "توثيق سيرة ريا وسكينة",
+          "publisher": "الجزيرة نت – الجزيرة الوثائقية",
+          "url": "https://www.aljazeera.net/arts/2009/5/14/%D8%AA%D9%88%D8%AB%D9%8A%D9%82-%D8%B3%D9%8A%D8%B1%D8%A9-%D8%B1%D9%8A%D8%A7-%D9%88%D8%B3%D9%83%D9%8A%D9%86%D8%A9"
+        },
+        {
+          "title": "Building a national case in interwar Egypt: Raya and Sakina's crimes through the pages of al-Ahrām (Fall 1920)",
+          "publisher": "Elena Chiti, History Compass / Wiley Online Library (2020)",
+          "url": "https://doi.org/10.1111/hic3.12607"
+        }
+      ],
       "published": false,
-      "content_type": "fictional_archive",
-      "disabled": true,
-      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "تتناول الدراسة الأكاديمية تغطية صحيفة الأهرام للقضية في خريف 1920، وتذكر اعتقال ريا وسكينة وآخرين في نوفمبر 1920.",
+        "تذكر الدراسة أن المحاكمة جرت في مايو 1921 وأن ستة من أفراد المجموعة حُكم عليهم بالإعدام.",
+        "تذكر الجزيرة أن القضية هزت المجتمع السكندري عام 1921 وأن ملف ذاكرة مصر المعاصرة يضم وثائق وصورًا وتقارير مرتبطة بالقضية.",
+        "تذكر الجزيرة أن تنفيذ أحكام الإعدام كان في الإسكندرية يومي 21 و22 ديسمبر 1921.",
+        "يجب عدم تقديم التفاصيل المتنازع عليها أو الأساطير الشعبية كحقائق؛ والتركيز على التغطية الصحفية والسياق التاريخي والإجراءات القضائية."
+      ]
     },
     {
       "episode_id": "social-10",
