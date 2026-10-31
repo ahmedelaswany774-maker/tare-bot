@@ -1,16 +1,22 @@
 {
   "policy_id": "rowat-growth-default-v1",
   "status": "active_until_explicit_user_change",
-  "channel": "@RowatAlwaqe",
-  "content_promise": "قصص حقيقية موثقة ضمن سلاسل مترابطة",
+  "channel": "قصص واقعيه",
+  "content_promise": "قصص واقعية موثقة بمصادر قابلة للتحقق",
   "publishing": {
     "posts_per_day": 4,
     "long_videos_per_week": 28,
     "shorts_per_long_video": 1,
-    "daily_slots": ["03:00", "09:00", "15:00", "21:00"],
+    "daily_slots": [
+      "03:00",
+      "09:00",
+      "15:00",
+      "21:00"
+    ],
     "require_explicit_episode_selection": true,
     "allow_random_topics": false,
-    "allow_unreviewed_public_publish": false
+    "allow_unreviewed_public_publish": false,
+    "require_human_review_before_upload": true
   },
   "seo": {
     "title_pattern": "real_case_name + clear_question_or_paradox + series_episode_number",
@@ -25,7 +31,10 @@
   },
   "retention": {
     "opening_seconds_max_before_core_event": 20,
-    "target_long_video_minutes": {"min": 25, "max": 40},
+    "target_long_video_minutes": {
+      "min": 25,
+      "max": 40
+    },
     "measure_first_30_seconds": true
   },
   "cta": {
@@ -38,7 +47,12 @@
   },
   "measurement": {
     "primary_checkpoint_hours": 24,
-    "checkpoints_hours": [4, 24, 72, 168],
+    "checkpoints_hours": [
+      4,
+      24,
+      72,
+      168
+    ],
     "required_metrics": [
       "impressions",
       "ctr",
