@@ -684,8 +684,58 @@
       "content_type": "fictional_archive",
       "disabled": true,
       "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
+    },
+    {
+      "episode_id": "social-36-faiza-haider",
+      "episode_number": 36,
+      "title": "فايزة حيدر.. من شوارع حلوان إلى تدريب فريق الرجال",
+      "short_title": "فايزة حيدر | كسرت الحواجز في الملعب",
+      "thumbnail_text": "من الشارع للقيادة",
+      "opening_hook": "بدأت فايزة حيدر لعب كرة القدم في شوارع حلوان وهي طفلة، ثم أصبحت قائدة لمنتخب مصر للسيدات، ووصلت إلى تدريب فريق من الرجال في تجربة غير مألوفة في الكرة المصرية.",
+      "topic": "سيرة وثائقية واقعية للاعبة والمدربة المصرية فايزة حيدر: بدايتها في كرة القدم، العقبات الاجتماعية والعائلية التي تحدثت عنها، مسيرتها مع المنتخب، ثم انتقالها إلى التدريب ومبادراتها لتوسيع مشاركة الفتيات. التزم بالوقائع المحددة في المصادر، وانسب التصريحات الشخصية إلى صاحبتها، ولا تضف مشاهد أو حوارات متخيلة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Helwan Cairo neighborhood football street",
+        "Egypt women's national football team historical",
+        "women football training Egypt",
+        "Fayza Haidar football coach",
+        "Ideal Goldi football team Egypt",
+        "Egyptian girls football academy training"
+      ],
+      "description": "حلقة وثائقية عن فايزة حيدر، لاعبة ومدربة كرة قدم مصرية بدأت اللعب منذ طفولتها، وقادت منتخب مصر للسيدات، ثم أصبحت أول امرأة تدرب فريقًا للرجال في مصر وفق تقارير FIFA وAl-Monitor. نعتمد على مقابلة فايزة مع المجلس الثقافي البريطاني وتغطيات مستقلة، مع التمييز بين الوقائع المنشورة والتصريحات المنقولة عنها.",
+      "sources": [
+        {
+          "title": "Haider breaking down barriers in Egyptian football",
+          "publisher": "FIFA",
+          "url": "https://inside.fifa.com/womens-football/news/haider-breaking-down-barriers-in-egyptian-football"
+        },
+        {
+          "title": "Meet Egypt’s first female coach of a men's soccer team",
+          "publisher": "Al-Monitor",
+          "url": "https://www.al-monitor.com/originals/2020/11/egypt-women-soccer-coach-male-teams-norms.html"
+        },
+        {
+          "title": "Faiza Heider: 'Football is practically my life'",
+          "publisher": "British Council",
+          "url": "https://www.britishcouncil.org/voices-magazine/faiza-heider-football-practically-my-life"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "يذكر المجلس الثقافي البريطاني في مقابلة نشرتها عام 2017 أن فايزة بدأت لعب كرة القدم في الشارع وهي في الخامسة أو السادسة، وأنها كانت الفتاة الوحيدة بين الأولاد الذين تلعب معهم.",
+        "بحسب المقابلة نفسها، واجهت فايزة تحفظًا من والدتها في البداية بسبب مخاوف من اعتراض الأقارب، ثم أصبحت والدتها داعمة لمسيرتها.",
+        "يذكر المجلس الثقافي البريطاني أن فايزة بدأت عام 2011 مشروع أكاديمية كرة قدم بدعم من المجلس، بهدف إتاحة اللعب للأطفال ومنهم الفتيات والأطفال ذوو الاحتياجات الخاصة.",
+        "ذكر FIFA في تقريره المنشور في 11 أغسطس 2021 أن فايزة قادت منتخب مصر الوطني للسيدات لمدة عقد، وأنها بدأت التدريب عام 2009 في مركز شباب شرق حلوان.",
+        "ذكر FIFA أنها لعبت في أول دوري نسائي مصري عام 1997، وانضمت إلى نادي الطيران عام 2003، وفاز فريقها بالبطولة الوطنية عام 2005، وأنها ظهرت دوليًا مع المنتخب في سن الرابعة عشرة.",
+        "ذكر FIFA أنها أصبحت أول مدربة مصرية تحصل على اعتماد من الاتحاد الإنجليزي لكرة القدم، وأنها حضرت دورات تدريبية لدى FIFA وCAF والاتحادين الإنجليزي والإسباني.",
+        "أكد تقرير Al-Monitor المنشور في نوفمبر 2020 تعيين فايزة حيدر مدربة لفريق الرجال في نادي Ideal Goldi، وذكر الصعوبات التي واجهتها في قبول اللاعبين والمجتمع لوجود مدربة امرأة.",
+        "تُنسب الأرقام والتصريحات والتجارب الشخصية إلى المصدر الذي نشرها، ولا تُعرض باعتبارها تحققًا مستقلًا من كل تفاصيل السيرة."
+      ]
     }
   ],
   "content_type": "verified_real_story",
-  "workflow_status": "awaiting_verified_episode_9"
+  "workflow_status": "episode_36_verified_sources_added_pending_draft_review"
 }
