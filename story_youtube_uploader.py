@@ -47,12 +47,17 @@ def load_episode():
         item for item in episodes
         if not item.get("published", False)
         and not item.get("disabled", False)
-        and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
-        and len(item.get("sources", [])) >= 2
-        and len({source.get("publisher", "").strip().lower() for source in item.get("sources", [])}) >= 2
-        and bool(item.get("verified_facts"))
-        and all(source.get("title") and source.get("publisher") and source.get("url", "").startswith("https://")
-                for source in item.get("sources", []))
+        and (
+            item.get("content_type", manifest.get("content_type")) == "fictional_drama"
+            or (
+                item.get("content_type", manifest.get("content_type")) == "verified_real_story"
+                and len(item.get("sources", [])) >= 2
+                and len({source.get("publisher", "").strip().lower() for source in item.get("sources", [])}) >= 2
+                and bool(item.get("verified_facts"))
+                and all(source.get("title") and source.get("publisher") and source.get("url", "").startswith("https://")
+                        for source in item.get("sources", []))
+            )
+        )
     ]
     if EPISODE_SELECTOR == "next":
         episode = next((item for item in eligible), None)
@@ -69,8 +74,8 @@ def load_episode():
             raise ValueError(f"الحلقة {requested_number} غير موجودة")
         if episode not in eligible:
             raise ValueError(
-                f"الحلقة {requested_number} غير مؤهلة: يجب أن تكون قصة حقيقية موثقة بمصدرين على الأقل "
-                "وغير منشورة أو معطلة."
+                f"الحلقة {requested_number} غير مؤهلة: يجب أن تكون حلقة مفعّلة وغير منشورة، "
+                "وأن تستوفي شروط نوع المحتوى المحدد."
             )
     return manifest, episode
 
@@ -117,7 +122,13 @@ def generate_story(manifest, episode):
     growth_policy = load_growth_policy()
     sources = "\\n".join(
         f"- {source['title']} — {source['publisher']} — {source['url']}"
-        for source in episode["sources"]
+        for source in episode.get("sources", [])
+    )
+    is_fiction = episode.get("content_type") == "fictional_drama"
+    story_type_instruction = (
+        "نوع المحتوى: دراما اجتماعية خيالية أصلية. لا تقدّم الأحداث أو الشخصيات باعتبارها وقائع حقيقية."
+        if is_fiction else
+        "نوع المحتوى: قصة اجتماعية أسرية واقعية موثقة. لا تستخدم إلا الوقائع الواردة في قائمة الوقائع المتحققة والمصادر أدناه."
     )
     target_words = episode.get("target_words", 1800)
     prompt_parts = [
@@ -125,14 +136,14 @@ def generate_story(manifest, episode):
         f"الموضوع: {episode['topic']}",
         f"العنوان التحريري: {episode['title']}",
         f"الافتتاحية: {episode['opening_hook']}",
-        "نوع المحتوى: قصة اجتماعية أسرية واقعية موثقة. لا تستخدم إلا الوقائع الواردة في قائمة الوقائع المتحققة والمصادر أدناه.",
-        "الوقائع المتحققة التي يجب الالتزام بها:\\n" + "\\n".join("- " + fact for fact in episode.get("verified_facts", [])),
+        story_type_instruction,
+        "عناصر الحبكة التي يجب الالتزام بها:\\n" + "\\n".join("- " + fact for fact in episode.get("verified_facts", [])),
         "ممنوع اختلاق حوار أو مشاهد خاصة أو دوافع أو أسماء أو تواريخ أو أرقام أو نتائج.",
         "إذا تضمنت القضية جريمة أو عنفًا، فهذه حلقة اجتماعية وثائقية: امتنع تمامًا عن أي وصف دموي أو تفصيلي للعنف؛ ركز على السياق الصحفي والقضائي والتاريخي فقط.",
-        "لا تنقل صياغة المصادر حرفيًا؛ اكتب شرحًا وسردًا أصليًا مع ذكر المصدر في الوصف.",
+        "اكتب سردًا أصليًا بالكامل، ولا تنسب أحداث الدراما الخيالية إلى أشخاص حقيقيين.",
         "إذا تعارضت المصادر أو لم تثبت معلومة، وضّح عدم اليقين ولا تعرضها كحقيقة.",
         "احمِ خصوصية الأشخاص غير المعروفين؛ لا تضف بيانات تعريفية أو تفاصيل شخصية غير منشورة وضرورية.",
-        f"المصادر المعتمدة:\\n{sources}",
+        (f"المصادر المعتمدة:\\n{sources}" if sources else "لا توجد مصادر؛ هذه حلقة درامية خيالية وليست قصة واقعية."),
         f"الطول المستهدف نحو {target_words} كلمة، والسرد باللهجة المصرية البيضاء.",
         f"ضع دعوة واحدة طبيعية بعد أول {growth_policy['cta']['never_before_core_hook_seconds']} ثانية، ثم خاتمة موجزة.",
         "أخرج متن السرد فقط دون Markdown أو JSON أو عناوين تقنية."
