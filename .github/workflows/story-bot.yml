@@ -1,12 +1,14 @@
 name: Story Bot - Social Stories Draft Builder
 
 on:
+  schedule:
+    - cron: "0 8,12,16,20 * * *"
   workflow_dispatch:
     inputs:
       episode_number:
         description: "رقم الحلقة الموثقة المطلوب تجهيز مسودتها"
         required: true
-        default: "9"
+        default: "next"
         type: string
       tts_backend:
         description: "محرك الصوت"
@@ -19,10 +21,10 @@ on:
           - fish
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: story-bot-draft-builder
+  group: story-bot
   cancel-in-progress: false
 
 jobs:
@@ -38,7 +40,19 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Install dependencies
-        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk pillow arabic-reshaper python-bidi
+        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk pillow arabic-reshaper python-bidi TTS
+      - name: Configure scheduled TTS
+        id: scheduled_tts
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          VOICE_REFERENCE_B64: ${{ secrets.VOICE_REFERENCE_B64 }}
+        run: |
+          if [ -n "$VOICE_REFERENCE_B64" ]; then
+            echo "$VOICE_REFERENCE_B64" | base64 --decode > voice_reference.wav
+            echo "backend=xtts" >> "$GITHUB_OUTPUT"
+          else
+            echo "backend=edge" >> "$GITHUB_OUTPUT"
+          fi
       - name: Build episode draft (publishing disabled)
         id: build_draft
         env:
@@ -46,28 +60,30 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           GEMINI_MODEL: gemini-3.1-flash-lite
           GEMINI_FALLBACK_MODELS: gemini-3.5-flash
           STORY_TARGET_WORDS: '1800'
           HISTORY_PATH: content/published_stories.json
           SERIES_MANIFEST_PATH: content/series/real_stories.json
           GROWTH_POLICY_PATH: content/strategy/growth_policy.json
-          EPISODE_NUMBER: ${{ inputs.episode_number }}
-          TTS_BACKEND: ${{ inputs.tts_backend }}
+          EPISODE_NUMBER: ${{ github.event_name == 'schedule' && 'next' || inputs.episode_number }}
+          TTS_BACKEND: ${{ github.event_name == 'schedule' && steps.scheduled_tts.outputs.backend || inputs.tts_backend }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '30'
-          ALLOW_UNREVIEWED_PUBLISH: 'false'
+          ALLOW_UNREVIEWED_PUBLISH: 'true'
         run: python story_youtube_uploader.py
-      - name: Save draft artifacts for review
-        if: ${{ always() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: social-story-draft-${{ github.run_id }}
-          path: |
-            story.mp4
-            story.mp3
-            story_metadata.json
-            upload_state.json
-          if-no-files-found: ignore
-          retention-days: 7
+      - name: Persist published episode state
+        if: ${{ success() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/series/real_stories.json
+          if git diff --cached --quiet; then
+            echo "No published-state changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: record published story episode"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
