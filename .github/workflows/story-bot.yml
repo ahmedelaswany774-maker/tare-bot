@@ -6,7 +6,7 @@ on:
       episode_number:
         description: "رقم الحلقة الموثقة المطلوب تجهيز مسودتها"
         required: true
-        default: "9"
+        default: "36"
         type: string
       tts_backend:
         description: "محرك الصوت"
