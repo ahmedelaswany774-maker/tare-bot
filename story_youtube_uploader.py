@@ -4,6 +4,7 @@ import math
 import time
 import re
 import subprocess
+import sys
 import asyncio
 import requests
 from datetime import datetime, timedelta, timezone
@@ -56,10 +57,8 @@ def load_episode():
     if EPISODE_SELECTOR == "next":
         episode = next((item for item in eligible), None)
         if episode is None:
-            raise ValueError(
-                "لا توجد حلقة مؤهلة للنشر: أضف حلقة verified_real_story بمصدرين موثوقين على الأقل "
-                "واجعلها غير منشورة وغير معطلة. تم إيقاف الحلقات الخيالية لمنع تقديمها كوقائع."
-            )
+            print("لا توجد حلقات موثقة غير منشورة. إنهاء ناجح دون توليد أو رفع.")
+            return manifest, None
     else:
         try:
             requested_number = int(EPISODE_SELECTOR)
@@ -200,6 +199,8 @@ def generate_metadata(story_text, max_attempts=3):
 
 def generate_content():
     manifest, episode = load_episode()
+    if episode is None:
+        return None
     story_text = generate_story(manifest, episode)
     return {
         "manifest": manifest,
@@ -212,6 +213,8 @@ def generate_content():
 
 
 content = generate_content()
+if content is None:
+    sys.exit(0)
 growth_policy = load_growth_policy()
 manifest = content["manifest"]
 episode = content["episode"]
