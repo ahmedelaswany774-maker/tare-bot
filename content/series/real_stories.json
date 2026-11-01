@@ -69,7 +69,7 @@
       "thumbnail_text": "ظهر الشاهد",
       "opening_hook": "يجتمع أفراد الأسرة لحسم النزاع، ويظهر جار قديم يحمل رواية مختلفة عن السنوات الأخيرة للأب.",
       "topic": "دراما اجتماعية خيالية أصلية ضمن سلسلة بيت العيلة: شهادة قلبت المجلس. حافظ على استمرارية الشخصيات والأحداث.",
-      "target_words": 1800,
+      "target_words": 1600,
       "visual_keywords": [
         "cinematic Egyptian family home",
         "Arab family drama scene",
@@ -78,12 +78,16 @@
         "dramatic close up portrait",
         "Egyptian neighborhood street"
       ],
-      "description": "جزء من حكاية اجتماعية درامية خيالية بعنوان بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
+      "description": "دراما اجتماعية خيالية أصلية من سلسلة بيت العيلة. الشخصيات والأحداث من نسج الخيال.",
       "sources": [],
       "published": false,
-      "content_type": "fictional_archive",
-      "disabled": true,
-      "disabled_reason": "أرشيف من مخططات درامية خيالية قديمة؛ لا يُستخدم في سلسلة القصص الواقعية ولا يُنشر."
+      "content_type": "fictional_drama",
+      "disabled": false,
+      "verified_facts": [
+        "تبدأ الخلافات عندما يظهر شاهد قديم برواية مختلفة عن السنوات الأخيرة للأب.",
+        "تدور المواجهة حول الميراث والذكريات والمسؤوليات داخل الأسرة.",
+        "تتطور الأحداث عبر شهادة الجار وردود فعل أفراد الأسرة، مع نهاية مشوقة تمهّد للحلقة التالية."
+      ]
     },
     {
       "episode_id": "social-11",
@@ -687,5 +691,5 @@
     }
   ],
   "content_type": "verified_real_story",
-  "workflow_status": "awaiting_verified_episode_9"
+  "workflow_status": "fictional_episode_10_enabled"
 }
