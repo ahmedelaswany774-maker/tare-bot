@@ -1,10 +1,10 @@
 {
-  "policy_id": "rowat-growth-90day-v2",
+  "policy_id": "rowat-growth-90day-v3",
   "status": "active_until_explicit_user_change",
   "channel": "قصص واقعيه",
   "content_promise": "قصص اجتماعية وأسرية واقعية موثقة من المجتمع المصري والعربي، بسرد أصلي يحترم الضحايا ويفصل بين الوقائع والاتهامات.",
   "publishing": {
-    "long_videos_per_week": 4,
+    "long_videos_per_week": 7,
     "target_duration_minutes": {
       "min": 20,
       "max": 30
@@ -12,9 +12,12 @@
     "max_daily_long_videos": 1,
     "planned_release_days": [
       "Monday",
+      "Tuesday",
       "Wednesday",
+      "Thursday",
       "Friday",
-      "Saturday"
+      "Saturday",
+      "Sunday"
     ],
     "planned_release_time_local": "19:00",
     "timezone": "Africa/Cairo",
@@ -23,7 +26,7 @@
     "allow_random_topics": false,
     "allow_unreviewed_public_publish": false,
     "require_human_review_before_upload": true,
-    "workflow_mode": "manual_draft_only_until_reviewed"
+    "workflow_mode": "daily_draft_manual_review_before_publish"
   },
   "seo": {
     "title_pattern": "قضية أو سؤال اجتماعي واضح + عنصر تشويق غير مضلل",
