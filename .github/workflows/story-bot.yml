@@ -57,7 +57,7 @@ jobs:
           TTS_BACKEND: ${{ inputs.tts_backend }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
-          PUBLISH_DELAY_MINUTES: '30'
+          PUBLISH_DELAY_MINUTES: '0'
           ALLOW_UNREVIEWED_PUBLISH: 'true'
         run: python story_youtube_uploader.py
       - name: Save generated and published artifacts
