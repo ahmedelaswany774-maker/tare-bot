@@ -422,10 +422,88 @@ def _make_audio_fish():
     os.remove(list_path)
 
 
+def _split_edge_text(text, max_chars=1800):
+    """Split long Arabic narration at sentence/word boundaries for Edge TTS."""
+    sentences = re.split(r"(?<=[.!؟?])\\s+|\\n+", text.strip())
+    chunks, current = [], ""
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        while len(sentence) > max_chars:
+            cut = sentence.rfind(" ", 0, max_chars)
+            if cut < max_chars // 2:
+                cut = max_chars
+            piece, sentence = sentence[:cut].strip(), sentence[cut:].strip()
+            if piece:
+                if current:
+                    chunks.append(current)
+                    current = ""
+                chunks.append(piece)
+        candidate = (current + " " + sentence).strip()
+        if len(candidate) <= max_chars:
+            current = candidate
+        else:
+            if current:
+                chunks.append(current)
+            current = sentence
+    if current:
+        chunks.append(current)
+    return chunks
+
+
 async def _make_audio_edge():
     edge_rate = "-18%" if episode.get("content_type") == "fictional_drama" else "+0%"
-    communicate = edge_tts.Communicate(story_text, "ar-EG-ShakirNeural", rate=edge_rate)
-    await communicate.save("story.mp3")
+    chunks = _split_edge_text(story_text)
+    if not chunks:
+        raise ValueError("نص القصة فارغ؛ لا يمكن إنشاء الصوت.")
+    print(f"بدء Edge TTS: تقسيم القصة إلى {len(chunks)} جزءًا.")
+    generated = []
+    try:
+        for index, chunk in enumerate(chunks, start=1):
+            part_path = f"edge_part_{index:03d}.mp3"
+            last_error = None
+            for attempt in range(1, 4):
+                try:
+                    communicate = edge_tts.Communicate(
+                        chunk, "ar-EG-ShakirNeural", rate=edge_rate
+                    )
+                    await communicate.save(part_path)
+                    if not os.path.exists(part_path) or os.path.getsize(part_path) < 1000:
+                        raise RuntimeError("Edge TTS returned an empty/too-small audio file.")
+                    generated.append(part_path)
+                    print(f"✅ Edge TTS جزء {index}/{len(chunks)}")
+                    last_error = None
+                    break
+                except Exception as exc:
+                    last_error = exc
+                    if os.path.exists(part_path):
+                        os.remove(part_path)
+                    if attempt < 3:
+                        delay = 4 * attempt
+                        print(f"⚠️ فشل الجزء {index} (محاولة {attempt}/3): {exc}; إعادة المحاولة بعد {delay} ثوانٍ.")
+                        await asyncio.sleep(delay)
+            if last_error is not None:
+                raise RuntimeError(f"فشل Edge TTS في الجزء {index}/{len(chunks)}: {last_error}") from last_error
+
+        concat_list = "edge_audio_parts.txt"
+        with open(concat_list, "w", encoding="utf-8") as handle:
+            for part in generated:
+                handle.write(f"file '{os.path.abspath(part)}'\\n")
+        subprocess.run(
+            ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
+             "-c:a", "libmp3lame", "-q:a", "2", "story.mp3"],
+            check=True, capture_output=True, text=True,
+        )
+        if not os.path.exists("story.mp3") or os.path.getsize("story.mp3") < 1000:
+            raise RuntimeError("لم ينتج FFmpeg ملف story.mp3 صالحًا.")
+        print(f"✅ تم دمج {len(generated)} جزءًا صوتيًا في story.mp3")
+    finally:
+        for part in generated:
+            if os.path.exists(part):
+                os.remove(part)
+        if os.path.exists("edge_audio_parts.txt"):
+            os.remove("edge_audio_parts.txt")
 
 
 try:
