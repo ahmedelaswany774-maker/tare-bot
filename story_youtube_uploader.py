@@ -326,20 +326,28 @@ def generate_teaser_script(manifest, episode, story_text):
            "المصادر: " + "; ".join(s['title'] + " (" + s['publisher'] + ")" for s in episode['sources']) + "\\n")
         + f"نص القصة للاستناد إلى أحداثه فقط:\\n{story_text[:10000]}"
     )
-    teaser = call_gemini(prompt, max_output_tokens=1200).strip()
+    try:
+        teaser = call_gemini(prompt, max_output_tokens=1200).strip()
+    except Exception as exc:
+        print(f"تحذير: تعذر توليد نص الريلز من Gemini؛ سيتم استخدام الصياغة الاحتياطية: {exc}")
+        teaser = ""
     word_count = len(teaser.split())
 
-    # Gemini may occasionally return a short answer despite the requested length.
-    # Retry once with an explicit minimum; do not publish a weak teaser.
+    # Retry Gemini once only when its first answer is too short. A retry outage
+    # must not abort the episode; the deterministic fallback below will handle it.
     if word_count < 35:
         retry_prompt = (
             prompt
-            + "\\nمهم جدًا: إجابتك السابقة كانت قصيرة أكثر من اللازم. أعد كتابة النص كاملًا "
-            + "في 80 إلى 100 كلمة عربية فعلية، مع 2-3 تفاصيل موثقة ونداء واضح لمشاهدة الحلقة الكاملة. "
+            + "\\nمهم جدًا: أعد كتابة النص في 80 إلى 100 كلمة عربية فعلية. "
             + "أخرج التعليق الصوتي فقط، دون مقدمة أو شرح."
         )
-        teaser = call_gemini(retry_prompt, max_output_tokens=1600).strip()
-        word_count = len(teaser.split())
+        try:
+            teaser = call_gemini(retry_prompt, max_output_tokens=1600).strip()
+            word_count = len(teaser.split())
+        except Exception as exc:
+            print(f"تحذير: فشلت إعادة محاولة نص الريلز؛ سيتم استخدام الصياغة الاحتياطية: {exc}")
+            teaser = ""
+            word_count = 0
 
     if word_count < 35 or word_count > 110:
         # Deterministic fallback: build a valid short teaser from the approved hook
