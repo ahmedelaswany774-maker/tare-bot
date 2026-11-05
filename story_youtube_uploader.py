@@ -342,26 +342,27 @@ def generate_teaser_script(manifest, episode, story_text):
         word_count = len(teaser.split())
 
     if word_count < 35 or word_count > 110:
-        # Never pass a full episode script to the Shorts renderer. Build a compact,
-        # grounded teaser from the approved hook and story, capped at 100 words.
-        sentences = re.split(r"(?<=[.!؟?])\\s+", story_text.strip())
-        selected = [episode["opening_hook"].strip()]
-        count = len(selected[0].split())
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if not sentence:
-                continue
-            n = len(sentence.split())
-            if count + n > 88:
-                continue
-            selected.append(sentence)
-            count += n
-            if count >= 72:
+        # Deterministic fallback: build a valid short teaser from the approved hook
+        # and the story body, independent of sentence boundaries or Gemini output.
+        clean_story = re.sub(r"[*#_>`]", " ", story_text)
+        clean_story = re.sub(r"\s+", " ", clean_story).strip()
+        hook = re.sub(r"\s+", " ", episode.get("opening_hook", "")).strip()
+        hook_words = hook.split()
+        story_words = clean_story.split()
+        # Keep the hook first, then add story words until the teaser is safely
+        # inside the 35-110 word contract.
+        combined = hook_words[:55]
+        for word in story_words:
+            if len(combined) >= 82:
                 break
-        teaser = " ".join(selected) + " شاهد القصة كاملة على قناة قصص واقعيه."
-        words = teaser.split()
-        if len(words) > 100:
-            teaser = " ".join(words[:94]) + " شاهد القصة كاملة على قناة قصص واقعيه."
+            combined.append(word)
+        teaser = " ".join(combined)
+        cta = "شاهد القصة كاملة على قناة قصص واقعيه."
+        if cta not in teaser:
+            teaser = (teaser + " " + cta).strip()
+        teaser_words = teaser.split()
+        if len(teaser_words) > 100:
+            teaser = " ".join(teaser_words[:94]) + " " + cta
         word_count = len(teaser.split())
     if word_count < 35 or word_count > 110:
         raise ValueError(
