@@ -1,0 +1,38 @@
+{
+  "series_id": "fictional-social-drama",
+  "series_title": "حكايات اجتماعية درامية",
+  "content_type": "fictional_drama",
+  "target_duration_minutes": {
+    "min": 27,
+    "max": 33
+  },
+  "playlist_title": "حكايات اجتماعية درامية — قصص خيالية",
+  "episodes": [
+    {
+      "episode_id": "fictional-37-inheritance-council",
+      "episode_number": 37,
+      "title": "وقف أمام أعمامه جميعًا من أجل حق أخته… والسر الذي قلب مجلس العائلة",
+      "short_title": "حق أختي مش هيروح",
+      "thumbnail_text": "حقها مش هيروح",
+      "opening_hook": "اجتمع أعمام سلمى ليطلبوا منها توقيع ورقة تنازل، لكن أخاها يوسف رفض أن يسمح لأحد أن يطلب منها التوقيع قبل أن تفهم حقها.",
+      "topic": "دراما اجتماعية خيالية عن صراع التقاليد والحقوق داخل عائلة بعد وفاة الأب، ومواجهة ضغط الأعمام على الأخت للتنازل عن حقها.",
+      "target_words": 3450,
+      "script_path": "content/drafts/episode-37-inheritance-council.md",
+      "visual_keywords": [
+        "Egyptian village family house exterior",
+        "Egyptian family council living room dramatic scene",
+        "old wooden table papers notebook close up",
+        "Egyptian rural farmland at golden hour",
+        "middle aged Egyptian men serious family discussion",
+        "Egyptian woman thoughtful portrait cinematic",
+        "young Egyptian man defending sister family meeting",
+        "old wooden storage box handwritten ledgers"
+      ],
+      "description": "حكاية درامية خيالية عن يوسف الذي وقف بجانب أخته سلمى عندما طلب منها أعمامها التنازل عن حقها باسم العادات. وبين مجلس العائلة والدفاتر القديمة، يكتشف الجميع أن الحفاظ على صلة الرحم لا يكون بإسكات صاحب الحق، بل بالوضوح والعدل. تنويه: الشخصيات والأحداث والحوار من نسج الخيال.",
+      "sources": [],
+      "content_type": "fictional_drama",
+      "published": false,
+      "disabled": false
+    }
+  ]
+}
