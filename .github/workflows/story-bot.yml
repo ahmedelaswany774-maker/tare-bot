@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       episode_number:
-        description: "رقم الحلقة الموثقة المطلوب تجهيزها ونشرها"
+        description: "next لاختيار الحلقة الموثقة التالية تلقائيًا، أو رقم حلقة موجودة فعلًا"
         required: true
-        default: "36"
+        default: "next"
         type: string
       tts_backend:
         description: "محرك الصوت"
