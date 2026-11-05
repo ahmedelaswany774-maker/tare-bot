@@ -42,23 +42,35 @@ def load_growth_policy():
 def load_episode():
     manifest = json.loads(Path(SERIES_MANIFEST_PATH).read_text(encoding="utf-8"))
     episodes = sorted(manifest["episodes"], key=lambda item: item["episode_number"])
-    eligible = [
-        item for item in episodes
-        if not item.get("published", False)
-        and not item.get("disabled", False)
-        and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
-        and len(item.get("sources", [])) >= 2
-        and len({source.get("publisher", "").strip().lower() for source in item.get("sources", [])}) >= 2
-        and bool(item.get("verified_facts"))
-        and all(source.get("title") and source.get("publisher") and source.get("url", "").startswith("https://")
-                for source in item.get("sources", []))
-    ]
+    is_fictional = manifest.get("content_type") == "fictional_drama"
+    if is_fictional:
+        eligible = [
+            item for item in episodes
+            if not item.get("published", False)
+            and not item.get("disabled", False)
+            and item.get("content_type") == "fictional_drama"
+            and Path(item.get("script_path", "")).is_file()
+        ]
+    else:
+        eligible = [
+            item for item in episodes
+            if not item.get("published", False)
+            and not item.get("disabled", False)
+            and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
+            and len(item.get("sources", [])) >= 2
+            and len({source.get("publisher", "").strip().lower() for source in item.get("sources", [])}) >= 2
+            and bool(item.get("verified_facts"))
+            and all(source.get("title") and source.get("publisher") and source.get("url", "").startswith("https://")
+                    for source in item.get("sources", []))
+        ]
     if EPISODE_SELECTOR == "next":
         episode = next((item for item in eligible), None)
         if episode is None:
+            if is_fictional:
+                raise ValueError("لا توجد مسودة درامية خيالية مؤهلة: تأكد من وجود ملف السيناريو وأن الحلقة غير منشورة أو معطلة.")
             raise ValueError(
                 "لا توجد حلقة مؤهلة للنشر: أضف حلقة verified_real_story بمصدرين موثوقين على الأقل "
-                "واجعلها غير منشورة وغير معطلة. تم إيقاف الحلقات الخيالية لمنع تقديمها كوقائع."
+                "واجعلها غير منشورة وغير معطلة. تم إيقاف الحلقات الخيالية عن مسار القصص الواقعية."
             )
     else:
         try:
@@ -70,6 +82,8 @@ def load_episode():
             available_numbers = ", ".join(str(item["episode_number"]) for item in episodes)
             raise ValueError(f"الحلقة {requested_number} غير موجودة في ملف السلسلة. أرقام الحلقات المسجلة: {available_numbers}. استخدم EPISODE_NUMBER=next لاختيار حلقة مؤهلة تلقائيًا.")
         if episode not in eligible:
+            if is_fictional:
+                raise ValueError(f"المسودة {requested_number} غير مؤهلة: يجب أن يكون ملف السيناريو موجودًا وأن تكون غير منشورة أو معطلة.")
             raise ValueError(
                 f"الحلقة {requested_number} غير مؤهلة: يجب أن تكون قصة حقيقية موثقة بمصدرين على الأقل "
                 "وغير منشورة أو معطلة."
@@ -116,6 +130,31 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
 
 
 def generate_story(manifest, episode):
+    if episode.get("content_type") == "fictional_drama":
+        raw = Path(episode["script_path"]).read_text(encoding="utf-8")
+        start_marker = "# النص الكامل"
+        end_marker = "# ملاحظات المونتاج"
+        if start_marker not in raw or end_marker not in raw:
+            raise ValueError("ملف السيناريو لا يحتوي على حدود النص الكامل المتوقعة.")
+        story = raw.split(start_marker, 1)[1].split(end_marker, 1)[0]
+        lines = []
+        for line in story.splitlines():
+            stripped = line.strip()
+            if not stripped or stripped == "---":
+                continue
+            if stripped.startswith("#"):
+                continue
+            if stripped.startswith("**التوقيت التقريبي:"):
+                continue
+            line = re.sub(r"\\*\\*(.*?)\\*\\*", r"\\1", line)
+            lines.append(line.strip())
+        spoken = "\\n".join(lines).strip()
+        word_count = len(spoken.split())
+        if word_count < 3000:
+            raise ValueError(f"نص الحلقة أقصر من الحد الأدنى المطلوب: {word_count} كلمة.")
+        print(f"تم تحميل السيناريو الدرامي من الريبو: {word_count} كلمة.")
+        return spoken
+
     growth_policy = load_growth_policy()
     sources = "\\n".join(
         f"- {source['title']} — {source['publisher']} — {source['url']}"
@@ -222,17 +261,19 @@ description = content["description"]
 
 def generate_teaser_script(manifest, episode, story_text):
     """Create an original short-form teaser from the selected episode, not a raw crop."""
+    is_fictional = episode.get("content_type") == "fictional_drama"
     prompt = (
         "اكتب نص تعليق صوتي عربي مصري طبيعي لريلز ترويجي مدته 30 إلى 50 ثانية "
-        "عن القصة الموثقة التالية. افتح بسؤال أو مفارقة قوية خلال أول ثانيتين، "
-        "ثم اذكر 2-3 تفاصيل موثقة من النص، وصعّد التشويق دون كشف الخاتمة. "
-        "اختم بدعوة واضحة: شاهد القصة الكاملة على قناة قصص واقعيه. "
-        "لا تخترع أي معلومة أو حوار أو نتيجة، ولا تكتب عنوانًا أو تعليمات تصوير أو روابط. "
-        "أخرج التعليق الصوتي فقط، في حدود 75-105 كلمات.\\n"
-        f"عنوان الحلقة: {episode['title']}\\n"
-        f"الافتتاحية المعتمدة: {episode['opening_hook']}\\n"
-        f"المصادر: " + "; ".join(s['title'] + " (" + s['publisher'] + ")" for s in episode['sources']) + "\\n"
-        f"نص القصة للاستناد إلى وقائعه فقط:\\n{story_text[:10000]}"
+        + ("عن الحكاية الدرامية الخيالية التالية. لا تقدمها كواقعة حقيقية. " if is_fictional else "عن القصة الموثقة التالية. ")
+        + "افتح بسؤال أو مفارقة قوية خلال أول ثانيتين، ثم اذكر 2-3 تفاصيل من النص، "
+        + "وصعّد التشويق دون كشف الخاتمة. اختم بدعوة واضحة: شاهد القصة الكاملة على قناة قصص واقعيه. "
+        + "لا تخترع تفاصيل خارج النص، ولا تكتب عنوانًا أو تعليمات تصوير أو روابط. "
+        + "أخرج التعليق الصوتي فقط، في حدود 75-105 كلمات.\\n"
+        + f"عنوان الحلقة: {episode['title']}\\n"
+        + f"الافتتاحية المعتمدة: {episode['opening_hook']}\\n"
+        + ("تنويه: القصة خيالية.\\n" if is_fictional else
+           "المصادر: " + "; ".join(s['title'] + " (" + s['publisher'] + ")" for s in episode['sources']) + "\\n")
+        + f"نص القصة للاستناد إلى أحداثه فقط:\\n{story_text[:10000]}"
     )
     teaser = call_gemini(prompt, max_output_tokens=1200).strip()
     word_count = len(teaser.split())
@@ -424,7 +465,8 @@ def _make_audio_fish():
 
 
 async def _make_audio_edge():
-    communicate = edge_tts.Communicate(story_text, "ar-EG-ShakirNeural")
+    edge_rate = "-12%" if episode.get("content_type") == "fictional_drama" else "+0%"
+    communicate = edge_tts.Communicate(story_text, "ar-EG-ShakirNeural", rate=edge_rate)
     await communicate.save("story.mp3")
 
 
@@ -445,6 +487,15 @@ except Exception as e:
 audio_clip = AudioFileClip("story.mp3")
 target_duration = audio_clip.duration
 print(f"مدة الصوت: {target_duration:.1f} ثانية")
+if episode.get("content_type") == "fictional_drama":
+    min_seconds = int(manifest["target_duration_minutes"]["min"] * 60)
+    max_seconds = int(manifest["target_duration_minutes"]["max"] * 60)
+    if not min_seconds <= target_duration <= max_seconds:
+        raise ValueError(
+            f"مدة الحلقة الصوتية {target_duration / 60:.1f} دقيقة؛ المطلوب "
+            f"{manifest['target_duration_minutes']['min']}–{manifest['target_duration_minutes']['max']} دقيقة. "
+            "تم إيقاف الرندر والرفع حتى لا تُنشر حلقة أقصر من المطلوب."
+        )
 
 
 def fetch_pexels_clips(keywords, need_duration):
