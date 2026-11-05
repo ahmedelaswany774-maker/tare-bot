@@ -151,24 +151,8 @@ def generate_story(manifest, episode):
         source_words = len(spoken.split())
         if source_words < 3000:
             raise ValueError(f"نص الحلقة الأصلي أقصر من الحد الأدنى المطلوب: {source_words} كلمة.")
-        expansion_prompt = (
-            "أعد صياغة وتوسيع السيناريو الدرامي الخيالي التالي إلى نص تعليق صوتي عربي مصري "
-            "متماسك في حدود 3700 إلى 4000 كلمة فعلية، بما يناسب حلقة تقارب 30 دقيقة. "
-            "حافظ على نفس الشخصيات وتسلسل المشاهد والنهاية والرسالة، ووسّع الحوار والتفاصيل اليومية "
-            "والانتقالات والانفعالات الطبيعية دون تكرار أو حشو. لا تضف وقائع حقيقية أو أسماء أشخاص حقيقيين. "
-            "لا تغيّر أن القصة خيالية، ولا تضف مشاهد عنف أو وصفًا صادمًا. "
-            "أخرج نص السرد والحوار فقط، بلا عناوين تقنية أو Markdown أو تعليمات مونتاج.\\n\\n"
-            + spoken
-        )
-        expanded = call_gemini(expansion_prompt, max_retries=6, base_delay=15, max_output_tokens=18000).strip()
-        expanded_words = len(expanded.split())
-        if expanded_words < 3500:
-            raise ValueError(
-                f"Gemini أعاد نصًا أقصر من الحد المطلوب ({expanded_words} كلمة). "
-                "تم إيقاف الإنتاج بدل رفع حلقة لا تحقق المدة."
-            )
-        print(f"تم تحميل وتوسيع سيناريو الحلقة من الريبو: {source_words} إلى {expanded_words} كلمة.")
-        return expanded
+        print(f"تم تحميل السيناريو المكتوب من الريبو مباشرة دون استدعاء Gemini: {source_words} كلمة.")
+        return spoken
 
     growth_policy = load_growth_policy()
     sources = "\\n".join(
@@ -275,72 +259,22 @@ video_title = content["title"]
 description = content["description"]
 
 def generate_teaser_script(manifest, episode, story_text):
-    """Create an original short-form teaser from the selected episode, not a raw crop."""
-    is_fictional = episode.get("content_type") == "fictional_drama"
-    prompt = (
-        "اكتب نص تعليق صوتي عربي مصري طبيعي لريلز ترويجي مدته 30 إلى 50 ثانية "
-        + ("عن الحكاية الدرامية الخيالية التالية. لا تقدمها كواقعة حقيقية. " if is_fictional else "عن القصة الموثقة التالية. ")
-        + "افتح بسؤال أو مفارقة قوية خلال أول ثانيتين، ثم اذكر 2-3 تفاصيل من النص، "
-        + "وصعّد التشويق دون كشف الخاتمة. اختم بدعوة واضحة: شاهد القصة الكاملة على قناة قصص واقعيه. "
-        + "لا تخترع تفاصيل خارج النص، ولا تكتب عنوانًا أو تعليمات تصوير أو روابط. "
-        + "أخرج التعليق الصوتي فقط، في حدود 75-105 كلمات.\\n"
-        + f"عنوان الحلقة: {episode['title']}\\n"
-        + f"الافتتاحية المعتمدة: {episode['opening_hook']}\\n"
-        + ("تنويه: القصة خيالية.\\n" if is_fictional else
-           "المصادر: " + "; ".join(s['title'] + " (" + s['publisher'] + ")" for s in episode['sources']) + "\\n")
-        + f"نص القصة للاستناد إلى أحداثه فقط:\\n{story_text[:10000]}"
-    )
-    try:
-        teaser = call_gemini(prompt, max_output_tokens=1200).strip()
-    except Exception as exc:
-        print(f"تحذير: تعذر توليد نص الريلز من Gemini؛ سيتم استخدام الصياغة الاحتياطية: {exc}")
-        teaser = ""
-    word_count = len(teaser.split())
-
-    # Retry Gemini once only when its first answer is too short. A retry outage
-    # must not abort the episode; the deterministic fallback below will handle it.
-    if word_count < 35:
-        retry_prompt = (
-            prompt
-            + "\\nمهم جدًا: أعد كتابة النص في 80 إلى 100 كلمة عربية فعلية. "
-            + "أخرج التعليق الصوتي فقط، دون مقدمة أو شرح."
-        )
-        try:
-            teaser = call_gemini(retry_prompt, max_output_tokens=1600).strip()
-            word_count = len(teaser.split())
-        except Exception as exc:
-            print(f"تحذير: فشلت إعادة محاولة نص الريلز؛ سيتم استخدام الصياغة الاحتياطية: {exc}")
-            teaser = ""
-            word_count = 0
-
-    if word_count < 35 or word_count > 110:
-        # Deterministic fallback: build a valid short teaser from the approved hook
-        # and the story body, independent of sentence boundaries or Gemini output.
-        clean_story = re.sub(r"[*#_>`]", " ", story_text)
-        clean_story = re.sub(r"\s+", " ", clean_story).strip()
-        hook = re.sub(r"\s+", " ", episode.get("opening_hook", "")).strip()
-        hook_words = hook.split()
-        story_words = clean_story.split()
-        # Keep the hook first, then add story words until the teaser is safely
-        # inside the 35-110 word contract.
-        combined = hook_words[:55]
-        for word in story_words:
-            if len(combined) >= 82:
-                break
-            combined.append(word)
-        teaser = " ".join(combined)
-        cta = "شاهد القصة كاملة على قناة قصص واقعيه."
-        if cta not in teaser:
-            teaser = (teaser + " " + cta).strip()
-        teaser_words = teaser.split()
-        if len(teaser_words) > 100:
-            teaser = " ".join(teaser_words[:94]) + " " + cta
-        word_count = len(teaser.split())
-    if word_count < 35 or word_count > 110:
-        raise ValueError(
-            f"تعذر إنشاء نص ريلز صالح حتى بالصياغة الاحتياطية ({word_count} كلمة)."
-        )
-    print(f"تم إنشاء نص الريلز التشويقي ({word_count} كلمة).")
+    """Build the teaser locally from the supplied screenplay; no Gemini call."""
+    hook = re.sub(r"\s+", " ", episode.get("opening_hook", "")).strip()
+    clean_story = re.sub(r"[*#_>`]", " ", story_text)
+    clean_story = re.sub(r"\s+", " ", clean_story).strip()
+    combined = (hook + " " + clean_story).split()
+    teaser = " ".join(combined[:78])
+    if episode.get("content_type") == "fictional_drama":
+        teaser = "هذه حكاية درامية خيالية. " + teaser
+    cta = "شاهد القصة كاملة على قناة قصص واقعيه."
+    teaser = (teaser + " " + cta).strip()
+    if len(teaser.split()) > 105:
+        teaser = " ".join(teaser.split()[:96]) + " " + cta
+    count = len(teaser.split())
+    if count < 35:
+        raise ValueError(f"نص الريلز أقصر من الحد المطلوب ({count} كلمة). راجع نص الحلقة.")
+    print(f"تم إنشاء نص الريلز محليًا دون Gemini ({count} كلمة).")
     return teaser
 
 
