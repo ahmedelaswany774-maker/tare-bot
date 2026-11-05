@@ -146,9 +146,9 @@ def generate_story(manifest, episode):
                 continue
             if stripped.startswith("**التوقيت التقريبي:"):
                 continue
-            line = re.sub(r"\\*\\*(.*?)\\*\\*", r"\\1", line)
+            line = re.sub(r"\*\*(.*?)\*\*", r"\1", line)
             lines.append(line.strip())
-        spoken = "\\n".join(lines).strip()
+        spoken = "\n".join(lines).strip()
         word_count = len(spoken.split())
         if word_count < 3000:
             raise ValueError(f"نص الحلقة أقصر من الحد الأدنى المطلوب: {word_count} كلمة.")
@@ -465,7 +465,7 @@ def _make_audio_fish():
 
 
 async def _make_audio_edge():
-    edge_rate = "-12%" if episode.get("content_type") == "fictional_drama" else "+0%"
+    edge_rate = "-18%" if episode.get("content_type") == "fictional_drama" else "+0%"
     communicate = edge_tts.Communicate(story_text, "ar-EG-ShakirNeural", rate=edge_rate)
     await communicate.save("story.mp3")
 
