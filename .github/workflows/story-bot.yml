@@ -1,6 +1,12 @@
 name: Story Bot - Episode Video Production and YouTube Publishing
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/story-bot.yml"
+      - "story_youtube_uploader.py"
+      - "content/drafts/**"
   workflow_dispatch:
     inputs:
       episode_mode:
@@ -35,6 +41,7 @@ concurrency:
 
 jobs:
   build-draft:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[produce-episode]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 180
     steps:
@@ -59,11 +66,11 @@ jobs:
           GEMINI_FALLBACK_MODELS: gemini-3.5-flash
           STORY_TARGET_WORDS: '3800'
           HISTORY_PATH: content/published_stories.json
-          SERIES_MANIFEST_PATH: ${{ inputs.episode_mode == 'fictional_draft' && 'content/drafts/fictional_episodes.json' || 'content/series/real_stories.json' }}
+          SERIES_MANIFEST_PATH: ${{ (inputs.episode_mode || 'fictional_draft') == 'fictional_draft' && 'content/drafts/fictional_episodes.json' || 'content/series/real_stories.json' }}
           GROWTH_POLICY_PATH: content/strategy/growth_policy.json
-          EPISODE_NUMBER: ${{ inputs.episode_number }}
-          EPISODE_MODE: ${{ inputs.episode_mode }}
-          TTS_BACKEND: ${{ inputs.tts_backend }}
+          EPISODE_NUMBER: ${{ inputs.episode_number || '37' }}
+          EPISODE_MODE: ${{ inputs.episode_mode || 'fictional_draft' }}
+          TTS_BACKEND: ${{ inputs.tts_backend || 'edge' }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '0'
