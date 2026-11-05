@@ -149,11 +149,27 @@ def generate_story(manifest, episode):
             line = re.sub(r"\*\*(.*?)\*\*", r"\1", line)
             lines.append(line.strip())
         spoken = "\n".join(lines).strip()
-        word_count = len(spoken.split())
-        if word_count < 3000:
-            raise ValueError(f"نص الحلقة أقصر من الحد الأدنى المطلوب: {word_count} كلمة.")
-        print(f"تم تحميل السيناريو الدرامي من الريبو: {word_count} كلمة.")
-        return spoken
+        source_words = len(spoken.split())
+        if source_words < 3000:
+            raise ValueError(f"نص الحلقة الأصلي أقصر من الحد الأدنى المطلوب: {source_words} كلمة.")
+        expansion_prompt = (
+            "أعد صياغة وتوسيع السيناريو الدرامي الخيالي التالي إلى نص تعليق صوتي عربي مصري "
+            "متماسك في حدود 3700 إلى 4000 كلمة فعلية، بما يناسب حلقة تقارب 30 دقيقة. "
+            "حافظ على نفس الشخصيات وتسلسل المشاهد والنهاية والرسالة، ووسّع الحوار والتفاصيل اليومية "
+            "والانتقالات والانفعالات الطبيعية دون تكرار أو حشو. لا تضف وقائع حقيقية أو أسماء أشخاص حقيقيين. "
+            "لا تغيّر أن القصة خيالية، ولا تضف مشاهد عنف أو وصفًا صادمًا. "
+            "أخرج نص السرد والحوار فقط، بلا عناوين تقنية أو Markdown أو تعليمات مونتاج.\\n\\n"
+            + spoken
+        )
+        expanded = call_gemini(expansion_prompt, max_retries=3, max_output_tokens=18000).strip()
+        expanded_words = len(expanded.split())
+        if expanded_words < 3500:
+            raise ValueError(
+                f"Gemini أعاد نصًا أقصر من الحد المطلوب ({expanded_words} كلمة). "
+                "تم إيقاف الإنتاج بدل رفع حلقة لا تحقق المدة."
+            )
+        print(f"تم تحميل وتوسيع سيناريو الحلقة من الريبو: {source_words} إلى {expanded_words} كلمة.")
+        return expanded
 
     growth_policy = load_growth_policy()
     sources = "\\n".join(
