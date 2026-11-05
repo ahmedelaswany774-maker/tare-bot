@@ -91,7 +91,8 @@ def load_episode():
     return manifest, episode
 
 
-def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
+def call_gemini(prompt, max_retries=6, base_delay=15, max_output_tokens=8192):
+    """Call Gemini with bounded exponential backoff for transient service failures."""
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
@@ -104,6 +105,7 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
             "maxOutputTokens": max_output_tokens,
         },
     }
+    retryable_statuses = (408, 429, 500, 502, 503, 504)
     for attempt in range(1, max_retries + 1):
         resp = None
         try:
@@ -111,19 +113,24 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
                 url, headers={"Content-Type": "application/json"}, json=data, timeout=180
             )
             resp.raise_for_status()
-            return resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+            payload = resp.json()
+            return payload["candidates"][0]["content"]["parts"][0]["text"].strip()
         except requests.exceptions.HTTPError:
             status = resp.status_code if resp is not None else None
-            if status in (503, 500, 429) and attempt < max_retries:
-                delay = base_delay * attempt
-                print(f"⚠️ Gemini error {status}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
+            if status in retryable_statuses and attempt < max_retries:
+                retry_after = resp.headers.get("Retry-After") if resp is not None else None
+                try:
+                    delay = min(max(float(retry_after), 1), 180) if retry_after else min(base_delay * (2 ** (attempt - 1)), 180)
+                except (TypeError, ValueError):
+                    delay = min(base_delay * (2 ** (attempt - 1)), 180)
+                print(f"⚠️ Gemini error {status}; إعادة المحاولة بعد {int(delay)} ثانية (محاولة {attempt}/{max_retries})...")
                 time.sleep(delay)
                 continue
             raise
         except requests.exceptions.RequestException as e:
             if attempt < max_retries:
-                delay = base_delay * attempt
-                print(f"⚠️ خطأ في الشبكة: {e}, إعادة محاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
+                delay = min(base_delay * (2 ** (attempt - 1)), 180)
+                print(f"⚠️ خطأ اتصال بـ Gemini: {e}; إعادة المحاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
                 time.sleep(delay)
                 continue
             raise
@@ -161,7 +168,7 @@ def generate_story(manifest, episode):
             "أخرج نص السرد والحوار فقط، بلا عناوين تقنية أو Markdown أو تعليمات مونتاج.\\n\\n"
             + spoken
         )
-        expanded = call_gemini(expansion_prompt, max_retries=3, max_output_tokens=18000).strip()
+        expanded = call_gemini(expansion_prompt, max_retries=6, base_delay=15, max_output_tokens=18000).strip()
         expanded_words = len(expanded.split())
         if expanded_words < 3500:
             raise ValueError(
