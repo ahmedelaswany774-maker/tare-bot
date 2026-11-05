@@ -67,7 +67,8 @@ def load_episode():
             raise ValueError("EPISODE_NUMBER يجب أن يكون رقم حلقة أو next") from exc
         episode = next((item for item in episodes if item["episode_number"] == requested_number), None)
         if episode is None:
-            raise ValueError(f"الحلقة {requested_number} غير موجودة")
+            available_numbers = ", ".join(str(item["episode_number"]) for item in episodes)
+            raise ValueError(f"الحلقة {requested_number} غير موجودة في ملف السلسلة. أرقام الحلقات المسجلة: {available_numbers}. استخدم EPISODE_NUMBER=next لاختيار حلقة مؤهلة تلقائيًا.")
         if episode not in eligible:
             raise ValueError(
                 f"الحلقة {requested_number} غير مؤهلة: يجب أن تكون قصة حقيقية موثقة بمصدرين على الأقل "
