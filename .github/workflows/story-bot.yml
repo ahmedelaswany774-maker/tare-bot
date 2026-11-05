@@ -3,10 +3,18 @@ name: Story Bot - Social Stories Draft Builder
 on:
   workflow_dispatch:
     inputs:
-      episode_number:
-        description: "next لاختيار الحلقة الموثقة التالية تلقائيًا، أو رقم حلقة موجودة فعلًا"
+      episode_mode:
+        description: "نوع الإنتاج"
         required: true
-        default: "next"
+        default: fictional_draft
+        type: choice
+        options:
+          - fictional_draft
+          - verified_real_story
+      episode_number:
+        description: "رقم الحلقة داخل السلسلة المختارة"
+        required: true
+        default: "37"
         type: string
       tts_backend:
         description: "محرك الصوت"
@@ -51,9 +59,10 @@ jobs:
           GEMINI_FALLBACK_MODELS: gemini-3.5-flash
           STORY_TARGET_WORDS: '1800'
           HISTORY_PATH: content/published_stories.json
-          SERIES_MANIFEST_PATH: content/series/real_stories.json
+          SERIES_MANIFEST_PATH: ${{ inputs.episode_mode == 'fictional_draft' && 'content/drafts/fictional_episodes.json' || 'content/series/real_stories.json' }}
           GROWTH_POLICY_PATH: content/strategy/growth_policy.json
           EPISODE_NUMBER: ${{ inputs.episode_number }}
+          EPISODE_MODE: ${{ inputs.episode_mode }}
           TTS_BACKEND: ${{ inputs.tts_backend }}
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
@@ -65,7 +74,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/series/real_stories.json
+          git add content/series/real_stories.json content/drafts/fictional_episodes.json
           if git diff --cached --quiet; then
             echo "No episode history changes to persist."
           else
