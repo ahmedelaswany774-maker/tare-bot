@@ -528,6 +528,7 @@ except Exception as e:
 audio_clip = AudioFileClip("story.mp3")
 target_duration = audio_clip.duration
 print(f"مدة الصوت: {target_duration:.1f} ثانية")
+# [produce-episode] Continue rendering with the actual generated audio duration.
 print("تم تجاوز فحص الحد الأدنى والأقصى لمدة الحلقة؛ سيتم متابعة الرندر بالمدة الصوتية الفعلية.")
 
 
