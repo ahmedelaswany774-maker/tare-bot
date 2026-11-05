@@ -91,12 +91,15 @@ def load_episode():
     return manifest, episode
 
 
-def call_gemini(prompt, max_retries=6, base_delay=15, max_output_tokens=8192):
-    """Call Gemini with bounded exponential backoff for transient service failures."""
-    url = (
-        "https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
-    )
+def call_gemini(prompt, max_retries=6, base_delay=10, max_output_tokens=8192):
+    """Try the configured Gemini model, then fallback models on transient/provider errors."""
+    preferred_model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash-lite").strip()
+    fallback_models = [
+        model.strip()
+        for model in os.environ.get("GEMINI_FALLBACK_MODELS", "gemini-2.5-flash").split(",")
+        if model.strip()
+    ]
+    models = list(dict.fromkeys([preferred_model] + fallback_models))
     data = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -106,34 +109,59 @@ def call_gemini(prompt, max_retries=6, base_delay=15, max_output_tokens=8192):
         },
     }
     retryable_statuses = (408, 429, 500, 502, 503, 504)
-    for attempt in range(1, max_retries + 1):
-        resp = None
-        try:
-            resp = requests.post(
-                url, headers={"Content-Type": "application/json"}, json=data, timeout=180
-            )
-            resp.raise_for_status()
-            payload = resp.json()
-            return payload["candidates"][0]["content"]["parts"][0]["text"].strip()
-        except requests.exceptions.HTTPError:
-            status = resp.status_code if resp is not None else None
-            if status in retryable_statuses and attempt < max_retries:
-                retry_after = resp.headers.get("Retry-After") if resp is not None else None
-                try:
-                    delay = min(max(float(retry_after), 1), 180) if retry_after else min(base_delay * (2 ** (attempt - 1)), 180)
-                except (TypeError, ValueError):
-                    delay = min(base_delay * (2 ** (attempt - 1)), 180)
-                print(f"⚠️ Gemini error {status}; إعادة المحاولة بعد {int(delay)} ثانية (محاولة {attempt}/{max_retries})...")
-                time.sleep(delay)
-                continue
-            raise
-        except requests.exceptions.RequestException as e:
-            if attempt < max_retries:
-                delay = min(base_delay * (2 ** (attempt - 1)), 180)
-                print(f"⚠️ خطأ اتصال بـ Gemini: {e}; إعادة المحاولة بعد {delay} ثانية (محاولة {attempt}/{max_retries})...")
-                time.sleep(delay)
-                continue
-            raise
+    model_retries = min(max_retries, 3)
+    last_error = None
+
+    for model in models:
+        url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{model}:generateContent?key={GEMINI_KEY}"
+        )
+        for attempt in range(1, model_retries + 1):
+            resp = None
+            try:
+                print(f"🤖 Gemini model: {model} (محاولة {attempt}/{model_retries})")
+                resp = requests.post(
+                    url, headers={"Content-Type": "application/json"}, json=data, timeout=180
+                )
+                resp.raise_for_status()
+                payload = resp.json()
+                text = payload["candidates"][0]["content"]["parts"][0]["text"].strip()
+                if not text:
+                    raise ValueError(f"Gemini returned empty content from model {model}.")
+                return text
+            except requests.exceptions.HTTPError as exc:
+                last_error = exc
+                status = resp.status_code if resp is not None else None
+                if status in retryable_statuses and attempt < model_retries:
+                    retry_after = resp.headers.get("Retry-After") if resp is not None else None
+                    try:
+                        delay = min(max(float(retry_after), 1), 90) if retry_after else min(base_delay * (2 ** (attempt - 1)), 90)
+                    except (TypeError, ValueError):
+                        delay = min(base_delay * (2 ** (attempt - 1)), 90)
+                    print(f"⚠️ Gemini {model} returned HTTP {status}; retrying in {int(delay)}s.")
+                    time.sleep(delay)
+                    continue
+                print(f"⚠️ Gemini model {model} unavailable (HTTP {status}); trying the next configured model.")
+                break
+            except requests.exceptions.RequestException as exc:
+                last_error = exc
+                if attempt < model_retries:
+                    delay = min(base_delay * (2 ** (attempt - 1)), 90)
+                    print(f"⚠️ Gemini network error for {model}: {exc}; retrying in {delay}s.")
+                    time.sleep(delay)
+                    continue
+                print(f"⚠️ Network retries exhausted for {model}; trying the next configured model.")
+                break
+            except (KeyError, IndexError, TypeError, ValueError) as exc:
+                last_error = exc
+                print(f"⚠️ Gemini returned an unusable response for {model}: {exc}; trying the next configured model.")
+                break
+
+    raise RuntimeError(
+        "All configured Gemini models failed. Check Gemini API availability, model access, "
+        "and GEMINI_MODEL/GEMINI_FALLBACK_MODELS settings."
+    ) from last_error
 
 
 def generate_story(manifest, episode):
