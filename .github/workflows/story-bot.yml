@@ -63,8 +63,8 @@ jobs:
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
-          GEMINI_MODEL: gemini-3.1-flash-lite
-          GEMINI_FALLBACK_MODELS: gemini-3.5-flash
+          GEMINI_MODEL: gemini-2.5-flash-lite
+          GEMINI_FALLBACK_MODELS: gemini-2.5-flash
           STORY_TARGET_WORDS: '3800'
           HISTORY_PATH: content/published_stories.json
           SERIES_MANIFEST_PATH: ${{ (inputs.episode_mode || 'fictional_draft') == 'fictional_draft' && 'content/drafts/fictional_episodes.json' || 'content/series/real_stories.json' }}
