@@ -489,12 +489,17 @@ async def _make_audio_edge():
         concat_list = "edge_audio_parts.txt"
         with open(concat_list, "w", encoding="utf-8") as handle:
             for part in generated:
-                handle.write(f"file '{os.path.abspath(part)}'\\n")
-        subprocess.run(
-            ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
-             "-c:a", "libmp3lame", "-q:a", "2", "story.mp3"],
-            check=True, capture_output=True, text=True,
-        )
+                handle.write(f"file '{os.path.abspath(part)}'\n")
+        try:
+            subprocess.run(
+                ["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", concat_list,
+                 "-c:a", "libmp3lame", "-q:a", "2", "story.mp3"],
+                check=True, capture_output=True, text=True,
+            )
+        except subprocess.CalledProcessError as exc:
+            print("❌ FFmpeg concat stderr:")
+            print((exc.stderr or exc.stdout or str(exc)).strip())
+            raise
         if not os.path.exists("story.mp3") or os.path.getsize("story.mp3") < 1000:
             raise RuntimeError("لم ينتج FFmpeg ملف story.mp3 صالحًا.")
         print(f"✅ تم دمج {len(generated)} جزءًا صوتيًا في story.mp3")
