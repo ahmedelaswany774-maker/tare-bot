@@ -19,7 +19,7 @@
       "Saturday",
       "Sunday"
     ],
-    "planned_release_time_local": "19:00",
+    "planned_release_time_local": "08:00, 12:00, 16:00, 20:00",
     "timezone": "Africa/Cairo",
     "shorts_per_long_video": 1,
     "require_explicit_episode_selection": false,
