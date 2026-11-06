@@ -77,9 +77,23 @@ def main():
         print(f"Generating episode {number}: {episode['title']}", flush=True)
         text = call_gemini(build_prompt(episode))
         count = word_count(text)
-        if count < MIN_WORDS:
-            raise RuntimeError(f"Episode {number} too short: {count} words; minimum {MIN_WORDS}.")
+        for attempt in range(1, int(os.getenv("MAX_CONTINUATIONS", "4")) + 1):
+            if count >= MIN_WORDS:
+                break
+            print(f"Episode {number}: {count} words; continuation {attempt}", flush=True)
+            continuation_prompt = (
+                f"استكمل النص التالي فقط دون تكرار أو إعادة المقدمة. المطلوب الوصول إلى {TARGET_WORDS} كلمة إجمالًا. "
+                f"لا تختلق وقائع أو حوارًا أو مشاهد أو أشخاصًا أو أرقامًا. إذا انتهت الوقائع المنشورة، أضف تحليلًا "
+                f"اجتماعيًا عامًا واضحًا أنه تعليق، ومرتبطًا مباشرة بموضوع الحلقة. عنوان الحلقة: {episode['title']}\n"
+                f"النص الحالي:\n{text[-6000:]}"
+            )
+            addition = call_gemini(continuation_prompt)
+            if not addition:
+                break
+            text = text.rstrip() + "\n\n" + addition.strip()
+            count = word_count(text)
         document = (
+
             f"# الحلقة {number}: {episode['title']}\n\n"
             f"> مسودة وثائقية مبنية على الوقائع والمصادر المدرجة. عدد الكلمات: {count}. "
             f"لا تُنشر قبل استكمال المراجعة التحريرية والتحقق من المصادر.\n\n"
@@ -90,12 +104,14 @@ def main():
         )
         path.write_text(document, encoding="utf-8")
         episode["script_path"] = path.as_posix()
-        episode["draft_status"] = "written_pending_editorial_and_source_review"
+        episode["draft_status"] = ("written_pending_editorial_and_source_review" if count >= MIN_WORDS
+                                   else "incomplete_below_minimum_pending_continuation")
         episode["draft_word_count"] = count
-        print(f"Saved {path} ({count} words)", flush=True)
+        MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print(f"Saved {path} ({count} words); {episode['draft_status']}", flush=True)
         time.sleep(2)
-    MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print("Completed all 28 scripts.", flush=True)
+    completed = sum(1 for e in episodes if int(e.get("draft_word_count", 0)) >= MIN_WORDS)
+    print(f"Batch checkpointed: {completed}/28 scripts meet the minimum. No publishing.", flush=True)
 
 if __name__ == "__main__":
     main()
