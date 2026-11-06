@@ -1707,7 +1707,7 @@
   "content_type": "verified_real_story",
   "workflow_status": "episode_36_verified_sources_added_pending_draft_review",
   "weekly_draft_batch": {
-    "status": "requested",
+    "status": "retry_with_continuation_and_per_episode_checkpoints",
     "episodes": "38-65",
     "requested_at": "2026-11-07",
     "publishing": false
