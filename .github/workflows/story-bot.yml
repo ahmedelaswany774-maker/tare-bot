@@ -8,20 +8,20 @@ on:
       - ".github/workflows/story-bot.yml"
       - "story_youtube_uploader.py"
       - "content/drafts/**"
+      - "content/series/real_stories.json"
   workflow_dispatch:
     inputs:
       episode_mode:
         description: "نوع الإنتاج"
         required: true
-        default: fictional_draft
+        default: verified_real_story
         type: choice
         options:
-          - fictional_draft
           - verified_real_story
       episode_number:
         description: "رقم الحلقة داخل السلسلة المختارة"
         required: true
-        default: "37"
+        default: "next"
         type: string
       tts_backend:
         description: "محرك الصوت"
@@ -65,10 +65,10 @@ jobs:
           GEMINI_FALLBACK_MODELS: ''
           STORY_TARGET_WORDS: '3800'
           HISTORY_PATH: content/published_stories.json
-          SERIES_MANIFEST_PATH: ${{ (inputs.episode_mode || 'fictional_draft') == 'fictional_draft' && 'content/drafts/fictional_episodes.json' || 'content/series/real_stories.json' }}
+          SERIES_MANIFEST_PATH: content/series/real_stories.json
           GROWTH_POLICY_PATH: content/strategy/growth_policy.json
-          EPISODE_NUMBER: ${{ inputs.episode_number || '37' }}
-          EPISODE_MODE: ${{ inputs.episode_mode || 'fictional_draft' }}
+          EPISODE_NUMBER: ${{ inputs.episode_number || 'next' }}
+          EPISODE_MODE: verified_real_story
           TTS_BACKEND: fish
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
