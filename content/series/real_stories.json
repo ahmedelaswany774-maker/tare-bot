@@ -786,6 +786,922 @@
       ],
       "youtube_video_id": "jOgw-h_U3dc",
       "published_at": "2026-11-06T16:10:24+00:00"
+    },
+    {
+      "episode_id": "social-38-story-38",
+      "episode_number": 38,
+      "title": "رية.. من فصول محو الأمية إلى مكتب المحاماة",
+      "short_title": "رية",
+      "thumbnail_text": "رية",
+      "opening_hook": "قصة رية عن منعها من التعليم بسبب كونها فتاة، ودعم والدتها لاستكمال الدراسة حتى الجامعة والعمل بالمحاماة.",
+      "topic": "قصة رية عن منعها من التعليم بسبب كونها فتاة، ودعم والدتها لاستكمال الدراسة حتى الجامعة والعمل بالمحاماة. لا تضف حوارًا أو أحداثًا غير منشورة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى القاهرة 24. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "رية.. من فصول محو الأمية إلى مكتب المحاماة",
+          "publisher": "القاهرة 24",
+          "url": "https://www.cairo24.com/1152576"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "نشأت رية في أسرة ترفض تعليم الفتيات.",
+        "التحقت بمحو الأمية ثم الجامعة وافتتحت مكتب محاماة.."
+      ]
+    },
+    {
+      "episode_id": "social-39-story-39",
+      "episode_number": 39,
+      "title": "سناء.. من محو الأمية إلى الماجستير",
+      "short_title": "سناء",
+      "thumbnail_text": "سناء",
+      "opening_hook": "سيرة سناء عبدالجواد عن حرمانها من التعليم في الصغر بسبب بُعد المدرسة، ثم عودتها للتعليم وحصولها على الماجستير.",
+      "topic": "سيرة سناء عبدالجواد عن حرمانها من التعليم في الصغر بسبب بُعد المدرسة، ثم عودتها للتعليم وحصولها على الماجستير.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى بوابة الأهرام. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "سناء.. من محو الأمية إلى الماجستير",
+          "publisher": "بوابة الأهرام",
+          "url": "https://gate.ahram.org.eg/News/2630178.aspx"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "قالت سناء إنها لم تحصل على حقها في التعليم بسبب بُعد المدرسة.",
+        "عادت للتعليم عبر محو الأمية حتى حصلت على الماجستير.."
+      ]
+    },
+    {
+      "episode_id": "social-40-story-40",
+      "episode_number": 40,
+      "title": "آمال إسماعيل.. عادت إلى الدراسة بعد الستين",
+      "short_title": "آمال إسماعيل",
+      "thumbnail_text": "آمال إسماعيل",
+      "opening_hook": "قصة آمال إسماعيل متولي: تركت التعليم في سن 12 عامًا بسبب الزواج والعادات، ثم عادت للدراسة بعد الستين وحصلت على ليسانس الآداب.",
+      "topic": "قصة آمال إسماعيل متولي: تركت التعليم في سن 12 عامًا بسبب الزواج والعادات، ثم عادت للدراسة بعد الستين وحصلت على ليسانس الآداب.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "آمال إسماعيل.. عادت إلى الدراسة بعد الستين",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2022/1/24/آمال-عندها-79-سنة-وبتكمل-دراسات-عليا-تركت-التعليم-فى/5630145"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "تركت آمال التعليم في سن 12 عامًا بعد الزواج.",
+        "عادت للدراسة الثانوية بعد الستين ثم حصلت على ليسانس الآداب.."
+      ]
+    },
+    {
+      "episode_id": "social-41-story-41",
+      "episode_number": 41,
+      "title": "الطيبة الضوي.. من محو الأمية إلى الماجستير",
+      "short_title": "الطيبة الضوي",
+      "thumbnail_text": "الطيبة الضوي",
+      "opening_hook": "قصة الطيبة الضوي عن رفض تعليمها في الصغر بسبب عادات محلية، ثم استكمالها التعليم حتى الماجستير، مع دعم زوجها وفق التقرير.",
+      "topic": "قصة الطيبة الضوي عن رفض تعليمها في الصغر بسبب عادات محلية، ثم استكمالها التعليم حتى الماجستير، مع دعم زوجها وفق التقرير.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "الطيبة الضوي.. من محو الأمية إلى الماجستير",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2019/4/14/صور-الطيبة-الضوى-قصة-فتاة-صعيدية-تمردت-على-الظروف-والعادات/4205818"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "حُرمت الطيبة من التعليم في طفولتها.",
+        "عادت للتعليم عبر محو الأمية حتى حصلت على الماجستير.."
+      ]
+    },
+    {
+      "episode_id": "social-42-story-42",
+      "episode_number": 42,
+      "title": "هاجر.. من فصول المتسربين إلى كلية الطب",
+      "short_title": "هاجر",
+      "thumbnail_text": "هاجر",
+      "opening_hook": "قصة هاجر من أبوقرقاص: ظروف مادية منعتها من المدرسة، ثم عادت عبر فصول التعليم المجتمعي وواصلت حتى كلية الطب.",
+      "topic": "قصة هاجر من أبوقرقاص: ظروف مادية منعتها من المدرسة، ثم عادت عبر فصول التعليم المجتمعي وواصلت حتى كلية الطب.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى الوطن. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "هاجر.. من فصول المتسربين إلى كلية الطب",
+          "publisher": "الوطن",
+          "url": "https://www.elwatannews.com/news/details/6326657"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "ظروف مادية حالت دون التحاق هاجر بالمدرسة.",
+        "التحقت بفصول التعليم المجتمعي.",
+        "واصلت حتى كلية الطب البشري.."
+      ]
+    },
+    {
+      "episode_id": "social-43-story-43",
+      "episode_number": 43,
+      "title": "حنان حسين.. من محو الأمية إلى باحثة دكتوراه",
+      "short_title": "حنان حسين",
+      "thumbnail_text": "حنان حسين",
+      "opening_hook": "سيرة حنان حسين عن عودتها إلى التعليم بعد الانقطاع في المرحلة الابتدائية، ووصولها إلى مرحلة باحثة دكتوراه في التاريخ.",
+      "topic": "سيرة حنان حسين عن عودتها إلى التعليم بعد الانقطاع في المرحلة الابتدائية، ووصولها إلى مرحلة باحثة دكتوراه في التاريخ.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى الوطن. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "حنان حسين.. من محو الأمية إلى باحثة دكتوراه",
+          "publisher": "الوطن",
+          "url": "https://www.elwatannews.com/news/details/5949982"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "لم تستكمل حنان التعليم في المرحلة الابتدائية.",
+        "عادت عبر فصول محو الأمية ووصلت إلى مرحلة باحثة دكتوراه في التاريخ.."
+      ]
+    },
+    {
+      "episode_id": "social-44-story-44",
+      "episode_number": 44,
+      "title": "منال بكري.. أرملة ربّت ثلاثة مهندسين",
+      "short_title": "منال بكري",
+      "thumbnail_text": "منال بكري",
+      "opening_hook": "قصة منال بكري: وفاة الزوج وتركه ثلاثة أبناء، ثم عملها في تعليم الكبار وفتح فصول محو أمية حتى تخرج أبناؤها.",
+      "topic": "قصة منال بكري: وفاة الزوج وتركه ثلاثة أبناء، ثم عملها في تعليم الكبار وفتح فصول محو أمية حتى تخرج أبناؤها.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى مصراوي. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "منال بكري.. أرملة ربّت ثلاثة مهندسين",
+          "publisher": "مصراوي",
+          "url": "https://www.masrawy.com/news/news_regions/details/2025/3/18/2756398/منال-بكري-الأم-المثالية-ببني-سويف-قصة-أرملة-تحدت-الصعاب-وخرجت-3-مهندسين"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج منال عام 1999.",
+        "عملت في تعليم الكبار وفتحت فصول محو أمية.",
+        "تخرج أبناؤها الثلاثة في تخصصات علمية وهندسية.."
+      ]
+    },
+    {
+      "episode_id": "social-45-story-45",
+      "episode_number": 45,
+      "title": "مريم وهب عطالله.. ماكينة الخياطة التي علمت ثلاثة أبناء",
+      "short_title": "مريم وهب عطالله",
+      "thumbnail_text": "مريم وهب عطالله",
+      "opening_hook": "قصة مريم من قفط بقنا: عملت في الحياكة 17 عامًا بعد وفاة زوجها لتعليم أبنائها الثلاثة.",
+      "topic": "قصة مريم من قفط بقنا: عملت في الحياكة 17 عامًا بعد وفاة زوجها لتعليم أبنائها الثلاثة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى بوابة الأهرام. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "مريم وهب عطالله.. ماكينة الخياطة التي علمت ثلاثة أبناء",
+          "publisher": "بوابة الأهرام",
+          "url": "https://gate.ahram.org.eg/News/4747568.aspx"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج مريم وترك ثلاثة أبناء.",
+        "عملت في الحياكة 17 عامًا.",
+        "تخرج اثنان في الهندسة والتربية النوعية والثالثة تدرس الحاسبات.."
+      ]
+    },
+    {
+      "episode_id": "social-46-story-46",
+      "episode_number": 46,
+      "title": "أميمة الخواص.. 26 عامًا من تربية ثلاثة أبناء",
+      "short_title": "أميمة الخواص",
+      "thumbnail_text": "أميمة الخواص",
+      "opening_hook": "قصة أميمة من الإسماعيلية: وفاة زوجها في حادث أثناء عودته من العمل، وتوليها تربية ثلاثة أبناء حتى حصلوا على تعليم جامعي.",
+      "topic": "قصة أميمة من الإسماعيلية: وفاة زوجها في حادث أثناء عودته من العمل، وتوليها تربية ثلاثة أبناء حتى حصلوا على تعليم جامعي.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى الأهرام. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "أميمة الخواص.. 26 عامًا من تربية ثلاثة أبناء",
+          "publisher": "الأهرام",
+          "url": "https://ahram.org.eg/daily/NewsPrint/847510.aspx"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج أميمة في حادث أثناء عودته من العمل.",
+        "تولت تربية ثلاثة أبناء على مدى نحو 26 عامًا.",
+        "حصل الأبناء على تعليم جامعي.."
+      ]
+    },
+    {
+      "episode_id": "social-47-story-47",
+      "episode_number": 47,
+      "title": "خضرة فرج بدوي.. تعلمت القراءة لتتابع تعليم أبنائها",
+      "short_title": "خضرة فرج بدوي",
+      "thumbnail_text": "خضرة فرج بدوي",
+      "opening_hook": "قصة خضرة عن حصولها على شهادة محو الأمية بعد وفاة زوجها، وحرصها على تعليم أبنائها ورعاية أحفادها.",
+      "topic": "قصة خضرة عن حصولها على شهادة محو الأمية بعد وفاة زوجها، وحرصها على تعليم أبنائها ورعاية أحفادها.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى الأهرام. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "خضرة فرج بدوي.. تعلمت القراءة لتتابع تعليم أبنائها",
+          "publisher": "الأهرام",
+          "url": "https://ahram.org.eg/daily/NewsPrint/487761.aspx"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "ترملت خضرة وتركت لها ثلاثة أبناء.",
+        "حصلت على شهادة محو أمية لتتابع تعليمهم.",
+        "رعت أحفادها بعد وفاة ابنتها.."
+      ]
+    },
+    {
+      "episode_id": "social-48-story-48",
+      "episode_number": 48,
+      "title": "أم ليلى.. بائعة الخضار التي احتضنت طفلين",
+      "short_title": "أم ليلى",
+      "thumbnail_text": "أم ليلى",
+      "opening_hook": "قصة فوزية موسى المعروفة بأم ليلى: بائعة خضار أرملة تولت رعاية حفيداتها، كما قبلت تربية طفلين صغيرين.",
+      "topic": "قصة فوزية موسى المعروفة بأم ليلى: بائعة خضار أرملة تولت رعاية حفيداتها، كما قبلت تربية طفلين صغيرين. انسب الرواية للصحيفة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى الأهرام. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "أم ليلى.. بائعة الخضار التي احتضنت طفلين",
+          "publisher": "الأهرام",
+          "url": "https://gate.ahram.org.eg/daily/News/202594/29/643265/المحافظات/قصص--كفاح-أمهات-لا-تعرفن-المستحيل.aspx"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "كانت فوزية موسى المعروفة بأم ليلى أرملة وبائعة خضار.",
+        "رعت بنات ابنتها المتوفاة.",
+        "ذكر التقرير أنها ربت طفلين صغيرين.."
+      ]
+    },
+    {
+      "episode_id": "social-49-story-49",
+      "episode_number": 49,
+      "title": "سعاد أحمد خلف.. من الميكروباصات إلى إدارة المشروعات",
+      "short_title": "سعاد أحمد خلف",
+      "thumbnail_text": "سعاد أحمد خلف",
+      "opening_hook": "قصة سعاد أحمد خلف: بعد وفاة زوجها عملت في مجالات متعددة بدأت بالميكروباصات والورش، ثم أدارت مشروعات لإعالة أبنائها وأحفادها.",
+      "topic": "قصة سعاد أحمد خلف: بعد وفاة زوجها عملت في مجالات متعددة بدأت بالميكروباصات والورش، ثم أدارت مشروعات لإعالة أبنائها وأحفادها.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى القاهرة 24. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "سعاد أحمد خلف.. من الميكروباصات إلى إدارة المشروعات",
+          "publisher": "القاهرة 24",
+          "url": "https://www.cairo24.com/1536595"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "عملت سعاد في مجالات متعددة بعد وفاة زوجها.",
+        "تضمن التقرير بداياتها في الميكروباصات والورش ثم إدارة مشروعات.."
+      ]
+    },
+    {
+      "episode_id": "social-50-story-50",
+      "episode_number": 50,
+      "title": "نجلاء حسني.. سنوات من العمل لتعليم أبنائها بعد الطلاق",
+      "short_title": "نجلاء حسني",
+      "thumbnail_text": "نجلاء حسني",
+      "opening_hook": "قصة نجلاء حسني عن عملها في شوي السمك بالمنصورة بعد الطلاق، واعتمادها على دخلها لتربية أبنائها وتعليمهم.",
+      "topic": "قصة نجلاء حسني عن عملها في شوي السمك بالمنصورة بعد الطلاق، واعتمادها على دخلها لتربية أبنائها وتعليمهم.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "نجلاء حسني.. سنوات من العمل لتعليم أبنائها بعد الطلاق",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2021/10/3/قصة-كفاح-أم-مصرية-نجلاء-16-عاما-أمام-نار-شوى/5482977"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "عملت نجلاء في شوي السمك بمدينة المنصورة بعد طلاقها.",
+        "اعتمدت على عملها لتوفير حياة أفضل لأبنائها.."
+      ]
+    },
+    {
+      "episode_id": "social-51-story-51",
+      "episode_number": 51,
+      "title": "روجينا فوزي.. أم أعادت ترتيب حياتها بعد وفاة الزوج",
+      "short_title": "روجينا فوزي",
+      "thumbnail_text": "روجينا فوزي",
+      "opening_hook": "قصة روجينا فوزي من سوهاج: وفاة الزوج في حادث وتركه ثلاث بنات، ثم انتقالها من المدرسة الخاصة إلى الحكومية لمواجهة ضيق الدخل.",
+      "topic": "قصة روجينا فوزي من سوهاج: وفاة الزوج في حادث وتركه ثلاث بنات، ثم انتقالها من المدرسة الخاصة إلى الحكومية لمواجهة ضيق الدخل.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى مصراوي. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "روجينا فوزي.. أم أعادت ترتيب حياتها بعد وفاة الزوج",
+          "publisher": "مصراوي",
+          "url": "https://www.masrawy.com/news/news_regions/details/2024/3/18/2554353/اشتغلت-خياطة-علشان-تربي-بناتها-قصة-كفاح-الأم-المثالية-بسوهاج"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج روجينا في حادث وترك ثلاث بنات.",
+        "كان معاشه محدودًا.",
+        "نقلت البنات من مدرسة خاصة إلى حكومية.."
+      ]
+    },
+    {
+      "episode_id": "social-52-story-52",
+      "episode_number": 52,
+      "title": "عرب حسن علي.. حين غاب الأب ولم يتوقف تعليم الأبناء",
+      "short_title": "عرب حسن علي",
+      "thumbnail_text": "عرب حسن علي",
+      "opening_hook": "قصة عرب حسن علي من البحيرة عن هجر الزوج للأسرة وترك ثلاثة أبناء دون نفقات، ومواصلة الأم عملها معلمة حتى تخرج الأبناء في كليات طبية.",
+      "topic": "قصة عرب حسن علي من البحيرة عن هجر الزوج للأسرة وترك ثلاثة أبناء دون نفقات، ومواصلة الأم عملها معلمة حتى تخرج الأبناء في كليات طبية. انسب الادعاءات للتقرير.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى مصراوي. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "عرب حسن علي.. حين غاب الأب ولم يتوقف تعليم الأبناء",
+          "publisher": "مصراوي",
+          "url": "https://www.masrawy.com/news/news_regions/details/2024/3/18/2554356/أم-الدكاترة-الأم-المثالية-بالبحيرة-هجرها-زوجها-وكافحت-لتربية-أبنائها"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "ذكر التقرير أن زوج عرب ترك الأسرة وسافر ثم طلقها دون نفقات.",
+        "عملت معلمة.",
+        "تخرج الأبناء في الصيدلة والطب.."
+      ]
+    },
+    {
+      "episode_id": "social-53-story-53",
+      "episode_number": 53,
+      "title": "مرثا إبراهيم.. عملت في أكثر من مهنة لتكمل تعليم طفليها",
+      "short_title": "مرثا إبراهيم",
+      "thumbnail_text": "مرثا إبراهيم",
+      "opening_hook": "قصة مرثا إبراهيم عوض من الأقصر: وفاة الزوج، وعملها في مشغل ملابس ومزرعة دواجن لتربية طفليها وتعليمهما.",
+      "topic": "قصة مرثا إبراهيم عوض من الأقصر: وفاة الزوج، وعملها في مشغل ملابس ومزرعة دواجن لتربية طفليها وتعليمهما.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى الوطن. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "مرثا إبراهيم.. عملت في أكثر من مهنة لتكمل تعليم طفليها",
+          "publisher": "الوطن",
+          "url": "https://www.elwatannews.com/news/details/7219429"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج مرثا عام 1999 وترك طفلين.",
+        "عملت في مشغل ملابس ومزرعة دواجن.",
+        "حصل الابن والابنة على مؤهلات جامعية.."
+      ]
+    },
+    {
+      "episode_id": "social-54-story-54",
+      "episode_number": 54,
+      "title": "فرح حسين.. زوجة اختارت رعاية أربعة أطفال",
+      "short_title": "فرح حسين",
+      "thumbnail_text": "فرح حسين",
+      "opening_hook": "قصة فرح حسين عبدالقادر عن رعايتها أربعة أبناء لزوجها بعد وفاة والدتهم، واستمرارها في تربيتهم وتعليمهم.",
+      "topic": "قصة فرح حسين عبدالقادر عن رعايتها أربعة أبناء لزوجها بعد وفاة والدتهم، واستمرارها في تربيتهم وتعليمهم.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى القاهرة 24. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "فرح حسين.. زوجة اختارت رعاية أربعة أطفال",
+          "publisher": "القاهرة 24",
+          "url": "https://www.cairo24.com/1975272"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "تزوجت فرح رجلًا لديه أربعة أبناء فقدوا والدتهم.",
+        "واصلت رعايتهم وتعليمهم.",
+        "ذكر التقرير وجود حفيد طبيب وآخر مهندس.."
+      ]
+    },
+    {
+      "episode_id": "social-55-story-55",
+      "episode_number": 55,
+      "title": "السيدة سليمان.. 22 عامًا من العمل لتعليم ثلاثة أبناء",
+      "short_title": "السيدة سليمان",
+      "thumbnail_text": "السيدة سليمان",
+      "opening_hook": "قصة السيدة سليمان من الجيزة: وفاة الزوج، والعمل حارسة عقار وأعمالًا أخرى لإعالة ثلاثة أبناء حتى حصولهم على مؤهلات جامعية.",
+      "topic": "قصة السيدة سليمان من الجيزة: وفاة الزوج، والعمل حارسة عقار وأعمالًا أخرى لإعالة ثلاثة أبناء حتى حصولهم على مؤهلات جامعية.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "السيدة سليمان.. 22 عامًا من العمل لتعليم ثلاثة أبناء",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2023/3/21/شالت-الحمل-22-سنة-الأم-المثالية-بالجيزة-اشتغلت-حارسة-عقار/6122713"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج السيدة عام 2003 وترك ثلاثة أبناء.",
+        "عملت حارسة عقار قرابة 22 عامًا.",
+        "تخرج الأبناء وحصلوا على مؤهلات جامعية.."
+      ]
+    },
+    {
+      "episode_id": "social-56-story-56",
+      "episode_number": 56,
+      "title": "آمال عبد العال.. معلمة صباحًا وعاملة مساءً",
+      "short_title": "آمال عبد العال",
+      "thumbnail_text": "آمال عبد العال",
+      "opening_hook": "قصة آمال عبد العال: عملها في التدريس ومصنع الملابس ورعاية زوجها بعد مرضه وتعليم بناتها.",
+      "topic": "قصة آمال عبد العال: عملها في التدريس ومصنع الملابس ورعاية زوجها بعد مرضه وتعليم بناتها. تجنب تفاصيل طبية حساسة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "آمال عبد العال.. معلمة صباحًا وعاملة مساءً",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2023/3/21/الأمهات-المثاليات-فى-الجيزة-رحلة-عطاء-بالشقاء-والعمل/6123151"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "عملت آمال معلمة حاسب آلي صباحًا وفي مصنع ملابس مساءً.",
+        "بدأت العمل لمساندة أسرتها بعد مرض والدها.",
+        "واصلت رعاية زوجها وبناتها.."
+      ]
+    },
+    {
+      "episode_id": "social-57-story-57",
+      "episode_number": 57,
+      "title": "زينب عبد الغفار.. اختارت الحفاظ على علاقة الأب بأبنائه",
+      "short_title": "زينب عبد الغفار",
+      "thumbnail_text": "زينب عبد الغفار",
+      "opening_hook": "قصة زينب من الفيوم: خلافات السكن أدت إلى الطلاق، ثم عملها وبيعها المفروشات والتطريز لتغطية احتياجات الأبناء ورعاية والدها، وقرارها عدم رفع دعوى نفقة.",
+      "topic": "قصة زينب من الفيوم: خلافات السكن أدت إلى الطلاق، ثم عملها وبيعها المفروشات والتطريز لتغطية احتياجات الأبناء ورعاية والدها، وقرارها عدم رفع دعوى نفقة. اعرضه اختيارًا شخصيًا لا نصيحة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى بوابة الأهرام. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "زينب عبد الغفار.. اختارت الحفاظ على علاقة الأب بأبنائه",
+          "publisher": "بوابة الأهرام",
+          "url": "https://gate.ahram.org.eg/News/4747578.aspx"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "طلقت زينب بعد ست سنوات من الزواج وكان لديها طفلان.",
+        "عملت في تطريز وبيع أطقم الأسرة.",
+        "قالت إنها لم ترفع دعوى نفقة حفاظًا على علاقة الأب بأبنائه.."
+      ]
+    },
+    {
+      "episode_id": "social-58-story-58",
+      "episode_number": 58,
+      "title": "هناء مكرم.. سند الأسرة في طنطا",
+      "short_title": "هناء مكرم",
+      "thumbnail_text": "هناء مكرم",
+      "opening_hook": "قصة هناء مكرم من طنطا: عملها في مشغل ملابس لمساندة زوجها، ثم تحملها مسؤوليات الأسرة ورعاية الزوج بعد تدهور صحته.",
+      "topic": "قصة هناء مكرم من طنطا: عملها في مشغل ملابس لمساندة زوجها، ثم تحملها مسؤوليات الأسرة ورعاية الزوج بعد تدهور صحته.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى مصراوي. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "هناء مكرم.. سند الأسرة في طنطا",
+          "publisher": "مصراوي",
+          "url": "https://www.masrawy.com/news/news_regions/details/2025/3/18/2756379/سيدة-الصبر-والعطاء-قصة-هناء-مكرم-الأم-المثالية-بالغربية"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "بدأت هناء حياتها الزوجية عام 1996.",
+        "عملت في مشغل ملابس لمساندة زوجها.",
+        "تولت مسؤوليات الأسرة ورعاية الأبناء.."
+      ]
+    },
+    {
+      "episode_id": "social-59-story-59",
+      "episode_number": 59,
+      "title": "صفاء علي.. مدرسة بالحصة بدأت بأجر محدود",
+      "short_title": "صفاء علي",
+      "thumbnail_text": "صفاء علي",
+      "opening_hook": "قصة صفاء علي من بني سويف: وفاة زوجها وتركه ثلاث بنات، وحصولها على دبلومة تربوية والعمل مدرسة بالحصة ثم تثبيتها، ومواصلة تعليم بناتها.",
+      "topic": "قصة صفاء علي من بني سويف: وفاة زوجها وتركه ثلاث بنات، وحصولها على دبلومة تربوية والعمل مدرسة بالحصة ثم تثبيتها، ومواصلة تعليم بناتها.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "صفاء علي.. مدرسة بالحصة بدأت بأجر محدود",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2023/3/20/الأم-المثالية-ببنى-سويف-عملت-مدرسة-بالحصة-بـ90-قرشا-وزوجى-توفى-وترك-3-بنات/6122516"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "توفي زوج صفاء وترك ثلاث بنات.",
+        "حصلت على دبلومة تربوية وعملت مدرسة بالحصة بأجر 90 قرشًا.",
+        "تخرجت الكبرى في الطب.."
+      ]
+    },
+    {
+      "episode_id": "social-60-story-60",
+      "episode_number": 60,
+      "title": "الحاجة سعيدة.. بائعة السوق التي أكملت تعليم أبنائها",
+      "short_title": "الحاجة سعيدة",
+      "thumbnail_text": "الحاجة سعيدة",
+      "opening_hook": "قصة سعيدة حسن السوداني من كفر الشيخ: مرض الزوج وتركه أربعة أبناء، وعملها بائعة في السوق حتى حصل الأبناء على مؤهلات عليا.",
+      "topic": "قصة سعيدة حسن السوداني من كفر الشيخ: مرض الزوج وتركه أربعة أبناء، وعملها بائعة في السوق حتى حصل الأبناء على مؤهلات عليا.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى مصراوي. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "الحاجة سعيدة.. بائعة السوق التي أكملت تعليم أبنائها",
+          "publisher": "مصراوي",
+          "url": "https://www.masrawy.com/news/news_regions/details/2022/3/19/2193973/بعد-مرض-زوجها-قصة-كفاح-الحاجة-سعيدة-مع-4-أبناء-حصلوا-على-مؤهلات-عليا-في-كفر-الشيخ"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "مرض زوج سعيدة وترك لها أربعة أبناء.",
+        "عملت بائعة في السوق.",
+        "واصلت العمل حتى حصل الأبناء على مؤهلات عليا.."
+      ]
+    },
+    {
+      "episode_id": "social-61-story-61",
+      "episode_number": 61,
+      "title": "أم إبراهيم.. تمسكت بمحل زوجها وربّت أبناءها",
+      "short_title": "أم إبراهيم",
+      "thumbnail_text": "أم إبراهيم",
+      "opening_hook": "قصة أم إبراهيم: تولت إدارة محل زوجها بعد وفاته، وواصلت العمل لتربية خمسة أبناء.",
+      "topic": "قصة أم إبراهيم: تولت إدارة محل زوجها بعد وفاته، وواصلت العمل لتربية خمسة أبناء. انسب التفاصيل للتقرير.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى فيتو. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "أم إبراهيم.. تمسكت بمحل زوجها وربّت أبناءها",
+          "publisher": "فيتو",
+          "url": "https://www.vetogate.com/4554602"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "واصلت أم إبراهيم العمل في محل زوجها بعد وفاته.",
+        "تولت إعالة خمسة أبناء.",
+        "ذكر التقرير أن الأبناء أكملوا تعليمهم وتزوجوا.."
+      ]
+    },
+    {
+      "episode_id": "social-62-story-62",
+      "episode_number": 62,
+      "title": "سمية عبد الرازق.. شقيقة لم تتنازل عن حقها في الميراث",
+      "short_title": "سمية عبد الرازق",
+      "thumbnail_text": "سمية عبد الرازق",
+      "opening_hook": "قصة سمية: خلافها مع شقيقها حول نصيبها ونصيب شقيقاتها من الميراث، ولجوؤها للقضاء بعد تعثر المحاولات الودية.",
+      "topic": "قصة سمية: خلافها مع شقيقها حول نصيبها ونصيب شقيقاتها من الميراث، ولجوؤها للقضاء بعد تعثر المحاولات الودية. لا تقدم استشارة قانونية.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى مصراوي. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "سمية عبد الرازق.. شقيقة لم تتنازل عن حقها في الميراث",
+          "publisher": "مصراوي",
+          "url": "https://www.masrawy.com/news/news_egypt/details/2018/10/1/1436559/أول-امرأة-حاصلة-على-حكم-ضد-شقيقها-لتمكينها-من-الميراث-حقي-ومش-هسيبه-"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "قالت سمية إن شقيقها رفض إعطاءها وشقيقاتها نصيبهن.",
+        "لجأت للقضاء بعد محاولات ودية.",
+        "ذكر التقرير صدور حكم بتمكينها من نصيبها.."
+      ]
+    },
+    {
+      "episode_id": "social-63-story-63",
+      "episode_number": 63,
+      "title": "شقيقة تسترد حقها في ريع عقار والدها",
+      "short_title": "شقيقة تسترد حقها في ريع عقار والدها",
+      "thumbnail_text": "شقيقة تسترد حقها في ريع ",
+      "opening_hook": "قضية عن سيدة طالبت بنصيبها من ريع عقار ورثته بعد استئثار شقيقها بالإيجار، وانتهت بحكم لصالحها عن جزء من العقار.",
+      "topic": "قضية عن سيدة طالبت بنصيبها من ريع عقار ورثته بعد استئثار شقيقها بالإيجار، وانتهت بحكم لصالحها عن جزء من العقار. اذكر حدود الحكم بدقة.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "شقيقة تسترد حقها في ريع عقار والدها",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2021/4/19/قول-للى-أكل-الحرام-يخاف-المحكمة-تقضى-لسيدة-بأحقيتها-في/5282346"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "طالبت سيدة بنصيبها من ريع عقار موروث.",
+        "ذكر التقرير أن شقيقها كان ينتفع بالعقار ويرفض دفع نصيبها.",
+        "قضت المحكمة بمبلغ عن نصيبها في أحد العقارين.."
+      ]
+    },
+    {
+      "episode_id": "social-64-story-64",
+      "episode_number": 64,
+      "title": "هدى نصر الله.. قضية ميراث فتحت نقاشًا عن اختلاف الشرائع",
+      "short_title": "هدى نصر الله",
+      "thumbnail_text": "هدى نصر الله",
+      "opening_hook": "قصة المحامية هدى نصر الله وحكم محكمة أسرة حلوان عام 2019 بشأن توزيع ميراث والدها وفق لائحة الأقباط الأرثوذكس.",
+      "topic": "قصة المحامية هدى نصر الله وحكم محكمة أسرة حلوان عام 2019 بشأن توزيع ميراث والدها وفق لائحة الأقباط الأرثوذكس. اعرض السياق بحياد واحترام ولا تعمم الحكم.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى يورونيوز / أ ف ب. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "هدى نصر الله.. قضية ميراث فتحت نقاشًا عن اختلاف الشرائع",
+          "publisher": "يورونيوز / أ ف ب",
+          "url": "https://arabic.euronews.com/2019/11/26/a-coptic-egyptian-woman-gets-a-court-ruling-equal-to-her-two-brothers-in-inheritance"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "هدى نصر الله أقامت دعوى بشأن توزيع ميراث والدها بالتساوي بينها وبين شقيقيها.",
+        "صدر حكم من محكمة أسرة حلوان في نوفمبر 2019 وفق لائحة الأقباط الأرثوذكس.."
+      ]
+    },
+    {
+      "episode_id": "social-65-story-65",
+      "episode_number": 65,
+      "title": "شقيقة تواجه عقدًا قديمًا لاسترداد حقها في بيت الأسرة",
+      "short_title": "شقيقة تواجه عقدًا قديمًا لاسترداد حقها في بيت الأسرة",
+      "thumbnail_text": "شقيقة تواجه عقدًا قديمًا",
+      "opening_hook": "قضية عن نزاع شقيقة مع شقيقها حول نصيبها في بيت والدهما، وتقديم عقد صحة توقيع قديم، ثم صدور حكم استئنافي لصالحها.",
+      "topic": "قضية عن نزاع شقيقة مع شقيقها حول نصيبها في بيت والدهما، وتقديم عقد صحة توقيع قديم، ثم صدور حكم استئنافي لصالحها. لا تقدم نصيحة قانونية.",
+      "target_words": 3200,
+      "visual_keywords": [
+        "Egyptian family home documentary",
+        "Egyptian neighborhood street",
+        "Egyptian social life documentary",
+        "family discussion at home"
+      ],
+      "description": "حلقة وثائقية اجتماعية مبنية على تقرير منشور لدى اليوم السابع. التزم بالوقائع المحددة، وميّز بين الوقائع والأقوال والادعاءات، ولا تختلق حوارات أو مشاهد أو نتائج.",
+      "sources": [
+        {
+          "title": "شقيقة تواجه عقدًا قديمًا لاسترداد حقها في بيت الأسرة",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2026/11/4/هل-يضيع-حقك-في-الميراث-بسبب-عقد-صحة-توقيع-القضاء/7605721"
+        }
+      ],
+      "published": false,
+      "content_type": "verified_real_story",
+      "disabled": false,
+      "disabled_reason": "",
+      "verified_facts": [
+        "بدأ النزاع عام 2011 حول نصيب سيدة في منزل والدها.",
+        "قدم الشقيق عقدًا يحمل حكم صحة توقيع.",
+        "صدر حكم استئنافي في يناير 2026 برفض دعوى صحة التوقيع.."
+      ]
     }
   ],
   "content_type": "verified_real_story",
