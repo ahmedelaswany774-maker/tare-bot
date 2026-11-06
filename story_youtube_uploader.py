@@ -372,8 +372,8 @@ def _make_audio_xtts():
 def _make_audio_fish():
     """Generate story.mp3 using Fish Audio REST API (voice cloning via
     reference_id = صوتك المستنسخ). Splits long text into chunks (API length
-    limits), synthesizes each, then concatenates them with ffmpeg. Raises on
-    any failure so the caller can fall back to edge-tts."""
+    limits), synthesizes each, then concatenates them with ffmpeg. Any failure
+    stops production; a different voice must never be substituted."""
     if not FISH_API_KEY:
         raise RuntimeError("FISH_API_KEY غير موجود")
     if not FISH_VOICE_ID:
@@ -519,11 +519,8 @@ try:
     else:
         _make_audio_fish()
 except Exception as e:
-    if TTS_BACKEND == "xtts":
-        print(f"❌ فشل XTTS، سيتم إيقاف التشغيل حتى لا نرفع فيديو بصوت مختلف: {e}")
-        raise
-    print(f"⚠️ فشل TTS backend={TTS_BACKEND} ({e})، هنستخدم edge-tts كبديل")
-    asyncio.run(_make_audio_edge())
+    print(f"❌ فشل محرك الصوت المطلوب ({TTS_BACKEND})؛ تم إيقاف الإنتاج لمنع استخدام صوت مختلف: {e}")
+    raise
 
 audio_clip = AudioFileClip("story.mp3")
 target_duration = audio_clip.duration
