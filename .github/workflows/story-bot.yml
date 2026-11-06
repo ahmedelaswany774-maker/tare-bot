@@ -86,6 +86,7 @@ jobs:
             echo "No episode history changes to persist."
           else
             git commit -m "chore: persist published episode history"
+            git pull --rebase origin main
             git push
           fi
       - name: Save generated and published artifacts
