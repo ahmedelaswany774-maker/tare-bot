@@ -1,4 +1,5 @@
 name: Story Bot - Episode Video Production and YouTube Publishing
+# Manual production trigger
 # Retry production after transient Gemini 503 handling was improved.
 
 on:
