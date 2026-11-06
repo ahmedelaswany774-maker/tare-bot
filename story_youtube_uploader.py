@@ -129,6 +129,23 @@ def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
             raise
 
 def generate_story(manifest, episode):
+    if episode.get("script_path") and episode.get("content_type") == "verified_real_story":
+        raw = Path(episode["script_path"]).read_text(encoding="utf-8")
+        start_marker = "# النص الكامل"
+        end_marker = "# ملاحظات المونتاج"
+        if start_marker not in raw or end_marker not in raw:
+            raise ValueError("ملف السيناريو الواقعي لا يحتوي على حدود النص الكامل المتوقعة.")
+        story = raw.split(start_marker, 1)[1].split(end_marker, 1)[0].strip()
+        spoken = "\n".join(
+            line.strip() for line in story.splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        )
+        source_words = len(spoken.split())
+        if source_words < 2400:
+            raise ValueError(f"سيناريو الحلقة الواقعية أقصر من الحد الأدنى: {source_words} كلمة.")
+        print(f"تم تحميل السيناريو الواقعي المكتوب من الريبو مباشرة: {source_words} كلمة.")
+        return spoken
+
     if episode.get("content_type") == "fictional_drama":
         raw = Path(episode["script_path"]).read_text(encoding="utf-8")
         start_marker = "# النص الكامل"
