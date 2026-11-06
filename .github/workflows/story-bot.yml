@@ -26,11 +26,9 @@ on:
       tts_backend:
         description: "محرك الصوت"
         required: true
-        default: edge
+        default: fish
         type: choice
         options:
-          - edge
-          - xtts
           - fish
 
 permissions:
@@ -71,7 +69,7 @@ jobs:
           GROWTH_POLICY_PATH: content/strategy/growth_policy.json
           EPISODE_NUMBER: ${{ inputs.episode_number || '37' }}
           EPISODE_MODE: ${{ inputs.episode_mode || 'fictional_draft' }}
-          TTS_BACKEND: ${{ inputs.tts_backend || 'edge' }}
+          TTS_BACKEND: fish
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '0'
