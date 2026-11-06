@@ -1,0 +1,101 @@
+import json
+import os
+import re
+import time
+from pathlib import Path
+import requests
+
+MANIFEST = Path("content/series/real_stories.json")
+OUT_DIR = Path("content/drafts/verified_real")
+API_KEY = os.environ["GEMINI_API_KEY"]
+MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+MIN_WORDS = int(os.getenv("MIN_SCRIPT_WORDS", "2400"))
+TARGET_WORDS = int(os.getenv("STORY_TARGET_WORDS", "3200"))
+
+def word_count(text):
+    return len(re.findall(r"\S+", text))
+
+def call_gemini(prompt):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
+    payload = {"contents":[{"parts":[{"text":prompt}]}],
+               "generationConfig":{"temperature":0.65,"topP":0.9,"maxOutputTokens":12288}}
+    last_error = None
+    for attempt in range(1, 7):
+        try:
+            response = requests.post(url, json=payload, timeout=300)
+            if response.status_code in (429, 500, 503):
+                raise requests.HTTPError(f"temporary Gemini status {response.status_code}")
+            response.raise_for_status()
+            return response.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+        except Exception as exc:
+            last_error = exc
+            if attempt == 6:
+                break
+            time.sleep(min(90, attempt * 15))
+    raise RuntimeError(f"Gemini generation failed: {last_error}")
+
+def build_prompt(episode):
+    facts = "\n".join(f"- {fact}" for fact in episode.get("verified_facts", []))
+    sources = "\n".join(f"- {s.get('title')} | {s.get('publisher')} | {s.get('url')}" for s in episode.get("sources", []))
+    return f"""
+أنت كاتب سيناريو وثائقي اجتماعي لقناة مصرية اسمها «قصص واقعيه».
+اكتب السيناريو الكامل للحلقة رقم {episode['episode_number']} بعنوان: {episode['title']}.
+الموضوع: {episode['topic']}
+الافتتاحية: {episode.get('opening_hook','')}
+
+الوقائع المتاحة فقط:
+{facts}
+
+المصادر المتاحة:
+{sources}
+
+قواعد إلزامية:
+1. هذه قصة واقعية وليست دراما خيالية. لا تخترع حوارًا أو مشهدًا أو شخصية أو حدثًا أو دافعًا أو تاريخًا أو رقمًا أو نتيجة.
+2. لا تملأ الفراغات بمواقف متخيلة، ولا تكتب مشاهد تمثيلية بصيغة حدثت بالفعل.
+3. انسب المعلومات إلى التقرير المنشور، ووضح عندما تكون التفاصيل غير متاحة أو غير مؤكدة.
+4. إذا كانت الوقائع المنشورة قليلة، وسّع الحلقة بتحليل اجتماعي عام واضح أنه تعليق، لا بإضافة وقائع عن صاحبة القصة.
+5. استخدم اللهجة المصرية البيضاء، واحمِ خصوصية الأشخاص.
+6. لا تنحرف عن موضوع الحلقة ولا تضف حبكات جانبية أو موضوعات رياضية أو ألغاز أو قصص نجاة أو خيال.
+7. لا تقدم نصائح قانونية أو طبية. في موضوع الميراث اعرض القضية وحدود الحكم فقط.
+8. لا تنسخ نص المصدر حرفيًا. اكتب صياغة أصلية.
+9. اكتب سردًا وثائقيًا طويلًا بافتتاحية قوية وتمهيد وتسلسل الوقائع وسياق اجتماعي وخاتمة.
+10. الطول المستهدف نحو {TARGET_WORDS} كلمة عربية، دون حشو أو تكرار.
+11. أخرج متن السرد فقط، دون JSON أو تعليمات مونتاج.
+""".strip()
+
+def main():
+    data = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    episodes = [e for e in data.get("episodes", [])
+                if 38 <= int(e.get("episode_number", 0)) <= 65
+                and e.get("content_type", data.get("content_type")) == "verified_real_story"]
+    if len(episodes) != 28:
+        raise SystemExit(f"Expected 28 episodes (38-65), found {len(episodes)}")
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for episode in episodes:
+        number = int(episode["episode_number"])
+        path = OUT_DIR / f"episode-{number:02d}.md"
+        print(f"Generating episode {number}: {episode['title']}", flush=True)
+        text = call_gemini(build_prompt(episode))
+        count = word_count(text)
+        if count < MIN_WORDS:
+            raise RuntimeError(f"Episode {number} too short: {count} words; minimum {MIN_WORDS}.")
+        document = (
+            f"# الحلقة {number}: {episode['title']}\n\n"
+            f"> مسودة وثائقية مبنية على الوقائع والمصادر المدرجة. عدد الكلمات: {count}. "
+            f"لا تُنشر قبل استكمال المراجعة التحريرية والتحقق من المصادر.\n\n"
+            f"# النص الكامل\n\n{text.strip()}\n\n"
+            f"# ملاحظات المونتاج\n\n"
+            "- استخدم صورًا أصلية أو مرخصة، ولا تعرض مشاهد تمثيلية على أنها لقطات حقيقية.\n"
+            "- أظهر المصادر في الوصف، وراجع كل اسم ورقم وتاريخ قبل التسجيل.\n"
+        )
+        path.write_text(document, encoding="utf-8")
+        episode["script_path"] = path.as_posix()
+        episode["draft_status"] = "written_pending_editorial_and_source_review"
+        episode["draft_word_count"] = count
+        print(f"Saved {path} ({count} words)", flush=True)
+        time.sleep(2)
+    MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print("Completed all 28 scripts.", flush=True)
+
+if __name__ == "__main__":
+    main()
