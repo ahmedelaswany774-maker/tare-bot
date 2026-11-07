@@ -61,11 +61,17 @@ jobs:
           data = json.loads(Path('content/series/real_stories.json').read_text(encoding='utf-8'))
           eligible = []
           for ep in data.get('episodes', []):
-              publishers = {s.get('publisher', '').strip().lower() for s in ep.get('sources', []) if s.get('publisher') and s.get('url', '').startswith('https://')}
+              publishers = {s.get('publisher', '').strip().lower() for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')}
               script = ep.get('script_path', '')
+              word_count = 0
+              if script and Path(script).is_file():
+                  raw = Path(script).read_text(encoding='utf-8')
+                  if '# النص الكامل' in raw and '# ملاحظات المونتاج' in raw:
+                      body = raw.split('# النص الكامل', 1)[1].split('# ملاحظات المونتاج', 1)[0]
+                      word_count = len(body.split())
               if (not ep.get('published') and not ep.get('disabled')
                   and ep.get('content_type', data.get('content_type')) == 'verified_real_story'
-                  and len(publishers) >= 2 and script and Path(script).is_file()):
+                  and len(publishers) >= 2 and word_count >= 2400):
                   eligible.append(ep.get('episode_number'))
           print('Eligible episodes:', eligible)
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
