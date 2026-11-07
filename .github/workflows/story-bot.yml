@@ -126,3 +126,5 @@ jobs:
             upload_state.json
           if-no-files-found: ignore
           retention-days: 7
+
+# Manual production trigger requested by the channel owner.
