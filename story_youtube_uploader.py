@@ -49,6 +49,7 @@ def load_episode():
             if not item.get("published", False)
             and not item.get("disabled", False)
             and item.get("content_type") == "fictional_drama"
+            and item.get("upload_status") not in ("uploading", "uploaded")
             and Path(item.get("script_path", "")).is_file()
         ]
     else:
@@ -56,6 +57,7 @@ def load_episode():
             item for item in episodes
             if not item.get("published", False)
             and not item.get("disabled", False)
+            and item.get("upload_status") not in ("uploading", "uploaded")
             and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
             and len(item.get("sources", [])) >= 2
             and len({source.get("publisher", "").strip().lower() for source in item.get("sources", [])}) >= 2
@@ -681,9 +683,22 @@ request = youtube.videos().insert(
     },
     media_body=MediaFileUpload("story.mp4"),
 )
+# Persist a remote upload lock BEFORE calling YouTube. If upload succeeds but
+# a later GitHub step fails, the next scheduled run must not upload this episode again.
+episode["upload_status"] = "uploading"
+episode["upload_started_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+save_json(SERIES_MANIFEST_PATH, manifest)
+subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+subprocess.run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=True)
+subprocess.run(["git", "pull", "--rebase", "--autostash", "origin", "main"], check=True)
+subprocess.run(["git", "add", SERIES_MANIFEST_PATH], check=True)
+subprocess.run(["git", "commit", "-m", f"chore: reserve episode {episode['episode_number']} before YouTube upload"], check=True)
+subprocess.run(["git", "push"], check=True)
+
 response = request.execute()
 video_id = response["id"]
 episode["published"] = True
+episode["upload_status"] = "published"
 episode["youtube_video_id"] = video_id
 episode["published_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 save_json(SERIES_MANIFEST_PATH, manifest)
