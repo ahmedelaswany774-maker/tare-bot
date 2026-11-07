@@ -869,7 +869,11 @@
       "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر.",
       "youtube_video_id": "ojLTZpIQ1Bs",
       "published_at": "2026-11-07T03:51:11Z",
-      "publish_recovery_note": "تم تثبيت حالة النشر يدويًا بعد نجاح رفع GitHub Actions وفشل خطوة حفظ سجل النشر في commit f0c3b93؛ لا تعِد رفع هذه الحلقة."
+      "publish_recovery_note": "تم رفع الحلقة 39 مرتين بسبب فشل حفظ حالة النشر في GitHub بعد نجاح الرفع. تم تثبيت published=true لمنع أي إعادة رفع أخرى. راجع رابطَي الفيديو واحذف النسخة الزائدة يدويًا من YouTube Studio.",
+      "duplicate_upload_video_ids": [
+        "ojLTZpIQ1Bs",
+        "3d1UtxF8V_4"
+      ]
     },
     {
       "episode_id": "social-40-story-40",
