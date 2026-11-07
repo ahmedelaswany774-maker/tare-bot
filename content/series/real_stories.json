@@ -994,7 +994,9 @@
       "script_path": "content/drafts/verified_real/episode-41.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4348,
-      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر."
+      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر.",
+      "upload_status": "uploading",
+      "upload_started_at": "2026-11-07T21:23:42+00:00"
     },
     {
       "episode_id": "social-42-story-42",
