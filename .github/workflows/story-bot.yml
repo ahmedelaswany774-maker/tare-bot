@@ -70,6 +70,7 @@ jobs:
                       body = raw.split('# النص الكامل', 1)[1].split('# ملاحظات المونتاج', 1)[0]
                       word_count = len(body.split())
               if (not ep.get('published') and not ep.get('disabled')
+                  and ep.get('upload_status') not in ('uploading', 'uploaded')
                   and ep.get('content_type', data.get('content_type')) == 'verified_real_story'
                   and len(publishers) >= 2 and word_count >= 2400):
                   eligible.append(ep.get('episode_number'))
