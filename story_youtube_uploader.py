@@ -16,7 +16,7 @@ from google.auth.transport.requests import Request
 
 from pathlib import Path
 
-GEMINI_KEY = os.environ["GEMINI_API_KEY"]
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
 PEXELS_KEY = os.environ["PEXELS_API_KEY"]
 FISH_API_KEY = os.environ.get("FISH_API_KEY", "")
 FISH_VOICE_ID = os.environ.get("FISH_VOICE_ID", "")
@@ -92,6 +92,8 @@ def load_episode():
 
 
 def call_gemini(prompt, max_retries=4, base_delay=5, max_output_tokens=8192):
+    if not GEMINI_KEY:
+        raise RuntimeError("GEMINI_API_KEY غير مضبوط؛ هذا المسار لا يعمل إلا إذا كان السيناريو غير موجود محليًا.")
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
         f"gemini-2.5-flash:generateContent?key={GEMINI_KEY}"
