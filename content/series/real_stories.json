@@ -983,7 +983,7 @@
           "url": "https://m.akhbarelyom.com/news/NewDetails/4467173/1/رحلة-الطيبة-من-فصول-محو-الأمية-إلى-رسالة"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -995,8 +995,10 @@
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4348,
       "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر.",
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-07T21:23:42+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-07T21:23:42+00:00",
+      "youtube_video_id": "J7zcdxKuG-g",
+      "published_at": "2026-11-07T21:23:59+00:00"
     },
     {
       "episode_id": "social-42-story-42",
