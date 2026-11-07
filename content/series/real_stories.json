@@ -812,8 +812,8 @@
       ],
       "published": false,
       "content_type": "verified_real_story",
-      "disabled": false,
-      "disabled_reason": "",
+      "disabled": true,
+      "disabled_reason": "موقوفة مؤقتًا: لم يُعثر بعد على مصدر مستقل ثانٍ يدعم الوقائع الأساسية؛ لا تُرفع حتى استكمال التوثيق ومراجعة السيناريو.",
       "verified_facts": [
         "نشأت رية في أسرة ترفض تعليم الفتيات.",
         "التحقت بمحو الأمية ثم الجامعة وافتتحت مكتب محاماة.."
@@ -843,6 +843,16 @@
           "title": "سناء.. من محو الأمية إلى الماجستير",
           "publisher": "بوابة الأهرام",
           "url": "https://gate.ahram.org.eg/News/2630178.aspx"
+        },
+        {
+          "title": "بالفيديو- المصرية سناء عبد الجواد.. من محو الأمية إلى ماجستير في القانون",
+          "publisher": "الجزيرة",
+          "url": "https://www.aljazeera.net/women/2021/4/2/بالفيديو-المصرية-سناء-عبد-الجواد-من"
+        },
+        {
+          "title": "من الأمية للماجستير ولسة بتعافر.. سناء تحدت الجهل",
+          "publisher": "اليوم السابع",
+          "url": "https://www.youm7.com/story/2021/3/12/من-الأمية-للماجستير-ولسة-بتعافر-سناء-تحدت-الجهل-ونجحت-فى/5239779"
         }
       ],
       "published": false,
@@ -855,7 +865,8 @@
       ],
       "script_path": "content/drafts/verified_real/episode-39.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 2999
+      "draft_word_count": 2999,
+      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر."
     },
     {
       "episode_id": "social-40-story-40",
@@ -878,6 +889,11 @@
           "title": "آمال إسماعيل.. عادت إلى الدراسة بعد الستين",
           "publisher": "اليوم السابع",
           "url": "https://www.youm7.com/story/2022/1/24/آمال-عندها-79-سنة-وبتكمل-دراسات-عليا-تركت-التعليم-فى/5630145"
+        },
+        {
+          "title": "الحياة تبدأ بعد الستين.. آمال قهرت السرطان مرتين وأصبحت أكبر طالبة في مصر",
+          "publisher": "القاهرة 24",
+          "url": "https://www.cairo24.com/1482819"
         }
       ],
       "published": false,
@@ -890,7 +906,8 @@
       ],
       "script_path": "content/drafts/verified_real/episode-40.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 3304
+      "draft_word_count": 3304,
+      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر."
     },
     {
       "episode_id": "social-41-story-41",
@@ -913,6 +930,16 @@
           "title": "الطيبة الضوي.. من محو الأمية إلى الماجستير",
           "publisher": "اليوم السابع",
           "url": "https://www.youm7.com/story/2019/4/14/صور-الطيبة-الضوى-قصة-فتاة-صعيدية-تمردت-على-الظروف-والعادات/4205818"
+        },
+        {
+          "title": "الطيبة الصعيدية تمحو الأمية.. سعي إلى العلم من المهد إلى الماجستير",
+          "publisher": "الوطن",
+          "url": "https://www.elwatannews.com/news/details/4059665"
+        },
+        {
+          "title": "رحلة الطيبة من فصول محو الأمية إلى رسالة الدكتوراه",
+          "publisher": "بوابة أخبار اليوم",
+          "url": "https://m.akhbarelyom.com/news/NewDetails/4467173/1/رحلة-الطيبة-من-فصول-محو-الأمية-إلى-رسالة"
         }
       ],
       "published": false,
@@ -925,7 +952,8 @@
       ],
       "script_path": "content/drafts/verified_real/episode-41.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 4348
+      "draft_word_count": 4348,
+      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر."
     },
     {
       "episode_id": "social-42-story-42",
@@ -1726,7 +1754,7 @@
     }
   ],
   "content_type": "verified_real_story",
-  "workflow_status": "episode_36_verified_sources_added_pending_draft_review",
+  "workflow_status": "episodes_39_41_sources_expanded_pending_script_fact_review",
   "weekly_draft_batch": {
     "status": "retry_with_continuation_and_per_episode_checkpoints",
     "episodes": "38-65",
