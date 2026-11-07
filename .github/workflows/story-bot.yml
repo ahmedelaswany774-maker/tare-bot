@@ -75,7 +75,7 @@ jobs:
                   eligible.append(ep.get('episode_number'))
           print('Eligible episodes:', eligible)
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
-              out.write('ready=' + ('true' if eligible else 'false') + '\\n')
+              out.write('ready=' + ('true' if eligible else 'false') + chr(10))
           PY
       - name: Install ffmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
