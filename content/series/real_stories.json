@@ -855,7 +855,7 @@
           "url": "https://www.youm7.com/story/2021/3/12/من-الأمية-للماجستير-ولسة-بتعافر-سناء-تحدت-الجهل-ونجحت-فى/5239779"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -866,7 +866,10 @@
       "script_path": "content/drafts/verified_real/episode-39.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 2999,
-      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر."
+      "source_review_note": "أضيف مصدر مستقل إضافي؛ يلزم مطابقة كل الوقائع الواردة في السيناريو مع المصدرين قبل تفعيل النشر.",
+      "youtube_video_id": "ojLTZpIQ1Bs",
+      "published_at": "2026-11-07T03:51:11Z",
+      "publish_recovery_note": "تم تثبيت حالة النشر يدويًا بعد نجاح رفع GitHub Actions وفشل خطوة حفظ سجل النشر في commit f0c3b93؛ لا تعِد رفع هذه الحلقة."
     },
     {
       "episode_id": "social-40-story-40",
