@@ -928,7 +928,7 @@
           "url": "https://ahlmasrnews.com/news/local-news/13478194/الحاجة-آمال-تحصل-الدكتوراه-في-عمر-الـ83"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -945,8 +945,10 @@
       "draft_status": "updated_pending_final_editorial_approval",
       "draft_word_count": 3164,
       "source_review_note": "تم تحديث السيناريو ومقارنة التسلسل الزمني مع تقارير اليوم السابع والقاهرة 24 وسكاي نيوز عربية. لا تُستخدم مشاهد تمثيلية على أنها أرشيف حقيقي؛ راجع تواريخ الشهادات قبل النشر.",
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-07T15:51:19+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-07T15:51:19+00:00",
+      "youtube_video_id": "QlI-J9vdFzQ",
+      "published_at": "2026-11-07T15:51:25+00:00"
     },
     {
       "episode_id": "social-41-story-41",
