@@ -1,8 +1,7 @@
 name: Draft 28 Weekly Social Stories
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,7 +12,6 @@ concurrency:
 
 jobs:
   draft:
-    if: ${{ contains(github.event.head_commit.message, '[draft-weekly-scripts]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
     steps:
