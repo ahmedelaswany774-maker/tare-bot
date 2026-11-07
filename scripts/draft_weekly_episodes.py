@@ -11,32 +11,49 @@ API_KEY = os.environ["GEMINI_API_KEY"]
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 MIN_WORDS = int(os.getenv("MIN_SCRIPT_WORDS", "2400"))
 TARGET_WORDS = int(os.getenv("STORY_TARGET_WORDS", "3200"))
+MAX_API_RETRIES = int(os.getenv("MAX_API_RETRIES", "8"))
 
 def word_count(text):
-    return len(re.findall(r"\S+", text))
+    return len(re.findall(r"\\S+", text))
 
 def call_gemini(prompt):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
     payload = {"contents":[{"parts":[{"text":prompt}]}],
                "generationConfig":{"temperature":0.65,"topP":0.9,"maxOutputTokens":12288}}
     last_error = None
-    for attempt in range(1, 7):
+    for attempt in range(1, MAX_API_RETRIES + 1):
         try:
             response = requests.post(url, json=payload, timeout=300)
-            if response.status_code in (429, 500, 503):
-                raise requests.HTTPError(f"temporary Gemini status {response.status_code}")
-            response.raise_for_status()
-            return response.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-        except Exception as exc:
-            last_error = exc
-            if attempt == 6:
+            if response.status_code == 429 or response.status_code in (500, 502, 503, 504):
+                retry_after = response.headers.get("Retry-After")
+                try:
+                    wait_seconds = float(retry_after) if retry_after else min(300, 30 * (2 ** (attempt - 1)))
+                except ValueError:
+                    wait_seconds = min(300, 30 * (2 ** (attempt - 1)))
+                last_error = f"temporary Gemini status {response.status_code}: {response.text[:500]}"
+                if attempt < MAX_API_RETRIES:
+                    print(f"Gemini temporary error; retry {attempt}/{MAX_API_RETRIES} after {wait_seconds:.0f}s", flush=True)
+                    time.sleep(wait_seconds)
+                    continue
                 break
-            time.sleep(min(90, attempt * 15))
-    raise RuntimeError(f"Gemini generation failed: {last_error}")
+            response.raise_for_status()
+            body = response.json()
+            candidates = body.get("candidates") or []
+            if not candidates:
+                raise RuntimeError(f"Gemini returned no candidates: {json.dumps(body, ensure_ascii=False)[:1000]}")
+            return candidates[0]["content"]["parts"][0]["text"].strip()
+        except (requests.Timeout, requests.ConnectionError, requests.HTTPError, KeyError, ValueError, RuntimeError) as exc:
+            last_error = str(exc)
+            if attempt == MAX_API_RETRIES:
+                break
+            wait_seconds = min(180, 15 * attempt)
+            print(f"Gemini request failed; retry {attempt}/{MAX_API_RETRIES} after {wait_seconds}s: {last_error[:250]}", flush=True)
+            time.sleep(wait_seconds)
+    raise RuntimeError(f"Gemini generation failed after {MAX_API_RETRIES} attempts: {last_error}")
 
 def build_prompt(episode):
-    facts = "\n".join(f"- {fact}" for fact in episode.get("verified_facts", []))
-    sources = "\n".join(f"- {s.get('title')} | {s.get('publisher')} | {s.get('url')}" for s in episode.get("sources", []))
+    facts = "\\n".join(f"- {fact}" for fact in episode.get("verified_facts", []))
+    sources = "\\n".join(f"- {s.get('title')} | {s.get('publisher')} | {s.get('url')}" for s in episode.get("sources", []))
     return f"""
 أنت كاتب سيناريو وثائقي اجتماعي لقناة مصرية اسمها «قصص واقعيه».
 اكتب السيناريو الكامل للحلقة رقم {episode['episode_number']} بعنوان: {episode['title']}.
@@ -63,6 +80,32 @@ def build_prompt(episode):
 11. أخرج متن السرد فقط، دون JSON أو تعليمات مونتاج.
 """.strip()
 
+def extract_saved_text(path):
+    if not path.exists():
+        return ""
+    raw = path.read_text(encoding="utf-8")
+    match = re.search(r"# النص الكامل\\s*(.*?)\\s*# ملاحظات المونتاج", raw, re.S)
+    return match.group(1).strip() if match else ""
+
+def save_checkpoint(episode, path, text):
+    number = int(episode["episode_number"])
+    count = word_count(text)
+    document = (
+        f"# الحلقة {number}: {episode['title']}\\n\\n"
+        f"> مسودة وثائقية محفوظة تلقائيًا. عدد الكلمات الحالي: {count}. "
+        f"لا تُنشر قبل استكمال المراجعة التحريرية والتحقق من المصادر.\\n\\n"
+        f"# النص الكامل\\n\\n{text.strip()}\\n\\n"
+        f"# ملاحظات المونتاج\\n\\n"
+        "- استخدم صورًا أصلية أو مرخصة، ولا تعرض مشاهد تمثيلية على أنها لقطات حقيقية.\\n"
+        "- أظهر المصادر في الوصف، وراجع كل اسم ورقم وتاريخ قبل التسجيل.\\n"
+    )
+    path.write_text(document, encoding="utf-8")
+    episode["script_path"] = path.as_posix()
+    episode["draft_status"] = ("written_pending_editorial_and_source_review" if count >= MIN_WORDS
+                               else "incomplete_below_minimum_pending_continuation")
+    episode["draft_word_count"] = count
+    return count
+
 def main():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     episodes = [e for e in data.get("episodes", [])
@@ -74,9 +117,23 @@ def main():
     for episode in episodes:
         number = int(episode["episode_number"])
         path = OUT_DIR / f"episode-{number:02d}.md"
-        print(f"Generating episode {number}: {episode['title']}", flush=True)
-        text = call_gemini(build_prompt(episode))
+        text = extract_saved_text(path)
         count = word_count(text)
+        if count >= MIN_WORDS:
+            episode["script_path"] = path.as_posix()
+            episode["draft_status"] = "written_pending_editorial_and_source_review"
+            episode["draft_word_count"] = count
+            print(f"Skipping completed episode {number}: {count} words already checkpointed", flush=True)
+            continue
+        if text:
+            print(f"Resuming episode {number} from saved checkpoint: {count} words", flush=True)
+        else:
+            print(f"Generating episode {number}: {episode['title']}", flush=True)
+            text = call_gemini(build_prompt(episode))
+            count = save_checkpoint(episode, path, text)
+            MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            print(f"Initial checkpoint saved for episode {number}: {count} words", flush=True)
+
         for attempt in range(1, int(os.getenv("MAX_CONTINUATIONS", "4")) + 1):
             if count >= MIN_WORDS:
                 break
@@ -84,32 +141,20 @@ def main():
             continuation_prompt = (
                 f"استكمل النص التالي فقط دون تكرار أو إعادة المقدمة. المطلوب الوصول إلى {TARGET_WORDS} كلمة إجمالًا. "
                 f"لا تختلق وقائع أو حوارًا أو مشاهد أو أشخاصًا أو أرقامًا. إذا انتهت الوقائع المنشورة، أضف تحليلًا "
-                f"اجتماعيًا عامًا واضحًا أنه تعليق، ومرتبطًا مباشرة بموضوع الحلقة. عنوان الحلقة: {episode['title']}\n"
-                f"النص الحالي:\n{text[-6000:]}"
+                f"اجتماعيًا عامًا واضحًا أنه تعليق، ومرتبطًا مباشرة بموضوع الحلقة. عنوان الحلقة: {episode['title']}\\n"
+                f"النص الحالي:\\n{text[-6000:]}"
             )
             addition = call_gemini(continuation_prompt)
             if not addition:
                 break
-            text = text.rstrip() + "\n\n" + addition.strip()
-            count = word_count(text)
-        document = (
-
-            f"# الحلقة {number}: {episode['title']}\n\n"
-            f"> مسودة وثائقية مبنية على الوقائع والمصادر المدرجة. عدد الكلمات: {count}. "
-            f"لا تُنشر قبل استكمال المراجعة التحريرية والتحقق من المصادر.\n\n"
-            f"# النص الكامل\n\n{text.strip()}\n\n"
-            f"# ملاحظات المونتاج\n\n"
-            "- استخدم صورًا أصلية أو مرخصة، ولا تعرض مشاهد تمثيلية على أنها لقطات حقيقية.\n"
-            "- أظهر المصادر في الوصف، وراجع كل اسم ورقم وتاريخ قبل التسجيل.\n"
-        )
-        path.write_text(document, encoding="utf-8")
-        episode["script_path"] = path.as_posix()
-        episode["draft_status"] = ("written_pending_editorial_and_source_review" if count >= MIN_WORDS
-                                   else "incomplete_below_minimum_pending_continuation")
-        episode["draft_word_count"] = count
-        MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            text = text.rstrip() + "\\n\\n" + addition.strip()
+            count = save_checkpoint(episode, path, text)
+            MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            print(f"Checkpoint saved for episode {number}: {count} words", flush=True)
+        count = save_checkpoint(episode, path, text)
+        MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
         print(f"Saved {path} ({count} words); {episode['draft_status']}", flush=True)
-        time.sleep(2)
+        time.sleep(5)
     completed = sum(1 for e in episodes if int(e.get("draft_word_count", 0)) >= MIN_WORDS)
     print(f"Batch checkpointed: {completed}/28 scripts meet the minimum. No publishing.", flush=True)
 
