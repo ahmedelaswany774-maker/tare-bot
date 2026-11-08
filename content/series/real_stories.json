@@ -1028,7 +1028,7 @@
           "url": "https://www.youm7.com/story/2021/9/3/تحدى-الإرادة-هاجر-تقهر-الصعاب-لتحقيق-حلمها-التحقت-بمدرسة-صديقة/5447777"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1041,8 +1041,10 @@
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 2733,
       "source_review_note": "مصدر مستقل إضافي أُضيف من اليوم السابع؛ يجب مراجعة تطابق التسلسل الزمني بين تقرير 2021 وتقرير 2022 قبل النشر.",
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-08T15:14:57+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-08T15:14:57+00:00",
+      "youtube_video_id": "WQvZo6LNaMY",
+      "published_at": "2026-11-08T15:15:01+00:00"
     },
     {
       "episode_id": "social-43-story-43",
