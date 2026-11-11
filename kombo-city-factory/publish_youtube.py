@@ -13,19 +13,52 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 
+def load_token_info(raw: str) -> dict:
+    try:
+        info = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(
+            "YT_TOKEN_JSON must contain one raw JSON object only (no HTTP status line, "
+            "no surrounding text, and no Markdown code fences)."
+        ) from exc
+    if not isinstance(info, dict):
+        raise RuntimeError("YT_TOKEN_JSON must be a JSON object.")
+
+    # OAuth Playground returns access_token; google-auth's user-credentials
+    # format expects the same value under the key 'token'.
+    if not info.get("token") and info.get("access_token"):
+        info["token"] = info["access_token"]
+
+    # Keep compatibility with a complete authorized-user JSON, while also
+    # supporting the OAuth Playground token response plus separate GitHub secrets.
+    info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
+    info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
+    info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
+    if not info.get("scopes") and info.get("scope"):
+        info["scopes"] = info["scope"].split()
+
+    missing = [key for key in ("client_id", "client_secret", "refresh_token") if not info.get(key)]
+    if missing:
+        raise RuntimeError(
+            "OAuth token JSON is missing required fields: " + ", ".join(missing)
+            + ". Ensure YT_TOKEN_JSON contains refresh_token and the separate "
+            "YT_CLIENT_ID / YT_CLIENT_SECRET secrets belong to the same Web OAuth client."
+        )
+    if not info.get("token"):
+        raise RuntimeError("YT_TOKEN_JSON is missing access_token (or token). Re-authorize the YouTube account.")
+    return info
+
+
 def main() -> int:
     video_path = Path(os.environ["VIDEO_PATH"])
     metadata_path = Path(os.environ["METADATA_PATH"])
     token_raw = os.getenv("YT_TOKEN_JSON", "").strip()
     if not token_raw:
-        raise RuntimeError(
-            "YT_TOKEN_JSON is missing. Add the Google OAuth token JSON for the رواة الواقع channel "
-            "to GitHub Actions repository secrets."
-        )
+        raise RuntimeError("YT_TOKEN_JSON is missing from GitHub Actions repository secrets.")
     if not video_path.is_file() or not metadata_path.is_file():
         raise RuntimeError("Generated MP4 or metadata JSON is missing.")
 
-    token_info = json.loads(token_raw)
+    token_info = load_token_info(token_raw)
     scopes = [
         "https://www.googleapis.com/auth/youtube.upload",
         "https://www.googleapis.com/auth/youtube.readonly",
