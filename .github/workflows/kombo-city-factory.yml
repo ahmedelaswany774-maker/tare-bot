@@ -98,8 +98,8 @@ jobs:
               receipt = video.with_suffix(".youtube.json")
               if meta.exists() and not receipt.exists():
                   with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-                      f.write(f"video={video.as_posix()}\\n")
-                      f.write(f"metadata={meta.as_posix()}\\n")
+                      f.write(f"video={video.as_posix()}\n")
+                      f.write(f"metadata={meta.as_posix()}\n")
                   print(f"Selected saved video: {video}")
                   break
           else:
