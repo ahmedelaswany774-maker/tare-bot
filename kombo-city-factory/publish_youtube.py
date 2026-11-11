@@ -18,10 +18,10 @@ def load_token_info(raw: str) -> dict:
     # HTTP response (status line + headers + JSON body). Never log token content.
     candidate = raw.strip()
     if candidate.startswith("HTTP/"):
-        separator = "\\r\\n\\r\\n"
+        separator = "\r\n\r\n"
         if separator in candidate:
             candidate = candidate.split(separator, 1)[1].strip()
-        elif "\\n\\n" in candidate:
+        elif "\n\n" in candidate:
             candidate = candidate.split("\\n\\n", 1)[1].strip()
     try:
         info = json.loads(candidate)
