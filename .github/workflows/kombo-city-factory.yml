@@ -87,7 +87,7 @@ jobs:
           python kombo-city-factory/publish_youtube.py
 
       - name: Commit generated video and used-idea ledger
-        if: success()
+        if: always() && steps.build.outcome == 'success'
         run: |
           cd ..
           git config user.name "github-actions[bot]"
