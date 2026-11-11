@@ -111,6 +111,8 @@ jobs:
         working-directory: .
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YOUTUBE_EXPECTED_HANDLE: RowatAlwaqe
           VIDEO_PATH: ${{ steps.build.outputs.video || steps.latest.outputs.video }}
           METADATA_PATH: ${{ steps.build.outputs.metadata || steps.latest.outputs.metadata }}
