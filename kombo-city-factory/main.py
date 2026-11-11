@@ -267,7 +267,7 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
     subtitle_path = captions.as_posix().replace(":", r"\:")
     font_dir = "/usr/share/fonts/truetype"
     vf_sub = (f"subtitles='{subtitle_path}':fontsdir='{font_dir}':"
-              "force_style='FontName=Noto Sans Arabic,FontSize=19,Bold=1,"
+              "force_style='FontName=DejaVu Sans,FontSize=19,Bold=1,"
               "PrimaryColour=&H0000D7FF,OutlineColour=&H00101010,BorderStyle=1,"
               "Outline=3,Shadow=1,Alignment=2,MarginV=230'")
     music = ROOT / "assets" / "music.mp3"
