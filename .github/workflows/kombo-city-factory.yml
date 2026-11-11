@@ -10,7 +10,7 @@ on:
         options:
           - generate_and_publish
           - publish_latest
-        default: generate_and_publish
+        default: publish_latest
   schedule:
     # Cairo is UTC+2 in winter and UTC+3 in summer.
     # Run at both candidate UTC hours; Python proceeds only at 08:00 Africa/Cairo.
@@ -92,7 +92,7 @@ jobs:
           from pathlib import Path
           import os
           out = Path("kombo-city-factory/output")
-          candidates = sorted(out.glob("*.mp4"), key=lambda p: p.stat().st_mtime, reverse=True)
+          candidates = sorted(out.glob("*.mp4"), key=lambda p: p.name, reverse=True)
           for video in candidates:
               meta = video.with_suffix(".json")
               receipt = video.with_suffix(".youtube.json")
@@ -100,7 +100,7 @@ jobs:
                   with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
                       f.write(f"video={video.as_posix()}\n")
                       f.write(f"metadata={meta.as_posix()}\n")
-                  print(f"Selected saved video: {video}")
+                  print(f"Selected saved video (newest filename timestamp, no YouTube receipt): {video}")
                   break
           else:
               raise SystemExit("No unpublished saved MP4 with matching metadata was found.")
@@ -131,6 +131,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "No generated output to commit."
           else
-            git commit -m "chore(kombo): generate daily educational short"
-            git push
+            git commit -m "chore(kombo): save generated video and publishing receipt"
+            # Rebase onto the latest main before pushing. Never force-push.
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
