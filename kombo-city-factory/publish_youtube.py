@@ -26,7 +26,10 @@ def main() -> int:
         raise RuntimeError("Generated MP4 or metadata JSON is missing.")
 
     token_info = json.loads(token_raw)
-    scopes = ["https://www.googleapis.com/auth/youtube.upload"]
+    scopes = [
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/youtube.readonly",
+    ]
     creds = Credentials.from_authorized_user_info(token_info, scopes=scopes)
     if creds.expired and creds.refresh_token:
         creds.refresh(Request())
