@@ -1,0 +1,73 @@
+name: Kombo City Factory (Fish Audio voice)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5,6 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tare-bot-kombo-city
+  cancel-in-progress: false
+
+jobs:
+  build-one-short:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: kombo-city-factory/requirements.txt
+      - name: Install FFmpeg and Arabic fonts
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-noto-core fonts-noto-extra fonts-noto-ui-core fonts-noto-ui-extra
+          fc-cache -f
+      - name: Install Python dependencies
+        run: python -m pip install --upgrade pip && pip install -r kombo-city-factory/requirements.txt
+      - name: Validate Python syntax
+        run: python -m py_compile kombo-city-factory/main.py
+      - name: Generate one short with the cloned Fish voice
+        id: build
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+        run: |
+          test -n "$GEMINI_API_KEY" || { echo "::error::Missing GEMINI_API_KEY"; exit 1; }
+          test -n "$FISH_API_KEY" || { echo "::error::Missing FISH_API_KEY"; exit 1; }
+          test -n "$FISH_VOICE_ID" || { echo "::error::Missing FISH_VOICE_ID"; exit 1; }
+          cd kombo-city-factory
+          python main.py --one ${{ github.event_name == 'schedule' && '--scheduled-guard' || '' }}
+      - name: Upload video artifact
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: tare-bot-kombo-city-${{ github.run_number }}
+          path: |
+            kombo-city-factory/output/*.mp4
+            kombo-city-factory/output/*.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Commit video and used-idea ledger
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add kombo-city-factory/used.txt kombo-city-factory/output/
+          if git diff --cached --quiet; then
+            echo "No generated output to commit."
+          else
+            git commit -m "chore(kombo): generate educational short with cloned voice"
+            git pull --rebase --autostash origin main
+            git push
+          fi
