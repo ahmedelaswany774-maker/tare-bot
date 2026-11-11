@@ -48,16 +48,12 @@ jobs:
           test -n "$FISH_VOICE_ID" || { echo "::error::Missing FISH_VOICE_ID"; exit 1; }
           cd kombo-city-factory
           python main.py --one ${{ github.event_name == 'schedule' && '--scheduled-guard' || '' }}
-      - name: Upload video artifact
+      - name: Verify generated video exists
         if: success()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: tare-bot-kombo-city-${{ github.run_number }}
-          path: |
-            kombo-city-factory/output/*.mp4
-            kombo-city-factory/output/*.json
-          if-no-files-found: error
-          retention-days: 7
+        run: |
+          test -n "$(find kombo-city-factory/output -maxdepth 1 -type f -name '*.mp4' -print -quit)" || { echo "::error::No MP4 was generated"; exit 1; }
+          ls -lh kombo-city-factory/output/
+
       - name: Commit video and used-idea ledger
         if: success()
         run: |
