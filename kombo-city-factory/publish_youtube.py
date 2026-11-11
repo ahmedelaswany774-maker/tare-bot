@@ -14,12 +14,22 @@ from googleapiclient.http import MediaFileUpload
 
 
 def load_token_info(raw: str) -> dict:
+    # Accept either the JSON body copied from OAuth Playground or its complete
+    # HTTP response (status line + headers + JSON body). Never log token content.
+    candidate = raw.strip()
+    if candidate.startswith("HTTP/"):
+        separator = "\\r\\n\\r\\n"
+        if separator in candidate:
+            candidate = candidate.split(separator, 1)[1].strip()
+        elif "\\n\\n" in candidate:
+            candidate = candidate.split("\\n\\n", 1)[1].strip()
     try:
-        info = json.loads(raw)
+        info = json.loads(candidate)
     except json.JSONDecodeError as exc:
         raise RuntimeError(
-            "YT_TOKEN_JSON must contain one raw JSON object only (no HTTP status line, "
-            "no surrounding text, and no Markdown code fences)."
+            "YT_TOKEN_JSON is not valid OAuth JSON. In OAuth Playground Step 2, copy the "
+            "complete JSON response body (including its opening { and closing }), not only "
+            "the access token. Do not include Markdown fences or explanatory text."
         ) from exc
     if not isinstance(info, dict):
         raise RuntimeError("YT_TOKEN_JSON must be a JSON object.")
