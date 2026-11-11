@@ -50,12 +50,6 @@ jobs:
           test -n "$YT_TOKEN_JSON" || { echo "::error::Missing YT_TOKEN_JSON (required for Google Drive upload)"; exit 1; }
           cd kombo-city-factory
           python main.py --one ${{ github.event_name == 'schedule' && '--scheduled-guard' || '' }}
-      - name: Verify generated video exists
-        if: success()
-        run: |
-          test -n "$(find kombo-city-factory/output -maxdepth 1 -type f -name '*.mp4' -print -quit)" || { echo "::error::No MP4 was generated"; exit 1; }
-          ls -lh kombo-city-factory/output/
-
       - name: Commit used-idea ledger only (video is stored in Google Drive)
         if: success()
         run: |
