@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build-one-short:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -27,11 +27,32 @@ jobs:
           python-version: "3.11"
           cache: pip
           cache-dependency-path: kombo-city-factory/requirements.txt
-      - name: Install FFmpeg and Arabic fonts
+      - name: Ensure FFmpeg and Arabic fonts
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg fonts-noto-core fonts-noto-extra fonts-noto-ui-core fonts-noto-ui-extra
+          set -e
+          install_packages() {
+            for attempt in 1 2 3; do
+              if sudo apt-get update && sudo apt-get install -y "$@"; then
+                return 0
+              fi
+              echo "Package mirror/DNS attempt $attempt failed; retrying..."
+              sleep $((attempt * 10))
+            done
+            return 1
+          }
+
+          if ! command -v ffmpeg >/dev/null 2>&1 || ! command -v ffprobe >/dev/null 2>&1; then
+            install_packages ffmpeg
+          fi
+
+          if ! fc-list 2>/dev/null | grep -qi "Noto Sans Arabic"; then
+            install_packages fonts-noto-core fonts-noto-extra fonts-noto-ui-core fonts-noto-ui-extra
+          fi
+
           fc-cache -f
+          command -v ffmpeg
+          command -v ffprobe
+          fc-match "Noto Sans Arabic"
       - name: Install Python dependencies
         run: python -m pip install --upgrade pip && pip install -r kombo-city-factory/requirements.txt
       - name: Validate Python syntax
