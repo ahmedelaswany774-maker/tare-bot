@@ -73,17 +73,6 @@ jobs:
           test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
           python main.py --one ${{ github.event_name == 'schedule' && '--scheduled-guard' || '' }}
 
-      - name: Upload video artifact
-        if: success()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
-        with:
-          name: kombo-city-video-${{ github.run_number }}
-          path: |
-            ${{ steps.build.outputs.video }}
-            ${{ steps.build.outputs.metadata }}
-          if-no-files-found: error
-          retention-days: 7
-
       - name: Commit generated video and used-idea ledger
         if: success()
         run: |
