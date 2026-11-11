@@ -308,6 +308,73 @@ def mark_used(idea_id: str) -> None:
             f.write(idea_id + "\n")
 
 
+
+def upload_to_google_drive(video_path: Path, metadata_path: Path) -> dict:
+    """Upload validated output using the existing Google OAuth token; never make files public."""
+    raw = os.getenv("YT_TOKEN_JSON", "").strip()
+    if not raw:
+        raise RuntimeError("YT_TOKEN_JSON غير موجود؛ لا يمكن رفع الفيديو إلى Google Drive.")
+    try:
+        token_info = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError("قيمة YT_TOKEN_JSON ليست JSON صالحًا.") from exc
+
+    from google.oauth2.credentials import Credentials
+    from google.auth.transport.requests import Request
+    from googleapiclient.discovery import build
+    from googleapiclient.http import MediaFileUpload
+    from googleapiclient.errors import HttpError
+
+    try:
+        credentials = Credentials.from_authorized_user_info(token_info)
+        if credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+        if not credentials.valid:
+            raise RuntimeError("توكن Google الحالي غير صالح أو لا يحتوي refresh token.")
+        drive = build("drive", "v3", credentials=credentials, cache_discovery=False)
+
+        folder_name = "Kombo City Factory"
+        escaped_name = folder_name.replace("'", "\\'")
+        found = drive.files().list(
+            q=f"name='{escaped_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false",
+            spaces="drive", pageSize=10, fields="files(id,name)",
+            supportsAllDrives=True, includeItemsFromAllDrives=True,
+        ).execute().get("files", [])
+        if found:
+            folder_id = found[0]["id"]
+        else:
+            folder = drive.files().create(
+                body={"name": folder_name, "mimeType": "application/vnd.google-apps.folder"},
+                fields="id", supportsAllDrives=True,
+            ).execute()
+            folder_id = folder["id"]
+
+        uploaded = {}
+        for path, mime in ((video_path, "video/mp4"), (metadata_path, "application/json")):
+            media = MediaFileUpload(str(path), mimetype=mime, resumable=True, chunksize=8 * 1024 * 1024)
+            result = drive.files().create(
+                body={"name": path.name, "parents": [folder_id]},
+                media_body=media, fields="id,name,webViewLink", supportsAllDrives=True,
+            ).execute()
+            uploaded[path.suffix] = {
+                "id": result["id"],
+                "name": result.get("name", path.name),
+                "url": result.get("webViewLink", f"https://drive.google.com/file/d/{result['id']}/view"),
+            }
+            print(f"Google Drive upload verified: {result.get('name', path.name)} [{result['id']}]")
+        return {"folder_id": folder_id, "files": uploaded}
+    except HttpError as exc:
+        details = getattr(exc, "content", b"")
+        if isinstance(details, bytes):
+            details = details.decode("utf-8", "replace")
+        if getattr(exc, "resp", None) is not None and exc.resp.status in (401, 403):
+            raise RuntimeError(
+                "Google رفض صلاحية Drive للتوكن الموجود في YT_TOKEN_JSON (HTTP "
+                f"{exc.resp.status}). لا يوجد Drive scope مؤكد في التفويض الحالي؛ "
+                "لم يتم حذف الفيديو ولم يتم تسجيل الفكرة كمستخدمة. تفاصيل: {str(details)[:500]}"
+            ) from exc
+        raise RuntimeError(f"فشل رفع Google Drive: {str(details)[:700]}") from exc
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--one", action="store_true", help="Generate one unused idea.")
@@ -339,20 +406,30 @@ def main() -> int:
     stamp = datetime.now(ZoneInfo("Africa/Cairo")).strftime("%Y%m%d_%H%M%S")
     output = OUTPUT_DIR / f"video_{int(idea['id']):02d}_{safe_slug(data['title'])}_{stamp}.mp4"
     build_video(images, audio, data["script"], captions, output)
-    # A successful validated render is the only point at which the idea is consumed.
-    mark_used(idea["id"])
-    (OUTPUT_DIR / (output.stem + ".json")).write_text(json.dumps({
+    metadata_path = OUTPUT_DIR / (output.stem + ".json")
+    metadata_path.write_text(json.dumps({
         "idea_id": idea["id"], "idea": idea["idea"], "title": data["title"],
         "caption": data["caption"], "script": data["script"], "duration_seconds": TARGET_SECONDS,
         "voice": "Fish Audio cloned voice from Tare Bot", "image_provider": "Pollinations with local fallback"
     }, ensure_ascii=False, indent=2), encoding="utf-8")
+    # Upload both deliverables first. A failed Drive upload must not consume the idea.
+    drive_result = upload_to_google_drive(output, metadata_path)
+    mark_used(idea["id"])
+    print("تم التحقق من رفع الفيديو والبيانات إلى Google Drive.")
+    print("Drive folder:", drive_result["folder_id"])
+    for item in drive_result["files"].values():
+        print("Drive file:", item["name"], item["url"])
     gh_output = os.getenv("GITHUB_OUTPUT")
     if gh_output:
-        meta_path = OUTPUT_DIR / (output.stem + ".json")
         with open(gh_output, "a", encoding="utf-8") as gh:
-            gh.write(f"video=kombo-city-factory/output/{output.name}\n")
-            gh.write(f"metadata=kombo-city-factory/output/{meta_path.name}\n")
-    print(f"نجاح: {output} ({output.stat().st_size} bytes)")
+            gh.write(f"drive_folder_id={drive_result['folder_id']}\\n")
+            for suffix, item in drive_result["files"].items():
+                key = "video" if suffix == ".mp4" else "metadata"
+                gh.write(f"{key}_drive_url={item['url']}\\n")
+    # Delete local deliverables only after both Drive uploads have succeeded.
+    output.unlink(missing_ok=True)
+    metadata_path.unlink(missing_ok=True)
+    print(f"نجاح: تم رفع مخرجات الفكرة #{idea['id']} وحذف النسخ المحلية.")
     print("العنوان:", data["title"])
     return 0
 
