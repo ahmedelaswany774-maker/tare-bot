@@ -422,10 +422,10 @@ def main() -> int:
     gh_output = os.getenv("GITHUB_OUTPUT")
     if gh_output:
         with open(gh_output, "a", encoding="utf-8") as gh:
-            gh.write(f"drive_folder_id={drive_result['folder_id']}\\n")
+            gh.write(f"drive_folder_id={drive_result['folder_id']}\n")
             for suffix, item in drive_result["files"].items():
                 key = "video" if suffix == ".mp4" else "metadata"
-                gh.write(f"{key}_drive_url={item['url']}\\n")
+                gh.write(f"{key}_drive_url={item['url']}\n")
     # Delete local deliverables only after both Drive uploads have succeeded.
     output.unlink(missing_ok=True)
     metadata_path.unlink(missing_ok=True)
