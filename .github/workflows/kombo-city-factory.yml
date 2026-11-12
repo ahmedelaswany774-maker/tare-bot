@@ -77,10 +77,12 @@ jobs:
           GEMINI_MODEL: gemini-2.5-flash
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
         run: |
           test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets."; exit 1; }
           test -n "$FISH_API_KEY" || { echo "::error::Add FISH_API_KEY in Actions secrets."; exit 1; }
           test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
+          test -n "$POLLINATIONS_API_KEY" || { echo "::error::Add POLLINATIONS_API_KEY in Actions secrets. Pollinations image generation now requires an authenticated key with available balance."; exit 1; }
           python main.py --one ${{ github.event_name == 'schedule' && '--scheduled-guard' || '' }}
 
       - name: Select latest saved video for publishing
