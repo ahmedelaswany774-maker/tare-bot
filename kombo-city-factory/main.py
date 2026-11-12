@@ -223,10 +223,10 @@ def media_duration(path: Path) -> float:
 
 def split_script(script: str, parts: list[str]) -> list[str]:
     cleaned = [re.sub(r"\s+", " ", str(p)).strip() for p in parts]
-    if len(cleaned) == 4 and all(cleaned):
+    if len(cleaned) == 6 and all(cleaned):
         return cleaned
     words = script.split()
-    return [" ".join(words[round(i*len(words)/4):round((i+1)*len(words)/4)]) for i in range(4)]
+    return [" ".join(words[round(i*len(words)/6):round((i+1)*len(words)/6)]) for i in range(6)]
 
 
 def srt_time(seconds: float) -> str:
