@@ -141,10 +141,19 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
             destination.write_bytes(response.content)
             with Image.open(destination) as image_file:
                 image_file.verify()
+            # The current image endpoint may ignore requested dimensions and return 580x1015.
+            # Accept a valid portrait master, then upscale once with a high-quality resampler.
             with Image.open(destination) as image_file:
-                if image_file.width < 768 or image_file.height < 1300:
-                    raise ValueError(f"Image resolution too low: {image_file.width}x{image_file.height}")
-            print(f"Scene {scene}: accepted high-resolution generated frame.")
+                image_file = image_file.convert("RGB")
+                if image_file.width < 512 or image_file.height < 900:
+                    raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
+                ratio = image_file.width / image_file.height
+                if not 0.52 <= ratio <= 0.62:
+                    raise ValueError(f"Image is not portrait 9:16: {image_file.width}x{image_file.height}")
+                image_file = image_file.resize((1080, 1920), Image.Resampling.LANCZOS)
+                image_file = image_file.filter(ImageFilter.UnsharpMask(radius=1.4, percent=115, threshold=3))
+                image_file.save(destination, format="JPEG", quality=94, optimize=True)
+            print(f"Scene {scene}: accepted portrait frame and normalized to 1080x1920.")
             return
         except Exception as exc:
             last_error = exc
