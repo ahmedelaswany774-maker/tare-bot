@@ -32,7 +32,8 @@ FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "").strip()
 FISH_TTS_URL = "https://api.fish.audio/v1/tts"
 FISH_MODEL = "s2.1-pro-free"
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
-IMAGE_BASE = "https://image.pollinations.ai/prompt/"
+IMAGE_BASE = "https://gen.pollinations.ai/image/"
+POLLINATIONS_API_KEY = os.getenv("POLLINATIONS_API_KEY", "").strip()
 SESSION = requests.Session()
 SESSION.headers.update({"User-Agent": "kombo-city-factory/1.0"})
 
@@ -130,11 +131,26 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
         " Avoid flat vector art, simple geometric icons, childish clipart, crude drawings, generic robot mascots, "
         "flat lighting, plastic low-detail faces, duplicated limbs, distorted hands, illegible text."
     )
-    url = IMAGE_BASE + quote(full_prompt, safe="") + "?width=1024&height=1792&nologo=true"
+    if not POLLINATIONS_API_KEY:
+        raise RuntimeError(
+            "POLLINATIONS_API_KEY غير مضبوط في GitHub Actions Secrets. "
+            "مزود الصور الحالي يتطلب مفتاحًا سريًا ورصيدًا متاحًا؛ لم نعد نستخدم الرابط القديم."
+        )
+    url = IMAGE_BASE + quote(full_prompt, safe="") + "?model=zimage&width=1024&height=1792"
+    headers = {"Authorization": f"Bearer {POLLINATIONS_API_KEY}"}
     last_error = None
     for attempt in range(3):
         try:
-            response = SESSION.get(url, timeout=150)
+            response = SESSION.get(url, headers=headers, timeout=150)
+            if response.status_code == 402:
+                raise RuntimeError(
+                    "Pollinations HTTP 402: رصيد الحساب أو ميزانية المفتاح غير كافية. "
+                    "تحقق من الرصيد وحدود المفتاح لدى المزود؛ لن يعالج تكرار المحاولة هذه المشكلة."
+                )
+            if response.status_code in (401, 403):
+                raise RuntimeError(
+                    f"Pollinations HTTP {response.status_code}: مفتاح API غير صالح أو لا يملك صلاحية توليد الصور."
+                )
             response.raise_for_status()
             if not response.headers.get("content-type", "").startswith("image/") or len(response.content) < 25_000:
                 raise ValueError("Image provider returned a low-quality or invalid image payload.")
@@ -157,8 +173,10 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
             return
         except Exception as exc:
             last_error = exc
-            if attempt < 2:
+            if attempt < 2 and not (isinstance(exc, RuntimeError) and ("HTTP 402" in str(exc) or "HTTP 401" in str(exc) or "HTTP 403" in str(exc))):
                 time.sleep(4 * (attempt + 1))
+            elif isinstance(exc, RuntimeError) and ("HTTP 402" in str(exc) or "HTTP 401" in str(exc) or "HTTP 403" in str(exc)):
+                break
     raise RuntimeError(
         f"تعذر إنتاج مشهد سينمائي صالح رقم {scene}: {last_error}. "
         "أوقفنا الإنتاج بدل استخدام رسمة احتياطية بدائية أو نشر فيديو ضعيف."
