@@ -86,8 +86,8 @@ def gemini_json(idea: str) -> dict:
             text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
             text = re.sub(r"^\s*```(?:json)?|\s*```\s*$", "", text, flags=re.I)
             result = json.loads(text)
-            required = ("script", "image1", "image2", "image3", "image4", "title", "caption", "srt_parts")
-            if any(not result.get(k) for k in required) or len(result["srt_parts"]) != 4:
+            required = ("script", "image1", "image2", "image3", "image4", "image5", "image6", "title", "caption", "srt_parts")
+            if any(not result.get(k) for k in required) or len(result["srt_parts"]) != 6:
                 raise ValueError("Gemini returned incomplete JSON fields.")
             words = result["script"].split()
             if not 65 <= len(words) <= 115:
@@ -100,80 +100,60 @@ def gemini_json(idea: str) -> dict:
     raise RuntimeError(f"تعذر توليد السيناريو بعد المحاولات: {last_error}")
 
 
-def fallback_image(path: Path, scene: int) -> None:
-    """Create a clean original illustrated city frame if image service is unavailable."""
-    img = Image.new("RGB", (WIDTH, HEIGHT), (20 + scene * 4, 36, 76))
-    d = ImageDraw.Draw(img)
-    # Soft sky and simple city skyline
-    for y in range(0, HEIGHT, 8):
-        t = y / HEIGHT
-        color = (int(18 + 25*t), int(35 + 35*t), int(75 + 45*t))
-        d.rectangle((0, y, WIDTH, y+8), fill=color)
-    for i, x in enumerate(range(-40, WIDTH, 180)):
-        h = 360 + ((i * 137 + scene * 71) % 520)
-        d.rounded_rectangle((x, HEIGHT-650-h, x+135, HEIGHT-500), radius=22, fill=(38, 76, 120), outline=(85, 160, 210), width=5)
-        for wy in range(HEIGHT-620-h+35, HEIGHT-530, 85):
-            d.rectangle((x+30, wy, x+52, wy+32), fill=(255, 213, 112))
-            d.rectangle((x+82, wy, x+104, wy+32), fill=(115, 210, 245))
-    if scene in (1, 3):
-        # Presenter fallback only on host scenes; cutaways stay clean and topic-focused.
-        cx, cy = WIDTH//2, HEIGHT//2 + 150
-        d.rounded_rectangle((cx-245, cy+70, cx+245, cy+650), radius=115, fill=(18, 48, 105), outline=(95, 190, 255), width=12)
-        d.ellipse((cx-190, cy-360, cx+190, cy+80), fill=(230, 166, 119), outline=(255, 220, 190), width=10)
-        d.pieslice((cx-205, cy-405, cx+205, cy-35), 180, 360, fill=(45, 30, 27))
-        d.ellipse((cx-115, cy-190, cx-55, cy-115), fill=(255,255,255))
-        d.ellipse((cx+55, cy-190, cx+115, cy-115), fill=(255,255,255))
-        d.ellipse((cx-92, cy-170, cx-65, cy-130), fill=(35, 55, 75))
-        d.ellipse((cx+78, cy-170, cx+105, cy-130), fill=(35, 55, 75))
-        d.arc((cx-75, cy-100, cx+75, cy+5), 10, 170, fill=(115, 35, 45), width=12)
-        d.line((cx+180, cy+210, cx+350, cy+20), fill=(230, 166, 119), width=48)
-        d.ellipse((cx+315, cy-35, cx+390, cy+45), fill=(230, 166, 119))
-    else:
-        # Simple cyan/gold technical illustration for cutaway fallback scenes.
-        cx, cy = WIDTH//2, HEIGHT//2
-        d.ellipse((cx-270, cy-270, cx+270, cy+270), outline=(65, 205, 245), width=18)
-        d.ellipse((cx-205, cy-205, cx+205, cy+205), outline=(245, 190, 85), width=8)
-        for angle in range(0, 360, 45):
-            import math
-            rad = angle * 3.14159265 / 180
-            x1, y1 = cx + int(210 * __import__("math").cos(rad)), cy + int(210 * __import__("math").sin(rad))
-            x2, y2 = cx + int(390 * __import__("math").cos(rad)), cy + int(390 * __import__("math").sin(rad))
-            d.line((x1, y1, x2, y2), fill=(80, 180, 225), width=10)
-    img.save(path, quality=92)
-
-
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
-    """Generate alternating host/cutaway images with a stable Kombo character bible."""
-    palette = ("deep navy and electric cyan with restrained warm-gold accents, "
-               "premium family-friendly 3D animated feature-film quality, polished materials, "
-               "cinematic volumetric lighting, depth of field, vertical 9:16 composition, "
-               "clean composition, no text, no letters, no logos, no watermark. ")
-    host_identity = ("same original young male presenter named Kombo: warm friendly face, large expressive "
-                     "brown eyes, thick dark wavy hair, subtle thin round glasses, navy-blue hoodie with "
-                     "a small simple cyan geometric emblem; preserve identical face shape, hair, glasses, "
-                     "outfit, proportions and age in every appearance. ")
-    if scene in (1, 3):
-        fixed = palette + host_identity + "Presenter clearly visible, medium shot, expressive explaining gesture. "
+    """Generate premium cinematic 3D frames; fail closed instead of publishing primitive placeholders."""
+    palette = (
+        "high-end cinematic 3D animated feature film still, art-directed professional studio quality, "
+        "physically based rendering, detailed realistic materials, sophisticated global illumination, "
+        "volumetric key light and rim light, atmospheric depth, cinematic color grading, "
+        "deep midnight navy, electric cyan and restrained warm gold palette, vertical 9:16, "
+        "visually rich but uncluttered composition, no text, no letters, no typography, no logos, no watermark. "
+    )
+    host_identity = (
+        "THE SAME ORIGINAL CHARACTER DESIGN in every host frame: young adult male cartoon presenter, "
+        "warm approachable face, expressive brown eyes, thick dark wavy hair with a defined silhouette, "
+        "thin round glasses, navy tailored hoodie with one small cyan geometric chest mark, "
+        "consistent facial proportions, hairstyle, glasses and exact outfit; premium feature-animation character sculpt, "
+        "detailed skin shading, expressive pose and hands. "
+    )
+    if scene in (1, 3, 5):
+        fixed = palette + host_identity + (
+            "Presenter-led shot, intentional cinematic composition, three-quarter medium shot, "
+            "clear readable silhouette, expressive hand gesture, studio environment with practical lighting. "
+        )
     else:
-        fixed = (palette + "Explanatory cinematic cutaway only: show the real object, mechanism or concept "
-                 "as a detailed 3D visualization; absolutely no presenter, no people, no mascot. ")
-    full_prompt = fixed + prompt
-    url = IMAGE_BASE + quote(full_prompt, safe="") + "?width=768&height=1365&nologo=true"
+        fixed = palette + (
+            "CINEMATIC EXPLANATORY CUTAWAY, no presenter and no people. Show the actual subject or mechanism "
+            "as a hero object with physically plausible detail, layered depth, dramatic macro or wide lens composition. "
+        )
+    full_prompt = fixed + prompt + (
+        " Avoid flat vector art, simple geometric icons, childish clipart, crude drawings, generic robot mascots, "
+        "flat lighting, plastic low-detail faces, duplicated limbs, distorted hands, illegible text."
+    )
+    url = IMAGE_BASE + quote(full_prompt, safe="") + "?width=1024&height=1792&nologo=true"
+    last_error = None
     for attempt in range(3):
         try:
-            r = SESSION.get(url, timeout=100)
-            r.raise_for_status()
-            if not r.headers.get("content-type", "").startswith("image/") or len(r.content) < 10_000:
-                raise ValueError("Image provider returned invalid or tiny data.")
-            destination.write_bytes(r.content)
-            with Image.open(destination) as im:
-                im.verify()
+            response = SESSION.get(url, timeout=150)
+            response.raise_for_status()
+            if not response.headers.get("content-type", "").startswith("image/") or len(response.content) < 25_000:
+                raise ValueError("Image provider returned a low-quality or invalid image payload.")
+            destination.write_bytes(response.content)
+            with Image.open(destination) as image_file:
+                image_file.verify()
+            with Image.open(destination) as image_file:
+                if image_file.width < 768 or image_file.height < 1300:
+                    raise ValueError(f"Image resolution too low: {image_file.width}x{image_file.height}")
+            print(f"Scene {scene}: accepted high-resolution generated frame.")
             return
-        except Exception:
+        except Exception as exc:
+            last_error = exc
             if attempt < 2:
-                time.sleep(3 * (attempt + 1))
-    print(f"تحذير: تعذر تنزيل صورة المشهد {scene}؛ سيتم إنشاء بديل محلي.")
-    fallback_image(destination, scene)
+                time.sleep(4 * (attempt + 1))
+    raise RuntimeError(
+        f"تعذر إنتاج مشهد سينمائي صالح رقم {scene}: {last_error}. "
+        "أوقفنا الإنتاج بدل استخدام رسمة احتياطية بدائية أو نشر فيديو ضعيف."
+    )
 
 
 def make_tts(text: str, output: Path) -> None:
@@ -260,8 +240,9 @@ def srt_time(seconds: float) -> str:
 def create_captions(script: str, parts: list[str], duration: float, output: Path) -> None:
     chunks = split_script(script, parts)
     lines = []
+    count = len(chunks)
     for i, caption in enumerate(chunks):
-        start, end = i * duration / 4, (i + 1) * duration / 4
+        start, end = i * duration / count, (i + 1) * duration / count
         lines.extend([str(i + 1), f"{srt_time(start)} --> {srt_time(end)}", caption, ""])
     output.write_text("\n".join(lines), encoding="utf-8-sig")
 
@@ -277,13 +258,18 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
     WORK_DIR.mkdir(parents=True, exist_ok=True)
     scene_files = []
     fade = 0.35
-    scene_duration = (TARGET_SECONDS + 3 * fade) / 4
+    scene_count = len(images)
+    if scene_count < 6:
+        raise RuntimeError("المطلوب 6 مشاهد سينمائية على الأقل.")
+    scene_duration = (TARGET_SECONDS + (scene_count - 1) * fade) / scene_count
     frames = int(scene_duration * FPS)
     moves = [
         ("min(zoom+0.00070,1.18)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
         ("min(zoom+0.00048,1.12)", "iw/2-(iw/zoom/2)+18*sin(on/18)", "ih/2-(ih/zoom/2)"),
         ("min(zoom+0.00062,1.16)", "iw/2-(iw/zoom/2)-22*sin(on/22)", "ih/2-(ih/zoom/2)+12*sin(on/25)"),
         ("if(lte(zoom,1.10),1.10,max(1.0,zoom-0.00042))", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
+        ("min(zoom+0.00055,1.15)", "iw/2-(iw/zoom/2)+12*sin(on/20)", "ih/2-(ih/zoom/2)-10*sin(on/24)"),
+        ("min(zoom+0.00075,1.18)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
     ]
     for i, image_path in enumerate(images):
         scene = WORK_DIR / f"scene_{i+1}.mp4"
@@ -373,7 +359,7 @@ def main() -> int:
     (WORK_DIR / "script.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     (WORK_DIR / "script.txt").write_text(data["script"], encoding="utf-8")
     images = []
-    for i in range(1, 5):
+    for i in range(1, 7):
         image_path = WORK_DIR / f"image_{i}.jpg"
         generate_image(data[f"image{i}"], image_path, i)
         images.append(image_path)
@@ -390,8 +376,8 @@ def main() -> int:
         "idea_id": idea["id"], "idea": idea["idea"], "title": data["title"],
         "caption": data["caption"], "script": data["script"], "duration_seconds": TARGET_SECONDS,
         "voice": "Fish Audio configured voice", "presenter": "Kombo - consistent young male 3D cartoon host",
-        "visual_style": "3D cinematic; alternating presenter and explanatory cutaway scenes",
-        "image_provider": "Pollinations with local fallback"
+        "visual_style": "6-shot cinematic 3D sequence; presenter/cutaway alternation; high-resolution fail-closed image quality gate",
+        "image_provider": "Pollinations high-resolution; fail-closed quality gate"
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     gh_output = os.getenv("GITHUB_OUTPUT")
     if gh_output:
