@@ -10,7 +10,7 @@ on:
         options:
           - generate_and_publish
           - publish_latest
-        default: publish_latest
+        default: generate_and_publish
   schedule:
     # Cairo is UTC+2 in winter and UTC+3 in summer.
     # Run at both candidate UTC hours; Python proceeds only at 08:00 Africa/Cairo.
