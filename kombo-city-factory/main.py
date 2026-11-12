@@ -18,7 +18,7 @@ from urllib.parse import quote
 from zoneinfo import ZoneInfo
 
 import requests
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 ROOT = Path(__file__).resolve().parent
 IDEAS_FILE = ROOT / "ideas.csv"
