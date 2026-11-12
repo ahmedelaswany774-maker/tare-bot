@@ -115,28 +115,48 @@ def fallback_image(path: Path, scene: int) -> None:
         for wy in range(HEIGHT-620-h+35, HEIGHT-530, 85):
             d.rectangle((x+30, wy, x+52, wy+32), fill=(255, 213, 112))
             d.rectangle((x+82, wy, x+104, wy+32), fill=(115, 210, 245))
-    # Consistent fallback mascot: young male presenter in a navy hoodie (not a robot).
-    cx, cy = WIDTH//2, HEIGHT//2 + 150
-    d.rounded_rectangle((cx-245, cy+70, cx+245, cy+650), radius=115, fill=(18, 48, 105), outline=(95, 190, 255), width=12)
-    d.ellipse((cx-190, cy-360, cx+190, cy+80), fill=(230, 166, 119), outline=(255, 220, 190), width=10)
-    d.pieslice((cx-205, cy-405, cx+205, cy-35), 180, 360, fill=(45, 30, 27))
-    d.ellipse((cx-115, cy-190, cx-55, cy-115), fill=(255,255,255))
-    d.ellipse((cx+55, cy-190, cx+115, cy-115), fill=(255,255,255))
-    d.ellipse((cx-92, cy-170, cx-65, cy-130), fill=(35, 55, 75))
-    d.ellipse((cx+78, cy-170, cx+105, cy-130), fill=(35, 55, 75))
-    d.arc((cx-75, cy-100, cx+75, cy+5), 10, 170, fill=(115, 35, 45), width=12)
-    d.line((cx+180, cy+210, cx+350, cy+20), fill=(230, 166, 119), width=48)
-    d.ellipse((cx+315, cy-35, cx+390, cy+45), fill=(230, 166, 119))
+    if scene in (1, 3):
+        # Presenter fallback only on host scenes; cutaways stay clean and topic-focused.
+        cx, cy = WIDTH//2, HEIGHT//2 + 150
+        d.rounded_rectangle((cx-245, cy+70, cx+245, cy+650), radius=115, fill=(18, 48, 105), outline=(95, 190, 255), width=12)
+        d.ellipse((cx-190, cy-360, cx+190, cy+80), fill=(230, 166, 119), outline=(255, 220, 190), width=10)
+        d.pieslice((cx-205, cy-405, cx+205, cy-35), 180, 360, fill=(45, 30, 27))
+        d.ellipse((cx-115, cy-190, cx-55, cy-115), fill=(255,255,255))
+        d.ellipse((cx+55, cy-190, cx+115, cy-115), fill=(255,255,255))
+        d.ellipse((cx-92, cy-170, cx-65, cy-130), fill=(35, 55, 75))
+        d.ellipse((cx+78, cy-170, cx+105, cy-130), fill=(35, 55, 75))
+        d.arc((cx-75, cy-100, cx+75, cy+5), 10, 170, fill=(115, 35, 45), width=12)
+        d.line((cx+180, cy+210, cx+350, cy+20), fill=(230, 166, 119), width=48)
+        d.ellipse((cx+315, cy-35, cx+390, cy+45), fill=(230, 166, 119))
+    else:
+        # Simple cyan/gold technical illustration for cutaway fallback scenes.
+        cx, cy = WIDTH//2, HEIGHT//2
+        d.ellipse((cx-270, cy-270, cx+270, cy+270), outline=(65, 205, 245), width=18)
+        d.ellipse((cx-205, cy-205, cx+205, cy+205), outline=(245, 190, 85), width=8)
+        for angle in range(0, 360, 45):
+            import math
+            rad = angle * 3.14159265 / 180
+            x1, y1 = cx + int(210 * __import__("math").cos(rad)), cy + int(210 * __import__("math").sin(rad))
+            x2, y2 = cx + int(390 * __import__("math").cos(rad)), cy + int(390 * __import__("math").sin(rad))
+            d.line((x1, y1, x2, y2), fill=(80, 180, 225), width=10)
     img.save(path, quality=92)
 
 
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
-    fixed = ("same original young male 3D cartoon presenter in every presenter shot: warm friendly face, "
-             "large expressive brown eyes, thick dark wavy hair, subtle round glasses, navy-blue hoodie "
-             "with a small simple cyan geometric emblem, consistent facial proportions and outfit; "
-             "premium family-friendly 3D animated feature-film quality, polished materials, cinematic "
-             "lighting, rich navy and cyan visual identity, miniature futuristic city when relevant, "
-             "vertical 9:16 composition, no text, no letters, no logos, no watermark. ")
+    """Generate alternating host/cutaway images with a stable Kombo character bible."""
+    palette = ("deep navy and electric cyan with restrained warm-gold accents, "
+               "premium family-friendly 3D animated feature-film quality, polished materials, "
+               "cinematic volumetric lighting, depth of field, vertical 9:16 composition, "
+               "clean composition, no text, no letters, no logos, no watermark. ")
+    host_identity = ("same original young male presenter named Kombo: warm friendly face, large expressive "
+                     "brown eyes, thick dark wavy hair, subtle thin round glasses, navy-blue hoodie with "
+                     "a small simple cyan geometric emblem; preserve identical face shape, hair, glasses, "
+                     "outfit, proportions and age in every appearance. ")
+    if scene in (1, 3):
+        fixed = palette + host_identity + "Presenter clearly visible, medium shot, expressive explaining gesture. "
+    else:
+        fixed = (palette + "Explanatory cinematic cutaway only: show the real object, mechanism or concept "
+                 "as a detailed 3D visualization; absolutely no presenter, no people, no mascot. ")
     full_prompt = fixed + prompt
     url = IMAGE_BASE + quote(full_prompt, safe="") + "?width=768&height=1365&nologo=true"
     for attempt in range(3):
@@ -247,54 +267,70 @@ def create_captions(script: str, parts: list[str], duration: float, output: Path
 
 
 def build_video(images: list[Path], audio: Path, script: str, captions: Path, output: Path) -> None:
-    """Render exactly 45 seconds, 1080x1920, 30fps, four Ken Burns scenes."""
+    """Render a polished 45-second vertical short with alternating cinematic camera moves."""
     audio_len = media_duration(audio)
     if audio_len < 20:
         raise RuntimeError(f"الصوت أقصر من المتوقع: {audio_len:.1f} ثانية.")
-    # Fit narration to 45s within a conservative tempo range; reject extreme mismatches.
     tempo = audio_len / TARGET_SECONDS
     if not 0.72 <= tempo <= 1.35:
         raise RuntimeError(f"مدة التعليق {audio_len:.1f}s بعيدة عن 45s؛ عدّل طول النص بدل قص الكلام.")
     WORK_DIR.mkdir(parents=True, exist_ok=True)
     scene_files = []
+    scene_duration = TARGET_SECONDS / 4
+    frames = int(scene_duration * FPS)
+    moves = [
+        ("min(zoom+0.00070,1.18)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
+        ("min(zoom+0.00048,1.12)", "iw/2-(iw/zoom/2)+18*sin(on/18)", "ih/2-(ih/zoom/2)"),
+        ("min(zoom+0.00062,1.16)", "iw/2-(iw/zoom/2)-22*sin(on/22)", "ih/2-(ih/zoom/2)+12*sin(on/25)"),
+        ("if(lte(zoom,1.10),1.10,max(1.0,zoom-0.00042))", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
+    ]
     for i, image_path in enumerate(images):
         scene = WORK_DIR / f"scene_{i+1}.mp4"
-        frames = int(TARGET_SECONDS / 4 * FPS)
-        vf = (f"scale=1200:2134:force_original_aspect_ratio=increase,"
-              f"crop=1200:2134,zoompan=z='min(zoom+0.00055,1.15)':"
-              f"x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d={frames}:s=1080x1920:fps={FPS},"
-              f"setsar=1,format=yuv420p")
-        run(["ffmpeg", "-y", "-loop", "1", "-i", str(image_path), "-t", str(TARGET_SECONDS/4),
-             "-vf", vf, "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
+        zoom, xpos, ypos = moves[i]
+        vf = (f"scale=1200:2134:force_original_aspect_ratio=increase,crop=1200:2134,"
+              f"zoompan=z='{zoom}':x='{xpos}':y='{ypos}':d={frames}:s=1080x1920:fps={FPS},"
+              "eq=saturation=1.12:contrast=1.04:brightness=0.01,"
+              "vignette=PI/5,setsar=1,format=yuv420p")
+        run(["ffmpeg", "-y", "-loop", "1", "-i", str(image_path), "-t", str(scene_duration),
+             "-vf", vf, "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
              "-r", str(FPS), str(scene)])
         scene_files.append(scene)
-    concat_file = WORK_DIR / "concat.txt"
-    concat_file.write_text("".join(f"file '{p.as_posix()}'\n" for p in scene_files), encoding="utf-8")
+    # Soft crossfades between scenes instead of hard cuts.
     joined = WORK_DIR / "joined.mp4"
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_file), "-c", "copy", str(joined)])
+    fade = 0.35
+    filter_parts = []
+    previous = "[0:v]"
+    offset = scene_duration - fade
+    for idx in range(1, len(scene_files)):
+        out_label = f"[xf{idx}]"
+        filter_parts.append(f"{previous}[{idx}:v]xfade=transition=fade:duration={fade}:offset={offset:.3f}{out_label}")
+        previous = out_label
+        offset += scene_duration - fade
+    run(["ffmpeg", "-y", *sum(([ "-i", str(p)] for p in scene_files), []),
+         "-filter_complex", ";".join(filter_parts), "-map", previous,
+         "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
+         "-pix_fmt", "yuv420p", str(joined)])
 
-    # Burn readable Arabic captions using the system Noto Naskh/Cairo-compatible font.
-    subtitle_path = captions.as_posix().replace(":", r"\:")
+    subtitle_path = captions.as_posix().replace(":", r"\\:")
     font_dir = "/usr/share/fonts/truetype"
     vf_sub = (f"subtitles='{subtitle_path}':fontsdir='{font_dir}':"
-              "force_style='FontName=DejaVu Sans,FontSize=19,Bold=1,"
+              "force_style='FontName=DejaVu Sans,FontSize=20,Bold=1,"
               "PrimaryColour=&H0000D7FF,OutlineColour=&H00101010,BorderStyle=1,"
-              "Outline=3,Shadow=1,Alignment=2,MarginV=230'")
+              "Outline=3,Shadow=1,Alignment=2,MarginV=235'")
     music = ROOT / "assets" / "music.mp3"
     cmd = ["ffmpeg", "-y", "-i", str(joined), "-i", str(audio)]
     if music.exists():
         cmd += ["-stream_loop", "-1", "-i", str(music)]
         filter_complex = (f"[1:a]atempo={tempo:.5f},apad,atrim=0:{TARGET_SECONDS},volume=1.0[voice];"
-                          f"[2:a]volume=0.10,afade=t=in:st=0:d=2,afade=t=out:st=40:d=5[music];"
+                          f"[2:a]volume=0.085,afade=t=in:st=0:d=2,afade=t=out:st=40:d=5[music];"
                           "[voice][music]amix=inputs=2:duration=first:dropout_transition=2[aout]")
     else:
         filter_complex = (f"[1:a]atempo={tempo:.5f},apad,atrim=0:{TARGET_SECONDS},volume=1.0[aout]")
     cmd += ["-filter_complex", filter_complex, "-vf", vf_sub, "-map", "0:v:0", "-map", "[aout]",
-            "-t", str(TARGET_SECONDS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
+            "-t", str(TARGET_SECONDS), "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
             "-c:a", "aac", "-b:a", "192k", "-pix_fmt", "yuv420p", "-r", str(FPS),
             "-movflags", "+faststart", str(output)]
     run(cmd)
-    # Hard validation: duration, streams, dimensions, and non-trivial size.
     probe = json.loads(run(["ffprobe", "-v", "error", "-show_streams", "-show_format",
                             "-of", "json", str(output)]).stdout)
     video = next((s for s in probe["streams"] if s["codec_type"] == "video"), None)
@@ -302,7 +338,7 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
     duration = float(probe["format"]["duration"])
     if not video or not audio_stream or int(video["width"]) != WIDTH or int(video["height"]) != HEIGHT:
         raise RuntimeError("فشل فحص مسارات الفيديو أو أبعاد 1080x1920.")
-    if abs(duration - TARGET_SECONDS) > 0.6 or output.stat().st_size < 100_000:
+    if abs(duration - TARGET_SECONDS) > 1.0 or output.stat().st_size < 100_000:
         raise RuntimeError(f"فشل فحص الفيديو النهائي: duration={duration:.2f}s, size={output.stat().st_size}.")
 
 
