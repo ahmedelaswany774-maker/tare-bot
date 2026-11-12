@@ -276,7 +276,8 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
         raise RuntimeError(f"مدة التعليق {audio_len:.1f}s بعيدة عن 45s؛ عدّل طول النص بدل قص الكلام.")
     WORK_DIR.mkdir(parents=True, exist_ok=True)
     scene_files = []
-    scene_duration = TARGET_SECONDS / 4
+    fade = 0.35
+    scene_duration = (TARGET_SECONDS + 3 * fade) / 4
     frames = int(scene_duration * FPS)
     moves = [
         ("min(zoom+0.00070,1.18)", "iw/2-(iw/zoom/2)", "ih/2-(ih/zoom/2)"),
@@ -297,7 +298,6 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
         scene_files.append(scene)
     # Soft crossfades between scenes instead of hard cuts.
     joined = WORK_DIR / "joined.mp4"
-    fade = 0.35
     filter_parts = []
     previous = "[0:v]"
     offset = scene_duration - fade
@@ -311,7 +311,7 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
          "-an", "-c:v", "libx264", "-preset", "veryfast", "-crf", "22",
          "-pix_fmt", "yuv420p", str(joined)])
 
-    subtitle_path = captions.as_posix().replace(":", r"\\:")
+    subtitle_path = captions.as_posix().replace(":", r"\:")
     font_dir = "/usr/share/fonts/truetype"
     vf_sub = (f"subtitles='{subtitle_path}':fontsdir='{font_dir}':"
               "force_style='FontName=DejaVu Sans,FontSize=20,Bold=1,"
