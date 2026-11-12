@@ -115,20 +115,28 @@ def fallback_image(path: Path, scene: int) -> None:
         for wy in range(HEIGHT-620-h+35, HEIGHT-530, 85):
             d.rectangle((x+30, wy, x+52, wy+32), fill=(255, 213, 112))
             d.rectangle((x+82, wy, x+104, wy+32), fill=(115, 210, 245))
-    # Same blue robot silhouette in all fallback scenes
-    cx, cy = WIDTH//2, HEIGHT//2 + 120
-    d.ellipse((cx-145, cy-190, cx+145, cy+100), fill=(42, 165, 230), outline=(185, 238, 255), width=12)
-    d.rounded_rectangle((cx-185, cy+30, cx+185, cy+350), radius=90, fill=(25, 126, 198), outline=(185, 238, 255), width=12)
-    d.ellipse((cx-85, cy-90, cx-25, cy-20), fill=(245, 255, 255))
-    d.ellipse((cx+25, cy-90, cx+85, cy-20), fill=(245, 255, 255))
-    d.arc((cx-65, cy-5, cx+65, cy+65), 10, 170, fill=(255,255,255), width=9)
+    # Consistent fallback mascot: young male presenter in a navy hoodie (not a robot).
+    cx, cy = WIDTH//2, HEIGHT//2 + 150
+    d.rounded_rectangle((cx-245, cy+70, cx+245, cy+650), radius=115, fill=(18, 48, 105), outline=(95, 190, 255), width=12)
+    d.ellipse((cx-190, cy-360, cx+190, cy+80), fill=(230, 166, 119), outline=(255, 220, 190), width=10)
+    d.pieslice((cx-205, cy-405, cx+205, cy-35), 180, 360, fill=(45, 30, 27))
+    d.ellipse((cx-115, cy-190, cx-55, cy-115), fill=(255,255,255))
+    d.ellipse((cx+55, cy-190, cx+115, cy-115), fill=(255,255,255))
+    d.ellipse((cx-92, cy-170, cx-65, cy-130), fill=(35, 55, 75))
+    d.ellipse((cx+78, cy-170, cx+105, cy-130), fill=(35, 55, 75))
+    d.arc((cx-75, cy-100, cx+75, cy+5), 10, 170, fill=(115, 35, 45), width=12)
+    d.line((cx+180, cy+210, cx+350, cy+20), fill=(230, 166, 119), width=48)
+    d.ellipse((cx+315, cy-35, cx+390, cy+45), fill=(230, 166, 119))
     img.save(path, quality=92)
 
 
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
-    fixed = ("original cute small blue helper robot with round glowing eyes, identical character design, "
-             "miniature futuristic city, polished family-friendly 3D animated film look, vibrant colors, "
-             "cinematic soft lighting, vertical 9:16 composition, no text, no letters, no logo. ")
+    fixed = ("same original young male 3D cartoon presenter in every presenter shot: warm friendly face, "
+             "large expressive brown eyes, thick dark wavy hair, subtle round glasses, navy-blue hoodie "
+             "with a small simple cyan geometric emblem, consistent facial proportions and outfit; "
+             "premium family-friendly 3D animated feature-film quality, polished materials, cinematic "
+             "lighting, rich navy and cyan visual identity, miniature futuristic city when relevant, "
+             "vertical 9:16 composition, no text, no letters, no logos, no watermark. ")
     full_prompt = fixed + prompt
     url = IMAGE_BASE + quote(full_prompt, safe="") + "?width=768&height=1365&nologo=true"
     for attempt in range(3):
@@ -345,7 +353,9 @@ def main() -> int:
     (OUTPUT_DIR / (output.stem + ".json")).write_text(json.dumps({
         "idea_id": idea["id"], "idea": idea["idea"], "title": data["title"],
         "caption": data["caption"], "script": data["script"], "duration_seconds": TARGET_SECONDS,
-        "voice": "Fish Audio cloned voice", "image_provider": "Pollinations with local fallback"
+        "voice": "Fish Audio configured voice", "presenter": "Kombo - consistent young male 3D cartoon host",
+        "visual_style": "3D cinematic; alternating presenter and explanatory cutaway scenes",
+        "image_provider": "Pollinations with local fallback"
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     gh_output = os.getenv("GITHUB_OUTPUT")
     if gh_output:
