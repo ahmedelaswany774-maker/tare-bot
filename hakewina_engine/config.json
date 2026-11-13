@@ -1,0 +1,26 @@
+{
+  "channel_name": "حكاوينا | قصص واقعية",
+  "language": "ar",
+  "audience": {
+    "age_range": "18-35"
+  },
+  "editorial_policy": {
+    "fictional_stories_allowed": false,
+    "minimum_independent_sources": 2,
+    "label_inspired_stories": true,
+    "never_invent_quotes_or_private_thoughts": true
+  },
+  "voice": {
+    "preferred_provider": "fish_audio"
+  },
+  "long_form": {
+    "target_minutes": 30,
+    "script_target_words": 3200
+  },
+  "shorts": {
+    "max_seconds": 60
+  },
+  "publishing": {
+    "automatic_public_upload_enabled": false
+  }
+}
