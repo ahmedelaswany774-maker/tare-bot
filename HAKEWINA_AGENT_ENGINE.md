@@ -18,4 +18,4 @@ Additive scaffold for حكاوينا | قصص واقعية. Existing rendering, 
 - Public upload remains disabled until an end-to-end dry run succeeds.
 
 ## First milestone
-Create a SQLite story registry, reject duplicate story fingerprints, and track idea → research → verified → script → packaging → shorts → production → published.
+Create a SQLite story registry, reject duplicate exact story titles, and track idea → research → verified → script → packaging → shorts → production → published.
