@@ -1067,6 +1067,11 @@
           "title": "حنان حسين.. من محو الأمية إلى باحثة دكتوراه",
           "publisher": "الوطن",
           "url": "https://www.elwatannews.com/news/details/5949982"
+        },
+        {
+          "title": "جامعة بني سويف: الباحثة حنان مرسي من محو الأمية إلى الدكتوراه",
+          "publisher": "جامعة بني سويف",
+          "url": "https://www.bsu.edu.eg/NewsDetails_New.aspx?NID=153393&cat_id=1&lang=ar"
         }
       ],
       "published": false,
@@ -1079,7 +1084,14 @@
       ],
       "script_path": "content/drafts/verified_real/episode-43.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 2436
+      "draft_word_count": 2436,
+      "editorial_approved": false,
+      "editorial_review_status": "pending_revision_and_human_review",
+      "editorial_review_notes": [
+        "المصدر الجامعي الرسمي يدعم انتقال حنان حسين مرسي من محو الأمية إلى مرحلة الدكتوراه في التاريخ.",
+        "يجب تعديل الافتتاحية: المادة المنشورة كانت عن ظهورها في برنامج عصر الشباب على قناة إكسترا نيوز، لا برنامجًا على شاشة التلفزيون المصري كما ورد في المسودة.",
+        "توجد مقاطع تخمينية ومشاهد متخيلة وتفاصيل اجتماعية عامة غير منسوبة لمصدر؛ يجب حذفها أو تمييزها بوضوح قبل اعتماد النص."
+      ]
     },
     {
       "episode_id": "social-44-story-44",
