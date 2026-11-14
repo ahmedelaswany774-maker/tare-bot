@@ -66,7 +66,7 @@ jobs:
           STORY_TARGET_WORDS: '3200'
           MIN_SCRIPT_WORDS: '2400'
           MAX_CONTINUATIONS: '4'
-          MAX_API_RETRIES: '8'
+          MAX_API_RETRIES: '4'
         run: python scripts/draft_weekly_episodes.py
       - name: Save Gemini checkpoints and manifest to the repository
         if: always() && steps.gemini_draft.outcome != 'skipped'
