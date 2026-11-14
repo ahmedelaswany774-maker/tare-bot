@@ -67,6 +67,8 @@ jobs:
               if ep.get('published') or ep.get('disabled') or ep.get('upload_status') in ('uploading', 'uploaded'):
                   continue
               reasons = []
+              if ep.get('editorial_approved') is not True:
+                  reasons.append('pending_editorial_approval')
               if ep.get('content_type', data.get('content_type')) != 'verified_real_story':
                   reasons.append('not_verified_real_story')
               sources = [s for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')]
@@ -144,7 +146,6 @@ jobs:
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '0'
-          ALLOW_UNREVIEWED_PUBLISH: 'true'
         run: python story_youtube_uploader.py
       - name: Persist episode history to prevent repeats
         if: success()
