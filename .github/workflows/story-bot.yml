@@ -108,6 +108,26 @@ jobs:
         if: steps.preflight.outputs.ready != 'true'
         run: |
           echo "::notice::No episode meets the production gate (verified facts, at least two source publishers, and a complete 2400+ word script). Rendering and publishing are skipped."
+      - name: Validate YouTube OAuth credentials before expensive production
+        if: steps.preflight.outputs.ready == 'true'
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          raw = os.environ.get("YT_TOKEN_JSON", "").strip()
+          if not raw:
+              sys.exit("YT_TOKEN_JSON is empty. Stop before video rendering.")
+          try:
+              data = json.loads(raw)
+          except Exception as exc:
+              sys.exit(f"YT_TOKEN_JSON is not valid JSON: {exc}")
+          required = ("client_id", "client_secret", "refresh_token", "token_uri")
+          missing = [key for key in required if not data.get(key)]
+          if missing:
+              sys.exit("YT_TOKEN_JSON is incomplete; missing: " + ", ".join(missing) + ". Stop before video rendering.")
+          print("YouTube OAuth JSON structure is valid. No credentials were printed.")
+          PY
       - name: Verify or install FFmpeg
         if: steps.preflight.outputs.ready == 'true'
         shell: bash
