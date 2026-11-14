@@ -60,11 +60,7 @@ def load_episode():
             and item.get("editorial_approved") is True
             and item.get("upload_status") not in ("uploading", "uploaded")
             and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
-            and len(item.get("sources", [])) >= 2
-            and len({source.get("publisher", "").strip().lower() for source in item.get("sources", [])}) >= 2
             and bool(item.get("verified_facts"))
-            and all(source.get("title") and source.get("publisher") and source.get("url", "").startswith("https://")
-                    for source in item.get("sources", []))
         ]
     if EPISODE_SELECTOR == "next":
         episode = next((item for item in eligible), None)
