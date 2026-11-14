@@ -132,7 +132,7 @@ def main():
                 print(f"Generating episode {number}: {episode['title']}", flush=True)
                 text = call_gemini(build_prompt(episode))
                 count = save_checkpoint(episode, path, text)
-                MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+                MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 print(f"Initial checkpoint saved for episode {number}: {count} words", flush=True)
 
             for attempt in range(1, int(os.getenv("MAX_CONTINUATIONS", "4")) + 1):
@@ -142,25 +142,25 @@ def main():
                 continuation_prompt = (
                     f"استكمل النص التالي فقط دون تكرار أو إعادة المقدمة. المطلوب الوصول إلى {TARGET_WORDS} كلمة إجمالًا. "
                     f"لا تختلق وقائع أو حوارًا أو مشاهد أو أشخاصًا أو أرقامًا. إذا انتهت الوقائع المنشورة، أضف تحليلًا "
-                    f"اجتماعيًا عامًا واضحًا أنه تعليق، ومرتبطًا مباشرة بموضوع الحلقة. عنوان الحلقة: {episode['title']}\\n"
-                    f"النص الحالي:\\n{text[-6000:]}"
+                    f"اجتماعيًا عامًا واضحًا أنه تعليق، ومرتبطًا مباشرة بموضوع الحلقة. عنوان الحلقة: {episode['title']}\n"
+                    f"النص الحالي:\n{text[-6000:]}"
                 )
                 addition = call_gemini(continuation_prompt)
                 if not addition:
                     break
-                text = text.rstrip() + "\\n\\n" + addition.strip()
+                text = text.rstrip() + "\n\n" + addition.strip()
                 count = save_checkpoint(episode, path, text)
-                MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+                MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 print(f"Checkpoint saved for episode {number}: {count} words", flush=True)
         except RuntimeError as exc:
             count = save_checkpoint(episode, path, text)
             episode["draft_status"] = "deferred_gemini_error_pending_continuation"
-            MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             print(f"Episode {number} deferred after {MAX_API_RETRIES} Gemini attempts; checkpoint preserved ({count} words): {exc}", flush=True)
             continue
 
         count = save_checkpoint(episode, path, text)
-        MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"Saved {path} ({count} words); {episode['draft_status']}", flush=True)
         time.sleep(5)
         print(f"Single completed-episode run: processed episode {number}; remaining episodes will be handled by later scheduled runs.", flush=True)
