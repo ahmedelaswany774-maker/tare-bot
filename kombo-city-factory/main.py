@@ -370,13 +370,7 @@ def mark_used(idea_id: str) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--one", action="store_true", help="Generate one unused idea.")
-    parser.add_argument("--scheduled-guard", action="store_true", help="Run only at 08:00 Cairo time.")
     args = parser.parse_args()
-    if args.scheduled_guard:
-        now = datetime.now(ZoneInfo("Africa/Cairo"))
-        if now.hour != 8:
-            print(f"تخطي التشغيل: الوقت في القاهرة الآن {now:%H:%M} وليس 08:00.")
-            return 0
     require_tools()
     OUTPUT_DIR.mkdir(exist_ok=True)
     WORK_DIR.mkdir(exist_ok=True)

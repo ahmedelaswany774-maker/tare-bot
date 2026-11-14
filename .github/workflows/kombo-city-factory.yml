@@ -12,9 +12,8 @@ on:
           - publish_latest
         default: generate_and_publish
   schedule:
-    # Cairo is UTC+2 in winter and UTC+3 in summer.
-    # Run at both candidate UTC hours; Python proceeds only at 08:00 Africa/Cairo.
-    - cron: "0 5,6 * * *"
+    # Four independent production slots per day; no exact-clock guard.
+    - cron: "0 6,10,14,18 * * *"
 
 permissions:
   contents: write
@@ -67,7 +66,7 @@ jobs:
         run: python -m pip install --upgrade pip && pip install -r requirements.txt
 
       - name: Validate Python syntax
-        run: python -m py_compile main.py
+        run: python -m py_compile main.py publish_youtube.py
 
       - name: Generate and validate one video
         id: build
@@ -83,7 +82,7 @@ jobs:
           test -n "$FISH_API_KEY" || { echo "::error::Add FISH_API_KEY in Actions secrets."; exit 1; }
           test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
           test -n "$POLLINATIONS_API_KEY" || { echo "::error::Add POLLINATIONS_API_KEY in Actions secrets. Pollinations image generation now requires an authenticated key with available balance."; exit 1; }
-          python main.py --one ${{ github.event_name == 'schedule' && '--scheduled-guard' || '' }}
+          python main.py --one
 
       - name: Select latest saved video for publishing
         id: latest
