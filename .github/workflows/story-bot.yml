@@ -159,23 +159,6 @@ jobs:
             git pull --rebase --autostash origin main
             git push
           fi
-      - name: Save generated and published artifacts
-        if: ${{ always() }}
-        continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: social-story-output-${{ github.run_id }}
-          path: |
-            story.mp4
-            story.mp3
-            story_metadata.json
-            upload_state.json
-          if-no-files-found: ignore
-          retention-days: 7
-
-# Manual production trigger requested by the channel owner.
-
-# [produce-episode] owner requested episode 40 production
       - name: Notify owner through a deduplicated GitHub issue
         if: failure()
         env:
