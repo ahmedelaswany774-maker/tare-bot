@@ -67,6 +67,12 @@ def main() -> int:
         raise RuntimeError("YT_TOKEN_JSON is missing from GitHub Actions repository secrets.")
     if not video_path.is_file() or not metadata_path.is_file():
         raise RuntimeError("Generated MP4 or metadata JSON is missing.")
+    receipt_path = video_path.with_suffix(".youtube.json")
+    if receipt_path.exists():
+        raise RuntimeError(
+            f"Duplicate-upload protection: a YouTube receipt already exists for {video_path.name}; "
+            "this file will not be uploaded again."
+        )
 
     token_info = load_token_info(token_raw)
     scopes = [
@@ -133,9 +139,29 @@ def main() -> int:
         "channel_title": channel_title,
         "channel_handle": custom_url,
         "privacy_status": "public",
+        "verification": "pending",
         "title": title,
     }
-    receipt_path = video_path.with_suffix(".youtube.json")
+    # Save immediately so a verification failure cannot cause a duplicate upload.
+    receipt_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+    verification = youtube.videos().list(part="snippet,status", id=video_id).execute()
+    items = verification.get("items", [])
+    if not items:
+        raise RuntimeError(
+            f"Upload returned video ID {video_id}, but YouTube did not return it during verification. "
+            "Receipt saved; automatic retry is blocked to prevent a duplicate."
+        )
+    uploaded = items[0]
+    uploaded_channel = uploaded.get("snippet", {}).get("channelId")
+    uploaded_privacy = uploaded.get("status", {}).get("privacyStatus")
+    if uploaded_channel != channel.get("id") or uploaded_privacy != "public":
+        raise RuntimeError(
+            f"Upload verification mismatch: channel_matches={uploaded_channel == channel.get('id')}, "
+            f"privacy={uploaded_privacy}. Receipt saved; manual inspection is required."
+        )
+    result["verification"] = "confirmed_public_on_expected_channel"
+    from datetime import datetime, timezone
+    result["verified_at"] = datetime.now(timezone.utc).isoformat()
     receipt_path.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print("YOUTUBE_PUBLISHED=" + json.dumps(result, ensure_ascii=False))
     return 0
