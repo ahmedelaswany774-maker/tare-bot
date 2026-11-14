@@ -36,6 +36,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: story-bot-draft-builder
@@ -174,3 +175,18 @@ jobs:
 # Manual production trigger requested by the channel owner.
 
 # [produce-episode] owner requested episode 40 production
+      - name: Notify owner through a deduplicated GitHub issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          title="[Factory Alert] Story Bot production failure"
+          existing="$(gh issue list --state open --search "in:title [Factory Alert] Story Bot production failure" --json number --jq '.[0].number // empty')"
+          body="The automated production workflow failed.\\n\\nRun: ${RUN_URL}\\n\\nThis issue is updated instead of creating a new alert for every retry."
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
