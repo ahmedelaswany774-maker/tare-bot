@@ -942,8 +942,8 @@
         "أفادت صحيفة أهل مصر في 2026 أن آمال حصلت على الماجستير عام 2023."
       ],
       "script_path": "content/drafts/verified_real/episode-40.md",
-      "draft_status": "updated_pending_final_editorial_approval",
-      "draft_word_count": 3164,
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 3053,
       "source_review_note": "تم تحديث السيناريو ومقارنة التسلسل الزمني مع تقارير اليوم السابع والقاهرة 24 وسكاي نيوز عربية. لا تُستخدم مشاهد تمثيلية على أنها أرشيف حقيقي؛ راجع تواريخ الشهادات قبل النشر.",
       "upload_status": "published",
       "upload_started_at": "2026-11-07T15:51:19+00:00",
@@ -1160,7 +1160,10 @@
         "توفي زوج مريم وترك ثلاثة أبناء.",
         "عملت في الحياكة 17 عامًا.",
         "تخرج اثنان في الهندسة والتربية النوعية والثالثة تدرس الحاسبات.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-45.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 3619
     },
     {
       "episode_id": "social-46-story-46",
@@ -1193,7 +1196,10 @@
         "توفي زوج أميمة في حادث أثناء عودته من العمل.",
         "تولت تربية ثلاثة أبناء على مدى نحو 26 عامًا.",
         "حصل الأبناء على تعليم جامعي.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-46.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4723
     },
     {
       "episode_id": "social-47-story-47",
@@ -1226,7 +1232,10 @@
         "ترملت خضرة وتركت لها ثلاثة أبناء.",
         "حصلت على شهادة محو أمية لتتابع تعليمهم.",
         "رعت أحفادها بعد وفاة ابنتها.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-47.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4258
     },
     {
       "episode_id": "social-48-story-48",
@@ -1259,7 +1268,10 @@
         "كانت فوزية موسى المعروفة بأم ليلى أرملة وبائعة خضار.",
         "رعت بنات ابنتها المتوفاة.",
         "ذكر التقرير أنها ربت طفلين صغيرين.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-48.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4043
     },
     {
       "episode_id": "social-49-story-49",
@@ -1291,7 +1303,10 @@
       "verified_facts": [
         "عملت سعاد في مجالات متعددة بعد وفاة زوجها.",
         "تضمن التقرير بداياتها في الميكروباصات والورش ثم إدارة مشروعات.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-49.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4656
     },
     {
       "episode_id": "social-50-story-50",
@@ -1323,7 +1338,10 @@
       "verified_facts": [
         "عملت نجلاء في شوي السمك بمدينة المنصورة بعد طلاقها.",
         "اعتمدت على عملها لتوفير حياة أفضل لأبنائها.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-50.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 2464
     },
     {
       "episode_id": "social-51-story-51",
@@ -1356,7 +1374,10 @@
         "توفي زوج روجينا في حادث وترك ثلاث بنات.",
         "كان معاشه محدودًا.",
         "نقلت البنات من مدرسة خاصة إلى حكومية.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-51.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 2462
     },
     {
       "episode_id": "social-52-story-52",
@@ -1389,7 +1410,10 @@
         "ذكر التقرير أن زوج عرب ترك الأسرة وسافر ثم طلقها دون نفقات.",
         "عملت معلمة.",
         "تخرج الأبناء في الصيدلة والطب.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-52.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4070
     },
     {
       "episode_id": "social-53-story-53",
@@ -1422,7 +1446,10 @@
         "توفي زوج مرثا عام 1999 وترك طفلين.",
         "عملت في مشغل ملابس ومزرعة دواجن.",
         "حصل الابن والابنة على مؤهلات جامعية.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-53.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4166
     },
     {
       "episode_id": "social-54-story-54",
@@ -1455,7 +1482,10 @@
         "تزوجت فرح رجلًا لديه أربعة أبناء فقدوا والدتهم.",
         "واصلت رعايتهم وتعليمهم.",
         "ذكر التقرير وجود حفيد طبيب وآخر مهندس.."
-      ]
+      ],
+      "script_path": "content/drafts/verified_real/episode-54.md",
+      "draft_status": "written_pending_editorial_and_source_review",
+      "draft_word_count": 4001
     },
     {
       "episode_id": "social-55-story-55",
