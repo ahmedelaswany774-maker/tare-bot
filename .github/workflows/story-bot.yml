@@ -135,12 +135,12 @@ jobs:
               for number, reasons in blocked:
                   summary.write(f'- Episode {number}: {", ".join(reasons)}\n')
           PY
-      - name: Stop with explicit reason when no verified episode is ready
+      - name: Skip video production when no approved episode is ready
         if: steps.preflight.outputs.ready != 'true'
         run: |
-          echo "::error::No eligible verified-real-story episode. Review the Story preflight summary for exact blockers. No video was rendered or uploaded."
-          exit 1
+          echo "::notice::No approved episode is ready. Draft checkpoints were saved successfully; video rendering and YouTube publishing are safely skipped until editorial approval."
       - name: Verify or install FFmpeg
+        if: steps.preflight.outputs.ready == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -155,7 +155,8 @@ jobs:
           command -v ffprobe
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
-      - name: Install dependencies
+      - name: Install production dependencies
+        if: steps.preflight.outputs.ready == 'true'
         run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk pillow arabic-reshaper python-bidi
       - name: Build episode and publish automatically
         if: steps.preflight.outputs.ready == 'true'
