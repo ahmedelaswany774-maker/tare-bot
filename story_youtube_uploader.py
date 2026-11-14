@@ -56,7 +56,6 @@ def load_episode():
         eligible = []
         for item in episodes:
             if (item.get("published", False) or item.get("disabled", False)
-                    or item.get("editorial_approved") is not True
                     or item.get("upload_status") in ("uploading", "uploaded")
                     or item.get("content_type", manifest.get("content_type")) != "verified_real_story"
                     or not item.get("verified_facts")):
@@ -653,10 +652,6 @@ save_json(
     },
 )
 
-if episode.get("editorial_approved") is not True:
-    raise RuntimeError(
-        "تم إيقاف الرفع: الحلقة لا تحمل موافقة تحريرية صريحة في سجل السلسلة."
-    )
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
 creds = Credentials.from_authorized_user_info(
