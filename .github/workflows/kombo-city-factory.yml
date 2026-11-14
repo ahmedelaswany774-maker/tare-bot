@@ -147,7 +147,7 @@ jobs:
           set -euo pipefail
           title="[Factory Alert] Kombo City Factory failure"
           existing="$(gh issue list --state open --search "in:title [Factory Alert] Kombo City Factory failure" --json number --jq '.[0].number // empty')"
-          body="$(printf 'The automated production workflow failed.\\n\\nRun: %s\\n\\nThis issue is updated instead of creating a new alert for every retry.' "$RUN_URL")"
+          body="$(printf 'The automated production workflow failed.\n\nRun: %s\n\nThis issue is updated instead of creating a new alert for every retry.' "$RUN_URL")"
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$body"
           else
