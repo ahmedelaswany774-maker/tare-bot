@@ -112,6 +112,8 @@ jobs:
         if: steps.preflight.outputs.ready == 'true'
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
         run: |
           python - <<'PY'
           import json, os, sys
@@ -122,11 +124,17 @@ jobs:
               data = json.loads(raw)
           except Exception as exc:
               sys.exit(f"YT_TOKEN_JSON is not valid JSON: {exc}")
-          required = ("client_id", "client_secret", "refresh_token", "token_uri")
-          missing = [key for key in required if not data.get(key)]
+          if not isinstance(data, dict):
+              sys.exit("YT_TOKEN_JSON must be a JSON object.")
+          if not data.get("token") and data.get("access_token"):
+              data["token"] = data["access_token"]
+          data.setdefault("client_id", os.environ.get("YT_CLIENT_ID", "").strip())
+          data.setdefault("client_secret", os.environ.get("YT_CLIENT_SECRET", "").strip())
+          data.setdefault("token_uri", "https://oauth2.googleapis.com/token")
+          missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not data.get(key)]
           if missing:
-              sys.exit("YT_TOKEN_JSON is incomplete; missing: " + ", ".join(missing) + ". Stop before video rendering.")
-          print("YouTube OAuth JSON structure is valid. No credentials were printed.")
+              sys.exit("YouTube OAuth data incomplete: " + ", ".join(missing) + ". Stop before video rendering.")
+          print("YouTube OAuth data validated using the same secret format as Kombo. No credentials were printed.")
           PY
       - name: Verify or install FFmpeg
         if: steps.preflight.outputs.ready == 'true'
@@ -155,6 +163,8 @@ jobs:
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           STORY_TARGET_WORDS: '3800'
           HISTORY_PATH: content/published_stories.json
           SERIES_MANIFEST_PATH: content/series/real_stories.json
