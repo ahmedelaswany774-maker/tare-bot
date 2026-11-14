@@ -53,15 +53,30 @@ def load_episode():
             and Path(item.get("script_path", "")).is_file()
         ]
     else:
-        eligible = [
-            item for item in episodes
-            if not item.get("published", False)
-            and not item.get("disabled", False)
-            and item.get("editorial_approved") is True
-            and item.get("upload_status") not in ("uploading", "uploaded")
-            and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
-            and bool(item.get("verified_facts"))
-        ]
+        eligible = []
+        for item in episodes:
+            if (item.get("published", False) or item.get("disabled", False)
+                    or item.get("editorial_approved") is not True
+                    or item.get("upload_status") in ("uploading", "uploaded")
+                    or item.get("content_type", manifest.get("content_type")) != "verified_real_story"
+                    or not item.get("verified_facts")):
+                continue
+            publishers = {
+                source.get("publisher", "").strip().lower()
+                for source in item.get("sources", [])
+                if source.get("title") and source.get("publisher")
+                and source.get("url", "").startswith("https://")
+            }
+            script_path = item.get("script_path", "")
+            if len(publishers) < 2 or not script_path or not Path(script_path).is_file():
+                continue
+            raw = Path(script_path).read_text(encoding="utf-8")
+            if "# النص الكامل" not in raw or "# ملاحظات المونتاج" not in raw:
+                continue
+            body = raw.split("# النص الكامل", 1)[1].split("# ملاحظات المونتاج", 1)[0]
+            if len(body.split()) < 2400:
+                continue
+            eligible.append(item)
     if EPISODE_SELECTOR == "next":
         episode = next((item for item in eligible), None)
         if episode is None:
