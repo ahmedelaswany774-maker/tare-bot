@@ -108,33 +108,65 @@ jobs:
         if: steps.preflight.outputs.ready != 'true'
         run: |
           echo "::notice::No episode meets the production gate (verified facts, at least two source publishers, and a complete 2400+ word script). Rendering and publishing are skipped."
-      - name: Validate YouTube OAuth credentials before expensive production
+      - name: Live YouTube OAuth smoke test (before rendering)
         if: steps.preflight.outputs.ready == 'true'
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YOUTUBE_EXPECTED_HANDLE: RowatAlwaqe
         run: |
+          set -euo pipefail
+          pip install google-api-python-client google-auth-oauthlib
           python - <<'PY'
-          import json, os, sys
+          import json, os, re, sys
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+
           raw = os.environ.get("YT_TOKEN_JSON", "").strip()
           if not raw:
-              sys.exit("YT_TOKEN_JSON is empty. Stop before video rendering.")
+              raise SystemExit("YT_TOKEN_JSON is empty; stopping before video rendering.")
+          # Accept either the raw OAuth Playground JSON body or its HTTP response.
+          candidate = re.split(r"\\r?\\n\\r?\\n", raw, maxsplit=1)[-1].strip() if raw.startswith("HTTP/") else raw
           try:
-              data = json.loads(raw)
-          except Exception as exc:
-              sys.exit(f"YT_TOKEN_JSON is not valid JSON: {exc}")
-          if not isinstance(data, dict):
-              sys.exit("YT_TOKEN_JSON must be a JSON object.")
-          if not data.get("token") and data.get("access_token"):
-              data["token"] = data["access_token"]
-          data.setdefault("client_id", os.environ.get("YT_CLIENT_ID", "").strip())
-          data.setdefault("client_secret", os.environ.get("YT_CLIENT_SECRET", "").strip())
-          data.setdefault("token_uri", "https://oauth2.googleapis.com/token")
-          missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not data.get(key)]
+              info = json.loads(candidate)
+          except Exception:
+              raise SystemExit("YT_TOKEN_JSON is not valid OAuth JSON; stopping before video rendering.")
+          if not isinstance(info, dict):
+              raise SystemExit("YT_TOKEN_JSON must be a JSON object.")
+          if not info.get("token") and info.get("access_token"):
+              info["token"] = info["access_token"]
+          info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
+          info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
+          info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
+          if not info.get("scopes") and info.get("scope"):
+              info["scopes"] = info["scope"].split()
+          missing = [k for k in ("client_id", "client_secret", "refresh_token", "token") if not info.get(k)]
           if missing:
-              sys.exit("YouTube OAuth data incomplete: " + ", ".join(missing) + ". Stop before video rendering.")
-          print("YouTube OAuth data validated using the same secret format as Kombo. No credentials were printed.")
+              raise SystemExit("OAuth data incomplete (" + ", ".join(missing) + "); stopping before rendering.")
+          scopes = [
+              "https://www.googleapis.com/auth/youtube.upload",
+              "https://www.googleapis.com/auth/youtube.readonly",
+          ]
+          creds = Credentials.from_authorized_user_info(info, scopes=scopes)
+          if creds.expired and creds.refresh_token:
+              creds.refresh(Request())
+          if not creds.valid:
+              raise SystemExit("YouTube OAuth credentials are invalid; stopping before rendering.")
+          youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
+          result = youtube.channels().list(part="id,snippet", mine=True, maxResults=1).execute()
+          channels = result.get("items", [])
+          if not channels:
+              raise SystemExit("OAuth connected but no YouTube channel was returned; stopping before rendering.")
+          channel = channels[0]
+          handle = channel.get("snippet", {}).get("customUrl", "").lstrip("@")
+          expected = os.getenv("YOUTUBE_EXPECTED_HANDLE", "RowatAlwaqe").lstrip("@").casefold()
+          if not handle or handle.casefold() != expected:
+              raise SystemExit("OAuth channel identity did not match the expected channel; stopping before rendering.")
+          print("YOUTUBE_OAUTH_SMOKE_TEST=PASS")
+          print("YOUTUBE_CHANNEL_ID=" + channel.get("id", "unknown"))
+          print("YOUTUBE_CHANNEL_TITLE=" + channel.get("snippet", {}).get("title", "unknown"))
           PY
       - name: Verify or install FFmpeg
         if: steps.preflight.outputs.ready == 'true'
