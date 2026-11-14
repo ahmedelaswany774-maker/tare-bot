@@ -179,7 +179,19 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 ratio = image_file.width / image_file.height
                 if not 0.52 <= ratio <= 0.62:
                     raise ValueError(f"Image is not portrait 9:16: {image_file.width}x{image_file.height}")
-                image_file = image_file.resize((1080, 1920), Image.Resampling.LANCZOS)
+                # Center-crop the provider frame to the exact Shorts 9:16 ratio before resizing.
+                # This avoids stretching a 580x1015 (or similar) source into a different aspect ratio.
+                target_ratio = WIDTH / HEIGHT
+                source_ratio = image_file.width / image_file.height
+                if source_ratio > target_ratio:
+                    crop_width = int(round(image_file.height * target_ratio))
+                    left = (image_file.width - crop_width) // 2
+                    image_file = image_file.crop((left, 0, left + crop_width, image_file.height))
+                elif source_ratio < target_ratio:
+                    crop_height = int(round(image_file.width / target_ratio))
+                    top = (image_file.height - crop_height) // 2
+                    image_file = image_file.crop((0, top, image_file.width, top + crop_height))
+                image_file = image_file.resize((WIDTH, HEIGHT), Image.Resampling.LANCZOS)
                 image_file = image_file.filter(ImageFilter.UnsharpMask(radius=1.4, percent=115, threshold=3))
                 image_file.save(destination, format="JPEG", quality=94, optimize=True)
             print(f"Scene {scene}: accepted portrait frame and normalized to 1080x1920.")
@@ -362,8 +374,21 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
     video = next((s for s in probe["streams"] if s["codec_type"] == "video"), None)
     audio_stream = next((s for s in probe["streams"] if s["codec_type"] == "audio"), None)
     duration = float(probe["format"]["duration"])
-    if not video or not audio_stream or int(video["width"]) != WIDTH or int(video["height"]) != HEIGHT:
-        raise RuntimeError("فشل فحص مسارات الفيديو أو أبعاد 1080x1920.")
+    fps_value = video.get("avg_frame_rate", "0/1") if video else "0/1"
+    try:
+        fps_num, fps_den = (int(x) for x in fps_value.split("/", 1))
+        actual_fps = fps_num / fps_den if fps_den else 0
+    except (TypeError, ValueError, ZeroDivisionError):
+        actual_fps = 0
+    if (not video or not audio_stream
+            or int(video["width"]) != WIDTH or int(video["height"]) != HEIGHT
+            or abs((int(video["width"]) / int(video["height"])) - (9 / 16)) > 0.0001
+            or abs(actual_fps - FPS) > 0.1):
+        raise RuntimeError(
+            f"فشل فحص صيغة YouTube Shorts: expected {WIDTH}x{HEIGHT} (9:16) at {FPS}fps; "
+            f"got {video.get('width') if video else 'no-video'}x{video.get('height') if video else 'no-video'} "
+            f"at {actual_fps:.3f}fps."
+        )
     if abs(duration - TARGET_SECONDS) > 1.0 or output.stat().st_size < 100_000:
         raise RuntimeError(f"فشل فحص الفيديو النهائي: duration={duration:.2f}s, size={output.stat().st_size}.")
 
