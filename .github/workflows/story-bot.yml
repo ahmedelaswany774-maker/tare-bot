@@ -1,4 +1,5 @@
 name: Story Bot - Episode Video Production and YouTube Publishing
+# Immediate owner-requested production trigger [produce-episode]
 # Four daily production slots (Egypt winter time: 10:00, 13:00, 16:00, 19:00).
 # Each slot uploads the next eligible, locally scripted episode; no Gemini drafting.
 
