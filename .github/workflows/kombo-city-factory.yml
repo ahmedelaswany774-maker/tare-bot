@@ -1,6 +1,11 @@
 name: Kombo City Factory
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kombo-city-factory.yml"
+      - "kombo-city-factory/**"
   workflow_dispatch:
     inputs:
       action:
