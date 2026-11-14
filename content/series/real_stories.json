@@ -1074,7 +1074,7 @@
           "url": "https://www.bsu.edu.eg/NewsDetails_New.aspx?NID=153393&cat_id=1&lang=ar"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1092,8 +1092,10 @@
         "يجب تعديل الافتتاحية: المادة المنشورة كانت عن ظهورها في برنامج عصر الشباب على قناة إكسترا نيوز، لا برنامجًا على شاشة التلفزيون المصري كما ورد في المسودة.",
         "توجد مقاطع تخمينية ومشاهد متخيلة وتفاصيل اجتماعية عامة غير منسوبة لمصدر؛ يجب حذفها أو تمييزها بوضوح قبل اعتماد النص."
       ],
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-14T23:03:28+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-14T23:03:28+00:00",
+      "youtube_video_id": "I9MN3f49_l0",
+      "published_at": "2026-11-14T23:03:32+00:00"
     },
     {
       "episode_id": "social-44-story-44",
