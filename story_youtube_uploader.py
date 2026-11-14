@@ -696,7 +696,15 @@ subprocess.run(["git", "commit", "-m", f"chore: reserve episode {episode['episod
 subprocess.run(["git", "push"], check=True)
 
 response = request.execute()
-video_id = response["id"]
+video_id = response.get("id")
+if not video_id:
+    raise RuntimeError("YouTube upload returned no video ID; episode remains locked to prevent duplicate uploads.")
+confirmed_privacy = response.get("status", {}).get("privacyStatus")
+if confirmed_privacy != privacy_status:
+    raise RuntimeError(
+        f"YouTube upload status mismatch: requested={privacy_status}, returned={confirmed_privacy}. "
+        "The upload may exist; episode remains locked to prevent a duplicate."
+    )
 episode["published"] = True
 episode["upload_status"] = "published"
 episode["youtube_video_id"] = video_id
