@@ -13,6 +13,7 @@ on:
     paths:
       - ".github/workflows/story-bot.yml"
       - "story_youtube_uploader.py"
+      - "scripts/draft_weekly_episodes.py"
       - "content/drafts/**"
       - "content/series/real_stories.json"
   workflow_dispatch:
