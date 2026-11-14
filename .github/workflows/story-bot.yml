@@ -1,5 +1,6 @@
 name: Story Bot - Episode Video Production and YouTube Publishing
 # Immediate owner-requested production trigger [produce-episode]
+# Manual run requested after single-episode Gemini drafting change.
 # Four daily production slots (Egypt winter time: 10:00, 13:00, 16:00, 19:00).
 # Each slot first lets Gemini checkpoint missing scripts, then builds the next approved episode.
 
