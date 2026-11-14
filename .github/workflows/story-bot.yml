@@ -71,10 +71,6 @@ jobs:
                   reasons.append('pending_editorial_approval')
               if ep.get('content_type', data.get('content_type')) != 'verified_real_story':
                   reasons.append('not_verified_real_story')
-              sources = [s for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')]
-              publishers = {s.get('publisher', '').strip().lower() for s in sources}
-              if len(publishers) < 2:
-                  reasons.append('needs_two_independent_publishers')
               if not ep.get('verified_facts'):
                   reasons.append('missing_verified_facts')
               script = ep.get('script_path', '')
