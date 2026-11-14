@@ -60,24 +60,53 @@ jobs:
           from pathlib import Path
           data = json.loads(Path('content/series/real_stories.json').read_text(encoding='utf-8'))
           eligible = []
-          for ep in data.get('episodes', []):
-              publishers = {s.get('publisher', '').strip().lower() for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')}
+          blocked = []
+          for ep in sorted(data.get('episodes', []), key=lambda item: item.get('episode_number', 0)):
+              if ep.get('published') or ep.get('disabled') or ep.get('upload_status') in ('uploading', 'uploaded'):
+                  continue
+              reasons = []
+              if ep.get('content_type', data.get('content_type')) != 'verified_real_story':
+                  reasons.append('not_verified_real_story')
+              sources = [s for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')]
+              publishers = {s.get('publisher', '').strip().lower() for s in sources}
+              if len(publishers) < 2:
+                  reasons.append('needs_two_independent_publishers')
+              if not ep.get('verified_facts'):
+                  reasons.append('missing_verified_facts')
               script = ep.get('script_path', '')
               word_count = 0
-              if script and Path(script).is_file():
+              if not script or not Path(script).is_file():
+                  reasons.append('missing_script_file')
+              else:
                   raw = Path(script).read_text(encoding='utf-8')
-                  if '# النص الكامل' in raw and '# ملاحظات المونتاج' in raw:
+                  if '# النص الكامل' not in raw or '# ملاحظات المونتاج' not in raw:
+                      reasons.append('invalid_script_markers')
+                  else:
                       body = raw.split('# النص الكامل', 1)[1].split('# ملاحظات المونتاج', 1)[0]
                       word_count = len(body.split())
-              if (not ep.get('published') and not ep.get('disabled')
-                  and ep.get('upload_status') not in ('uploading', 'uploaded')
-                  and ep.get('content_type', data.get('content_type')) == 'verified_real_story'
-                  and len(publishers) >= 2 and word_count >= 2400):
+                      if word_count < 2400:
+                          reasons.append(f'script_too_short_{word_count}_words')
+              if reasons:
+                  blocked.append((ep.get('episode_number'), reasons))
+              else:
                   eligible.append(ep.get('episode_number'))
           print('Eligible episodes:', eligible)
+          print('Blocked episodes and reasons:')
+          for number, reasons in blocked:
+              print(f'  Episode {number}: {", ".join(reasons)}')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
               out.write('ready=' + ('true' if eligible else 'false') + chr(10))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('## Story preflight\\n')
+              summary.write(f'Eligible episodes: {eligible}\\n\\n')
+              for number, reasons in blocked:
+                  summary.write(f'- Episode {number}: {", ".join(reasons)}\\n')
           PY
+      - name: Stop with explicit reason when no verified episode is ready
+        if: steps.preflight.outputs.ready != 'true'
+        run: |
+          echo "::error::No eligible verified-real-story episode. Review the Story preflight summary for exact blockers. No video was rendered or uploaded."
+          exit 1
       - name: Verify or install FFmpeg
         shell: bash
         run: |
