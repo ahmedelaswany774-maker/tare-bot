@@ -155,6 +155,8 @@ def main():
         MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(f"Saved {path} ({count} words); {episode['draft_status']}", flush=True)
         time.sleep(5)
+        print(f"Single-episode run complete: processed episode {number}; remaining episodes will be handled by later scheduled runs.", flush=True)
+        break
     completed = sum(1 for e in episodes if int(e.get("draft_word_count", 0)) >= MIN_WORDS)
     print(f"Batch checkpointed: {completed}/28 scripts meet the minimum. No publishing.", flush=True)
 
