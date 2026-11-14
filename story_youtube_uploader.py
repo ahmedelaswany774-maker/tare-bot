@@ -653,13 +653,40 @@ save_json(
 )
 
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
-creds = Credentials.from_authorized_user_info(
-    json.loads(os.environ["YT_TOKEN_JSON"]), SCOPES
-)
-creds.refresh(Request())
+def load_youtube_token_info(raw):
+    # Match Kombo City Factory: accept OAuth Playground JSON plus separate
+    # GitHub client credentials, or a complete authorized-user JSON.
+    candidate = raw.strip()
+    if candidate.startswith("HTTP/"):
+        if "\\r\\n\\r\\n" in candidate:
+            candidate = candidate.split("\\r\\n\\r\\n", 1)[1].strip()
+        elif "\\n\\n" in candidate:
+            candidate = candidate.split("\\n\\n", 1)[1].strip()
+    info = json.loads(candidate)
+    if not isinstance(info, dict):
+        raise RuntimeError("YT_TOKEN_JSON must be a JSON object.")
+    if not info.get("token") and info.get("access_token"):
+        info["token"] = info["access_token"]
+    info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
+    info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
+    info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
+    if not info.get("scopes") and info.get("scope"):
+        info["scopes"] = info["scope"].split()
+    missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not info.get(key)]
+    if missing:
+        raise RuntimeError("YouTube OAuth data missing: " + ", ".join(missing))
+    return info
 
-youtube = build("youtube", "v3", credentials=creds)
+
+SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+token_info = load_youtube_token_info(os.environ["YT_TOKEN_JSON"])
+creds = Credentials.from_authorized_user_info(token_info, SCOPES)
+if creds.expired and creds.refresh_token:
+    creds.refresh(Request())
+if not creds.valid:
+    raise RuntimeError("YouTube OAuth credentials are invalid or expired.")
+
+youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
 
 hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
 full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\nشاهد الحلقة التالية من قائمة التشغيل: {manifest['playlist_title']}\n\n{hashtags}"
