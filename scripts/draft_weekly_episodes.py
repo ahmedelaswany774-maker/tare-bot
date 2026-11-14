@@ -27,9 +27,9 @@ def call_gemini(prompt):
             if response.status_code == 429 or response.status_code in (500, 502, 503, 504):
                 retry_after = response.headers.get("Retry-After")
                 try:
-                    wait_seconds = float(retry_after) if retry_after else min(300, 30 * (2 ** (attempt - 1)))
+                    wait_seconds = min(60, max(5, float(retry_after))) if retry_after else min(60, 10 * attempt)
                 except ValueError:
-                    wait_seconds = min(300, 30 * (2 ** (attempt - 1)))
+                    wait_seconds = min(60, 10 * attempt)
                 last_error = f"temporary Gemini status {response.status_code}: {response.text[:500]}"
                 if attempt < MAX_API_RETRIES:
                     print(f"Gemini temporary error; retry {attempt}/{MAX_API_RETRIES} after {wait_seconds:.0f}s", flush=True)
@@ -46,7 +46,7 @@ def call_gemini(prompt):
             last_error = str(exc)
             if attempt == MAX_API_RETRIES:
                 break
-            wait_seconds = min(180, 15 * attempt)
+            wait_seconds = min(60, 10 * attempt)
             print(f"Gemini request failed; retry {attempt}/{MAX_API_RETRIES} after {wait_seconds}s: {last_error[:250]}", flush=True)
             time.sleep(wait_seconds)
     raise RuntimeError(f"Gemini generation failed after {MAX_API_RETRIES} attempts: {last_error}")
