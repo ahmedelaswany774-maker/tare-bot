@@ -57,6 +57,7 @@ def load_episode():
             item for item in episodes
             if not item.get("published", False)
             and not item.get("disabled", False)
+            and item.get("editorial_approved") is True
             and item.get("upload_status") not in ("uploading", "uploaded")
             and item.get("content_type", manifest.get("content_type")) == "verified_real_story"
             and len(item.get("sources", [])) >= 2
@@ -641,10 +642,9 @@ save_json(
     },
 )
 
-if os.environ.get("ALLOW_UNREVIEWED_PUBLISH", "false").lower() != "true":
+if episode.get("editorial_approved") is not True:
     raise RuntimeError(
-        "تم إيقاف الرفع التلقائي: راجع النص والفيديو والمصادر وحقوق المواد، "
-        "ثم فعّل ALLOW_UNREVIEWED_PUBLISH=true يدويًا بعد الموافقة."
+        "تم إيقاف الرفع: الحلقة لا تحمل موافقة تحريرية صريحة في سجل السلسلة."
     )
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
