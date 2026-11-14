@@ -104,31 +104,44 @@ def gemini_json(idea: str) -> dict:
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
     """Generate premium cinematic 3D frames; fail closed instead of publishing primitive placeholders."""
     palette = (
-        "high-end cinematic 3D animated feature film still, art-directed professional studio quality, "
+        "ONE SINGLE FULL-FRAME CINEMATIC STILL, one continuous camera shot, vertical 9:16 composition. "
+        "This is ONE image for ONE moment in a film, NOT a storyboard, NOT a contact sheet, NOT a collage. "
+        "No split screen, no panels, no grids, no triptych, no stacked frames, no repeated subject, no duplicated people. "
+        "High-end cinematic 3D animated feature film still, art-directed professional studio quality, "
         "physically based rendering, detailed realistic materials, sophisticated global illumination, "
         "volumetric key light and rim light, atmospheric depth, cinematic color grading, "
-        "deep midnight navy, electric cyan and restrained warm gold palette, vertical 9:16, "
+        "deep midnight navy, electric cyan and restrained warm gold palette, "
         "visually rich but uncluttered composition, no text, no letters, no typography, no logos, no watermark. "
     )
     host_identity = (
-        "THE SAME ORIGINAL CHARACTER DESIGN in every host frame: young adult male cartoon presenter, "
-        "warm approachable face, expressive brown eyes, thick dark wavy hair with a defined silhouette, "
-        "thin round glasses, navy tailored hoodie with one small cyan geometric chest mark, "
-        "consistent facial proportions, hairstyle, glasses and exact outfit; premium feature-animation character sculpt, "
-        "detailed skin shading, expressive pose and hands. "
+        "Show EXACTLY ONE presenter, appearing ONCE in the entire image. "
+        "One head, one face, one torso, one pair of arms, one body. "
+        "Young adult male cartoon presenter, warm approachable face, expressive brown eyes, "
+        "thick dark wavy hair with a defined silhouette, thin round glasses, "
+        "navy tailored hoodie with one small cyan geometric chest mark. "
+        "Keep this same character design across separate generated images, but NEVER show multiple copies "
+        "or multiple poses of him inside this single image. Premium feature-animation character sculpt, "
+        "detailed skin shading, expressive natural hand gesture. "
     )
     if scene in (1, 3, 5):
         fixed = palette + host_identity + (
-            "Presenter-led shot, intentional cinematic composition, three-quarter medium shot, "
-            "clear readable silhouette, expressive hand gesture, studio environment with practical lighting. "
+            "Single-subject presenter portrait, medium shot from waist or chest up, "
+            "one clear readable silhouette centered in one uninterrupted studio environment. "
+            "No screens, mirrors, posters, background people, picture-in-picture, or character portraits. "
+            "Use a distinct camera angle or gesture for this shot while keeping only one presenter visible. "
         )
     else:
         fixed = palette + (
-            "CINEMATIC EXPLANATORY CUTAWAY, no presenter and no people. Show the actual subject or mechanism "
-            "as a hero object with physically plausible detail, layered depth, dramatic macro or wide lens composition. "
+            "CINEMATIC EXPLANATORY CUTAWAY. Absolutely no people, no presenter, no faces, no characters, "
+            "no human silhouettes, and no reflections of people. Show only the actual subject or mechanism "
+            "as one hero object in one uninterrupted environment, with physically plausible detail, "
+            "layered depth, dramatic macro or wide lens composition. "
         )
     full_prompt = fixed + prompt + (
-        " Avoid flat vector art, simple geometric icons, childish clipart, crude drawings, generic robot mascots, "
+        " STRICT NEGATIVE COMPOSITION RULES: no collage, no triptych, no storyboard, no comic panels, "
+        "no tiled layout, no vertical or horizontal strips, no repeated character, no cloned subject, "
+        "no before-and-after layout, no multiple views of the same person, no inset images. "
+        "Avoid flat vector art, simple geometric icons, childish clipart, crude drawings, generic robot mascots, "
         "flat lighting, plastic low-detail faces, duplicated limbs, distorted hands, illegible text."
     )
     if not POLLINATIONS_API_KEY:
