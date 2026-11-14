@@ -97,10 +97,10 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
               out.write('ready=' + ('true' if eligible else 'false') + chr(10))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
-              summary.write('## Story preflight\\n')
-              summary.write(f'Eligible episodes: {eligible}\\n\\n')
+              summary.write('## Story preflight\n')
+              summary.write(f'Eligible episodes: {eligible}\n\n')
               for number, reasons in blocked:
-                  summary.write(f'- Episode {number}: {", ".join(reasons)}\\n')
+                  summary.write(f'- Episode {number}: {", ".join(reasons)}\n')
           PY
       - name: Stop with explicit reason when no verified episode is ready
         if: steps.preflight.outputs.ready != 'true'
