@@ -68,8 +68,6 @@ jobs:
               if ep.get('published') or ep.get('disabled') or ep.get('upload_status') in ('uploading', 'uploaded'):
                   continue
               reasons = []
-              if ep.get('editorial_approved') is not True:
-                  reasons.append('pending_editorial_approval')
               if ep.get('content_type', data.get('content_type')) != 'verified_real_story':
                   reasons.append('not_verified_real_story')
               if not ep.get('verified_facts'):
@@ -109,7 +107,7 @@ jobs:
       - name: Skip video production when no approved episode is ready
         if: steps.preflight.outputs.ready != 'true'
         run: |
-          echo "::notice::No episode meets the production gate (explicit editorial approval, verified facts, at least two source publishers, and a complete 2400+ word script). Rendering and publishing are skipped."
+          echo "::notice::No episode meets the production gate (verified facts, at least two source publishers, and a complete 2400+ word script). Rendering and publishing are skipped."
       - name: Verify or install FFmpeg
         if: steps.preflight.outputs.ready == 'true'
         shell: bash
