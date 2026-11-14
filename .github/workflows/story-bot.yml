@@ -1,9 +1,8 @@
 name: Story Bot - Episode Video Production and YouTube Publishing
-# Immediate owner-requested production trigger [produce-episode]
-# Manual run requested after single-episode Gemini drafting change.
+# Restored to the last proven production path: use saved, reviewed scripts; no Gemini API calls.
 # Four daily production slots (Egypt winter time: 10:00, 13:00, 16:00, 19:00).
-# Each slot first lets Gemini checkpoint missing scripts, then builds the next approved episode.
-# No approved episode is a safe skip: drafting succeeds while rendering/publishing remain gated.
+# One approved, sourced episode per run; Fish Audio voice; public YouTube upload.
+# A missing approval or incomplete script is a safe skip.
 
 on:
   schedule:
@@ -13,7 +12,6 @@ on:
     paths:
       - ".github/workflows/story-bot.yml"
       - "story_youtube_uploader.py"
-      - "scripts/draft_weekly_episodes.py"
       - "content/drafts/**"
       - "content/series/real_stories.json"
   workflow_dispatch:
@@ -57,38 +55,6 @@ jobs:
         uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5
         with:
           python-version: '3.11'
-      - name: Install Gemini drafting dependency
-        run: pip install requests
-      - name: Draft and resume missing real-story episodes with Gemini
-        id: gemini_draft
-        continue-on-error: true
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash
-          STORY_TARGET_WORDS: '3200'
-          MIN_SCRIPT_WORDS: '2400'
-          MAX_CONTINUATIONS: '4'
-          MAX_API_RETRIES: '4'
-        run: python scripts/draft_weekly_episodes.py
-      - name: Save Gemini checkpoints and manifest to the repository
-        if: always() && steps.gemini_draft.outcome != 'skipped'
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/drafts/verified_real/*.md content/series/real_stories.json
-          if git diff --cached --quiet; then
-            echo "No new Gemini checkpoints to persist."
-          else
-            git commit -m "chore: checkpoint Gemini real-story drafts"
-            git pull --rebase --autostash origin main
-            git push
-          fi
-      - name: Stop after preserving checkpoints if Gemini drafting failed
-        if: steps.gemini_draft.outcome != 'success'
-        run: |
-          echo "::error::Gemini drafting did not complete. Any saved checkpoints were committed; the next run can resume from them."
-          exit 1
       - name: Check for a complete eligible episode (no paid generation)
         id: preflight
         run: |
@@ -108,6 +74,9 @@ jobs:
                   reasons.append('not_verified_real_story')
               if not ep.get('verified_facts'):
                   reasons.append('missing_verified_facts')
+              publishers = {s.get('publisher', '').strip().lower() for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')}
+              if len(publishers) < 2:
+                  reasons.append(f'insufficient_independent_publishers_{len(publishers)}')
               script = ep.get('script_path', '')
               word_count = 0
               if not script or not Path(script).is_file():
@@ -140,7 +109,7 @@ jobs:
       - name: Skip video production when no approved episode is ready
         if: steps.preflight.outputs.ready != 'true'
         run: |
-          echo "::notice::No approved episode is ready. Draft checkpoints were saved successfully; video rendering and YouTube publishing are safely skipped until editorial approval."
+          echo "::notice::No episode meets the production gate (explicit editorial approval, verified facts, at least two source publishers, and a complete 2400+ word script). Rendering and publishing are skipped."
       - name: Verify or install FFmpeg
         if: steps.preflight.outputs.ready == 'true'
         shell: bash
