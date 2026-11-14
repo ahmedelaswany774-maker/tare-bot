@@ -3,6 +3,7 @@ name: Story Bot - Episode Video Production and YouTube Publishing
 # Manual run requested after single-episode Gemini drafting change.
 # Four daily production slots (Egypt winter time: 10:00, 13:00, 16:00, 19:00).
 # Each slot first lets Gemini checkpoint missing scripts, then builds the next approved episode.
+# No approved episode is a safe skip: drafting succeeds while rendering/publishing remain gated.
 
 on:
   schedule:
