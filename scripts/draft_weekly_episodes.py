@@ -13,6 +13,9 @@ MIN_WORDS = int(os.getenv("MIN_SCRIPT_WORDS", "2400"))
 TARGET_WORDS = int(os.getenv("STORY_TARGET_WORDS", "3200"))
 MAX_API_RETRIES = int(os.getenv("MAX_API_RETRIES", "4"))
 
+class GeminiDailyQuotaExceeded(RuntimeError):
+    """The Gemini free-tier daily request quota is exhausted; retrying cannot help."""
+
 def word_count(text):
     return len(re.findall(r"\S+", text))
 
@@ -24,6 +27,16 @@ def call_gemini(prompt):
     for attempt in range(1, MAX_API_RETRIES + 1):
         try:
             response = requests.post(url, json=payload, timeout=300)
+            if response.status_code == 429:
+                detail = response.text[:2000]
+                lowered = detail.lower()
+                if ("generate_content_free_tier_requests" in lowered
+                        or "per day" in lowered
+                        or "quota exceeded" in lowered):
+                    raise GeminiDailyQuotaExceeded(
+                        f"Gemini daily quota exhausted for {MODEL}; stop this run and resume after quota reset. "
+                        f"API response: {detail[:500]}"
+                    )
             if response.status_code == 429 or response.status_code in (500, 502, 503, 504):
                 retry_after = response.headers.get("Retry-After")
                 try:
@@ -152,6 +165,13 @@ def main():
                 count = save_checkpoint(episode, path, text)
                 MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 print(f"Checkpoint saved for episode {number}: {count} words", flush=True)
+        except GeminiDailyQuotaExceeded as exc:
+            count = save_checkpoint(episode, path, text)
+            episode["draft_status"] = "deferred_gemini_daily_quota_exhausted"
+            MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            print(f"Gemini daily quota exhausted at episode {number}; checkpoint preserved ({count} words). "
+                  f"Stopping this run without spending more requests: {exc}", flush=True)
+            break
         except RuntimeError as exc:
             count = save_checkpoint(episode, path, text)
             episode["draft_status"] = "deferred_gemini_error_pending_continuation"
