@@ -1146,7 +1146,9 @@
       ],
       "script_path": "content/drafts/verified_real/episode-44.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 3557
+      "draft_word_count": 3557,
+      "upload_status": "uploading",
+      "upload_started_at": "2026-11-15T20:53:48+00:00"
     },
     {
       "episode_id": "social-45-story-45",
