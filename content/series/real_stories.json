@@ -1135,7 +1135,7 @@
           "url": "https://gate.ahram.org.eg/News/5137902.aspx"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1147,8 +1147,10 @@
       "script_path": "content/drafts/verified_real/episode-44.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 3557,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-15T20:53:48+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-15T20:53:48+00:00",
+      "youtube_video_id": "IKKl-aY45_M",
+      "published_at": "2026-11-15T20:54:03+00:00"
     },
     {
       "episode_id": "social-45-story-45",
