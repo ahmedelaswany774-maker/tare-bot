@@ -102,8 +102,15 @@ def gemini_json(idea: str) -> dict:
             return result
         except Exception as exc:
             last_error = exc
-            retryable = isinstance(exc, RuntimeError) and any(
-                f"Gemini HTTP {code}" in str(exc) for code in (429, 500, 502, 503, 504)
+            # ReadTimeout/ConnectTimeout/ConnectionError are transient too.
+            # The previous logic retried HTTP capacity errors but stopped immediately
+            # on a network timeout, which caused avoidable failed production runs.
+            retryable = (
+                isinstance(exc, (requests.exceptions.Timeout, requests.exceptions.ConnectionError))
+                or (
+                    isinstance(exc, RuntimeError)
+                    and any(f"Gemini HTTP {code}" in str(exc) for code in (408, 429, 500, 502, 503, 504))
+                )
             )
             if not retryable or attempt >= len(retry_delays):
                 break
