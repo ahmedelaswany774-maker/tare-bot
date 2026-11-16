@@ -77,9 +77,12 @@ def gemini_json(idea: str) -> dict:
         "generationConfig": {"responseMimeType": "application/json", "temperature": 0.75}
     }
     last_error = None
-    for attempt in range(4):
+    # Gemini 503/429 are transient capacity/rate-limit errors. Give the service
+    # enough recovery time instead of exhausting all attempts in a few seconds.
+    retry_delays = (15, 30, 60, 90, 120)
+    for attempt in range(len(retry_delays) + 1):
         try:
-            response = SESSION.post(url, params={"key": api_key}, json=payload, timeout=90)
+            response = SESSION.post(url, params={"key": api_key}, json=payload, timeout=120)
             if response.status_code in (429, 500, 502, 503, 504):
                 raise RuntimeError(f"Gemini HTTP {response.status_code}: {response.text[:300]}")
             response.raise_for_status()
@@ -96,9 +99,15 @@ def gemini_json(idea: str) -> dict:
             return result
         except Exception as exc:
             last_error = exc
-            if attempt < 3:
-                time.sleep(4 * (attempt + 1))
-    raise RuntimeError(f"تعذر توليد السيناريو بعد المحاولات: {last_error}")
+            retryable = isinstance(exc, RuntimeError) and any(
+                f"Gemini HTTP {code}" in str(exc) for code in (429, 500, 502, 503, 504)
+            )
+            if not retryable or attempt >= len(retry_delays):
+                break
+            delay = retry_delays[attempt]
+            print(f"Gemini temporary error; retry {attempt + 1}/{len(retry_delays)} in {delay}s: {exc}")
+            time.sleep(delay)
+    raise RuntimeError(f"تعذر توليد السيناريو بعد إعادة المحاولة الذكية: {last_error}")
 
 
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
@@ -186,6 +195,10 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 image_file = image_file.convert("RGB")
                 if image_file.width < 512 or image_file.height < 900:
                     raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
+                # Analyze a small normalized copy. Initialize both objects explicitly:
+                # the seam detector reads px, and the luminance gate reads probe.
+                probe = image_file.resize((96, 160), Image.Resampling.LANCZOS)
+                px = probe.load()
                 # Detect only narrow, near-continuous separator lines. Pixel variation alone
                 # is not evidence of a collage: ordinary object edges and lighting changes are common.
                 def separator_clusters(axis: str) -> list[tuple[int, int]]:
