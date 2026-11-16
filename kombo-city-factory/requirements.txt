@@ -2,3 +2,4 @@ requests>=2.32.3
 Pillow>=10.4.0
 google-api-python-client>=2.160.0
 google-auth>=2.38.0
+huggingface_hub>=0.30.0
