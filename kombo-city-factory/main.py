@@ -151,11 +151,19 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
             "POLLINATIONS_API_KEY غير مضبوط في GitHub Actions Secrets. "
             "مزود الصور الحالي يتطلب مفتاحًا سريًا ورصيدًا متاحًا؛ لم نعد نستخدم الرابط القديم."
         )
-    url = IMAGE_BASE + quote(full_prompt, safe="") + "?model=zimage&width=1024&height=1792"
     headers = {"Authorization": f"Bearer {POLLINATIONS_API_KEY}"}
     last_error = None
     for attempt in range(3):
         try:
+            attempt_prompt = full_prompt
+            if attempt > 0:
+                attempt_prompt += (
+                    " CORRECTIVE RETRY: create a completely different single-camera composition. "
+                    "One uninterrupted scene filling the entire vertical frame edge-to-edge. "
+                    "Absolutely no divider lines, borders, split-screen, panels, frames, or multiple views. "
+                    "Do not place a straight vertical or horizontal line through the center. "
+                )
+            url = IMAGE_BASE + quote(attempt_prompt, safe="") + "?model=zimage&width=1024&height=1792"
             response = SESSION.get(url, headers=headers, timeout=150)
             if response.status_code == 402:
                 raise RuntimeError(
@@ -178,31 +186,58 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 image_file = image_file.convert("RGB")
                 if image_file.width < 512 or image_file.height < 900:
                     raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
-                # Reject obvious storyboard/contact-sheet outputs before they can enter the video.
-                probe = image_file.resize((96, 160), Image.Resampling.BILINEAR)
-                px = probe.load()
-                horizontal_seams = 0
-                for y in range(2, 158):
-                    jumps = 0
-                    for x in range(4, 92):
-                        a, b = px[x, y - 1], px[x, y]
-                        if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 105:
-                            jumps += 1
-                    if jumps >= 62:
-                        horizontal_seams += 1
-                vertical_seams = 0
-                for x in range(2, 94):
-                    jumps = 0
-                    for y in range(4, 156):
-                        a, b = px[x - 1, y], px[x, y]
-                        if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 105:
-                            jumps += 1
-                    if jumps >= 62:
-                        vertical_seams += 1
-                if horizontal_seams >= 2 or vertical_seams >= 2:
+                # Detect only narrow, near-continuous separator lines. Pixel variation alone
+                # is not evidence of a collage: ordinary object edges and lighting changes are common.
+                def separator_clusters(axis: str) -> list[tuple[int, int]]:
+                    candidates = []
+                    if axis == "vertical":
+                        positions = range(2, 94)
+                        span = 152
+                        for pos in positions:
+                            jumps = 0
+                            for yy in range(4, 156):
+                                a, b = px[pos - 1, yy], px[pos, yy]
+                                if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 125:
+                                    jumps += 1
+                            if jumps >= int(span * 0.88):
+                                candidates.append(pos)
+                    else:
+                        positions = range(2, 158)
+                        span = 88
+                        for pos in positions:
+                            jumps = 0
+                            for xx in range(4, 92):
+                                a, b = px[xx, pos - 1], px[xx, pos]
+                                if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 125:
+                                    jumps += 1
+                            if jumps >= int(span * 0.88):
+                                candidates.append(pos)
+                    clusters = []
+                    for pos in candidates:
+                        if not clusters or pos - clusters[-1][1] > 2:
+                            clusters.append([pos, pos])
+                        else:
+                            clusters[-1][1] = pos
+                    return [(a, b) for a, b in clusters]
+
+                vertical_clusters = separator_clusters("vertical")
+                horizontal_clusters = separator_clusters("horizontal")
+
+                def has_center_divider(clusters: list[tuple[int, int]], extent: int) -> bool:
+                    # A single divider is suspicious only when it is thin, almost continuous,
+                    # and placed in the central region typical of a split-screen layout.
+                    for left, right in clusters:
+                        center = (left + right) / 2
+                        if right - left <= 3 and extent * 0.25 <= center <= extent * 0.75:
+                            return True
+                    return False
+
+                if (len(vertical_clusters) >= 2 or len(horizontal_clusters) >= 2
+                        or has_center_divider(vertical_clusters, 96)
+                        or has_center_divider(horizontal_clusters, 160)):
                     raise ValueError(
-                        f"رفض صورة متعددة اللوحات/الشرائط: horizontal={horizontal_seams}, "
-                        f"vertical={vertical_seams}"
+                        f"رفض فاصل لوحات واضح: horizontal_clusters={len(horizontal_clusters)}, "
+                        f"vertical_clusters={len(vertical_clusters)}"
                     )
                 gray = probe.convert("L")
                 histogram = gray.histogram()
