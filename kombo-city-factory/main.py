@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
 import os
 import random
@@ -34,6 +35,8 @@ FISH_MODEL = "s2.1-pro-free"
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 IMAGE_BASE = "https://gen.pollinations.ai/image/"
 POLLINATIONS_API_KEY = os.getenv("POLLINATIONS_API_KEY", "").strip()
+HF_TOKEN = os.getenv("HF_TOKEN", "").strip()
+HF_IMAGE_MODEL = os.getenv("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell").strip()
 SESSION = requests.Session()
 SESSION.headers.update({"User-Agent": "kombo-city-factory/1.0"})
 
@@ -155,12 +158,11 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
         "Avoid flat vector art, simple geometric icons, childish clipart, crude drawings, generic robot mascots, "
         "flat lighting, plastic low-detail faces, duplicated limbs, distorted hands, illegible text."
     )
-    if not POLLINATIONS_API_KEY:
+    if not HF_TOKEN and not POLLINATIONS_API_KEY:
         raise RuntimeError(
-            "POLLINATIONS_API_KEY غير مضبوط في GitHub Actions Secrets. "
-            "مزود الصور الحالي يتطلب مفتاحًا سريًا ورصيدًا متاحًا؛ لم نعد نستخدم الرابط القديم."
+            "أضف HF_TOKEN أو POLLINATIONS_API_KEY في GitHub Actions Secrets لتفعيل توليد الصور."
         )
-    headers = {"Authorization": f"Bearer {POLLINATIONS_API_KEY}"}
+    headers = {"Authorization": f"Bearer {POLLINATIONS_API_KEY}"} if POLLINATIONS_API_KEY else {}
     last_error = None
     for attempt in range(3):
         try:
@@ -172,21 +174,51 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                     "Absolutely no divider lines, borders, split-screen, panels, frames, or multiple views. "
                     "Do not place a straight vertical or horizontal line through the center. "
                 )
-            url = IMAGE_BASE + quote(attempt_prompt, safe="") + "?model=zimage&width=1024&height=1792"
-            response = SESSION.get(url, headers=headers, timeout=150)
-            if response.status_code == 402:
-                raise RuntimeError(
-                    "Pollinations HTTP 402: رصيد الحساب أو ميزانية المفتاح غير كافية. "
-                    "تحقق من الرصيد وحدود المفتاح لدى المزود؛ لن يعالج تكرار المحاولة هذه المشكلة."
-                )
-            if response.status_code in (401, 403):
-                raise RuntimeError(
-                    f"Pollinations HTTP {response.status_code}: مفتاح API غير صالح أو لا يملك صلاحية توليد الصور."
-                )
-            response.raise_for_status()
-            if not response.headers.get("content-type", "").startswith("image/") or len(response.content) < 25_000:
-                raise ValueError("Image provider returned a low-quality or invalid image payload.")
-            destination.write_bytes(response.content)
+            image_bytes = None
+            image_source = ""
+            if HF_TOKEN:
+                try:
+                    from huggingface_hub import InferenceClient
+                    hf_client = InferenceClient(provider="auto", api_key=HF_TOKEN, timeout=180)
+                    hf_image = hf_client.text_to_image(
+                        attempt_prompt,
+                        model=HF_IMAGE_MODEL,
+                        width=1024,
+                        height=1792,
+                    )
+                    buffer = io.BytesIO()
+                    hf_image.save(buffer, format="JPEG", quality=95)
+                    image_bytes = buffer.getvalue()
+                    image_source = f"Hugging Face ({HF_IMAGE_MODEL})"
+                except Exception as hf_error:
+                    if not POLLINATIONS_API_KEY:
+                        raise RuntimeError(f"Hugging Face image generation failed: {hf_error}") from hf_error
+                    print(f"Hugging Face unavailable; falling back to Pollinations: {hf_error}")
+
+            if image_bytes is None:
+                if not POLLINATIONS_API_KEY:
+                    raise RuntimeError("Hugging Face did not return an image and no Pollinations fallback key is configured.")
+                url = IMAGE_BASE + quote(attempt_prompt, safe="") + "?model=zimage&width=1024&height=1792"
+                response = SESSION.get(url, headers=headers, timeout=150)
+                if response.status_code == 402:
+                    raise RuntimeError(
+                        "Pollinations HTTP 402: رصيد الحساب أو ميزانية المفتاح غير كافية. "
+                        "تحقق من الرصيد وحدود المفتاح لدى المزود."
+                    )
+                if response.status_code in (401, 403):
+                    raise RuntimeError(
+                        f"Pollinations HTTP {response.status_code}: مفتاح API غير صالح أو لا يملك صلاحية توليد الصور."
+                    )
+                response.raise_for_status()
+                image_bytes = response.content
+                image_content_type = response.headers.get("content-type", "")
+                image_source = "Pollinations"
+                if not image_content_type.startswith("image/"):
+                    raise ValueError("Pollinations returned a non-image response.")
+
+            if len(image_bytes) < 25_000:
+                raise ValueError(f"{image_source} returned a low-quality or invalid image payload.")
+            destination.write_bytes(image_bytes)
             with Image.open(destination) as image_file:
                 image_file.verify()
             # The current image endpoint may ignore requested dimensions and return 580x1015.
@@ -280,7 +312,7 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 image_file = image_file.resize((WIDTH, HEIGHT), Image.Resampling.LANCZOS)
                 image_file = image_file.filter(ImageFilter.UnsharpMask(radius=1.4, percent=115, threshold=3))
                 image_file.save(destination, format="JPEG", quality=94, optimize=True)
-            print(f"Scene {scene}: accepted portrait frame and normalized to 1080x1920.")
+            print(f"Scene {scene}: accepted portrait frame from {image_source} and normalized to 1080x1920.")
             return
         except Exception as exc:
             last_error = exc
