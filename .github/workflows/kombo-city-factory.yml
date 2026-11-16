@@ -83,11 +83,16 @@ jobs:
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
           POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_IMAGE_MODEL: black-forest-labs/FLUX.1-schnell
         run: |
           test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets."; exit 1; }
           test -n "$FISH_API_KEY" || { echo "::error::Add FISH_API_KEY in Actions secrets."; exit 1; }
           test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
-          test -n "$POLLINATIONS_API_KEY" || { echo "::error::Add POLLINATIONS_API_KEY in Actions secrets. Pollinations image generation now requires an authenticated key with available balance."; exit 1; }
+          if [ -z "$HF_TOKEN" ] && [ -z "$POLLINATIONS_API_KEY" ]; then
+            echo "::error::Add HF_TOKEN or POLLINATIONS_API_KEY in Actions secrets to enable image generation."
+            exit 1
+          fi
           python main.py --one
 
       - name: Select latest saved video for publishing
