@@ -110,6 +110,8 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
         "High-end cinematic 3D animated feature film still, art-directed professional studio quality, "
         "physically based rendering, detailed realistic materials, sophisticated global illumination, "
         "volumetric key light and rim light, atmospheric depth, cinematic color grading, "
+        "clearly exposed subject with readable face and object details, balanced midtones, visible shadow detail, "
+        "bright cyan practical lights and warm gold fill light, never underexposed or crushed blacks, "
         "deep midnight navy, electric cyan and restrained warm gold palette, "
         "visually rich but uncluttered composition, no text, no letters, no typography, no logos, no watermark. "
     )
@@ -204,9 +206,14 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                     )
                 gray = probe.convert("L")
                 histogram = gray.histogram()
-                dark_pixels = sum(histogram[:18])
-                if dark_pixels / (96 * 160) > 0.68 or sum(i * n for i, n in enumerate(histogram)) / (96 * 160) < 24:
-                    raise ValueError("رفض لقطة شديدة الظلام؛ تفاصيل الشخصية أو المشهد غير مقروءة.")
+                near_black_pixels = sum(histogram[:8])
+                mean_luminance = sum(i * n for i, n in enumerate(histogram)) / (96 * 160)
+                # Dark navy is intentional in the brand palette; reject only genuinely unusable near-black frames.
+                if near_black_pixels / (96 * 160) > 0.82 or mean_luminance < 12:
+                    raise ValueError(
+                        f"رفض إطار شبه أسود فعلًا: near_black={near_black_pixels / (96 * 160):.0%}, "
+                        f"mean_luminance={mean_luminance:.1f}"
+                    )
                 ratio = image_file.width / image_file.height
                 if not 0.52 <= ratio <= 0.62:
                     raise ValueError(f"Image is not portrait 9:16: {image_file.width}x{image_file.height}")
