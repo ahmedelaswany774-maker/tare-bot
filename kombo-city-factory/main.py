@@ -176,6 +176,39 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 image_file = image_file.convert("RGB")
                 if image_file.width < 512 or image_file.height < 900:
                     raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
+                # Reject obvious storyboard/contact-sheet outputs before they can enter the video.
+                probe = image_file.resize((96, 160), Image.Resampling.BILINEAR)
+                px = probe.load()
+                horizontal_seams = 0
+                for y in range(2, 158):
+                    jumps = 0
+                    for x in range(4, 92):
+                        a, b = px[x, y - 1], px[x, y]
+                        if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 105:
+                            jumps += 1
+                    if jumps >= 62:
+                        horizontal_seams += 1
+                vertical_seams = 0
+                for x in range(2, 94):
+                    jumps = 0
+                    for y in range(4, 156):
+                        a, b = px[x - 1, y], px[x, y]
+                        if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 105:
+                            jumps += 1
+                    if jumps >= 62:
+                        vertical_seams += 1
+                if horizontal_seams >= 2 or vertical_seams >= 2:
+                    raise ValueError(
+                        f"رفض صورة متعددة اللوحات/الشرائط: horizontal={horizontal_seams}, "
+                        f"vertical={vertical_seams}"
+                    )
+                gray = probe.convert("L")
+                histogram = gray.histogram()
+                dark_pixels = sum(histogram[:18])
+                if dark_pixels / (96 * 160) > 0.68 or sum(i * n for i, n in enumerate(histogram)) / (96 * 160) < 24:
+                    raise ValueError("رفض لقطة شديدة الظلام؛ تفاصيل الشخصية أو المشهد غير مقروءة.")
+                ratio = image_file.width / image_file.height
+                    raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
                 ratio = image_file.width / image_file.height
                 if not 0.52 <= ratio <= 0.62:
                     raise ValueError(f"Image is not portrait 9:16: {image_file.width}x{image_file.height}")
