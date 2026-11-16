@@ -1215,7 +1215,7 @@
           "url": "https://ahram.org.eg/daily/NewsPrint/847510.aspx"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1227,8 +1227,10 @@
       "script_path": "content/drafts/verified_real/episode-46.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4723,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-16T21:54:10+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-16T21:54:10+00:00",
+      "youtube_video_id": "8MUgmt4pzHY",
+      "published_at": "2026-11-16T21:54:18+00:00"
     },
     {
       "episode_id": "social-47-story-47",
