@@ -36,6 +36,8 @@ MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 IMAGE_BASE = "https://gen.pollinations.ai/image/"
 POLLINATIONS_API_KEY = os.getenv("POLLINATIONS_API_KEY", "").strip()
 HF_TOKEN = os.getenv("HF_TOKEN", "").strip()
+# Disable a billing-blocked HF provider for the rest of this run after its first 402.
+HF_PROVIDER_DISABLED = False
 HF_IMAGE_MODEL = os.getenv("HF_IMAGE_MODEL", "black-forest-labs/FLUX.1-schnell").strip()
 SESSION = requests.Session()
 SESSION.headers.update({"User-Agent": "kombo-city-factory/1.0"})
@@ -122,6 +124,7 @@ def gemini_json(idea: str) -> dict:
 
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
     """Generate premium cinematic 3D frames; fail closed instead of publishing primitive placeholders."""
+    global HF_PROVIDER_DISABLED
     palette = (
         "ONE SINGLE FULL-FRAME CINEMATIC STILL, one continuous camera shot, vertical 9:16 composition. "
         "This is ONE image for ONE moment in a film, NOT a storyboard, NOT a contact sheet, NOT a collage. "
@@ -183,7 +186,7 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 )
             image_bytes = None
             image_source = ""
-            if HF_TOKEN:
+            if HF_TOKEN and not HF_PROVIDER_DISABLED:
                 try:
                     from huggingface_hub import InferenceClient
                     hf_client = InferenceClient(provider="auto", api_key=HF_TOKEN, timeout=180)
@@ -198,6 +201,10 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                     image_bytes = buffer.getvalue()
                     image_source = f"Hugging Face ({HF_IMAGE_MODEL})"
                 except Exception as hf_error:
+                    hf_status = getattr(getattr(hf_error, "response", None), "status_code", None)
+                    if hf_status == 402 or "402 Payment Required" in str(hf_error):
+                        HF_PROVIDER_DISABLED = True
+                        print("Hugging Face returned HTTP 402; disabling it for the rest of this run to avoid repeated billing-blocked requests.")
                     if not POLLINATIONS_API_KEY:
                         raise RuntimeError(f"Hugging Face image generation failed: {hf_error}") from hf_error
                     print(f"Hugging Face unavailable; falling back to Pollinations: {hf_error}")
