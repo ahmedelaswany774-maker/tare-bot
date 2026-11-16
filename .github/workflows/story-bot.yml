@@ -72,9 +72,7 @@ jobs:
                   reasons.append('not_verified_real_story')
               if not ep.get('verified_facts'):
                   reasons.append('missing_verified_facts')
-              publishers = {s.get('publisher', '').strip().lower() for s in ep.get('sources', []) if s.get('title') and s.get('publisher') and s.get('url', '').startswith('https://')}
-              if len(publishers) < 2:
-                  reasons.append(f'insufficient_independent_publishers_{len(publishers)}')
+              # Source-count gate intentionally removed per owner request.
               script = ep.get('script_path', '')
               word_count = 0
               if not script or not Path(script).is_file():
@@ -100,6 +98,7 @@ jobs:
               out.write('ready=' + ('true' if eligible else 'false') + chr(10))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
               summary.write('## Story preflight\n')
+              summary.write('Source-count requirement: DISABLED by owner request.\n\n')
               summary.write(f'Eligible episodes: {eligible}\n\n')
               for number, reasons in blocked:
                   summary.write(f'- Episode {number}: {", ".join(reasons)}\n')
