@@ -60,14 +60,9 @@ def load_episode():
                     or item.get("content_type", manifest.get("content_type")) != "verified_real_story"
                     or not item.get("verified_facts")):
                 continue
-            publishers = {
-                source.get("publisher", "").strip().lower()
-                for source in item.get("sources", [])
-                if source.get("title") and source.get("publisher")
-                and source.get("url", "").startswith("https://")
-            }
+            # Source-count gate intentionally removed per owner request.
             script_path = item.get("script_path", "")
-            if len(publishers) < 2 or not script_path or not Path(script_path).is_file():
+            if not script_path or not Path(script_path).is_file():
                 continue
             raw = Path(script_path).read_text(encoding="utf-8")
             if "# النص الكامل" not in raw or "# ملاحظات المونتاج" not in raw:
