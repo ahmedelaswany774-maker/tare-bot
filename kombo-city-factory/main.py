@@ -208,8 +208,6 @@ def generate_image(prompt: str, destination: Path, scene: int) -> None:
                 if dark_pixels / (96 * 160) > 0.68 or sum(i * n for i, n in enumerate(histogram)) / (96 * 160) < 24:
                     raise ValueError("رفض لقطة شديدة الظلام؛ تفاصيل الشخصية أو المشهد غير مقروءة.")
                 ratio = image_file.width / image_file.height
-                    raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
-                ratio = image_file.width / image_file.height
                 if not 0.52 <= ratio <= 0.62:
                     raise ValueError(f"Image is not portrait 9:16: {image_file.width}x{image_file.height}")
                 # Center-crop the provider frame to the exact Shorts 9:16 ratio before resizing.
