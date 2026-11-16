@@ -4,8 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/kombo-city-factory.yml"
-      - "kombo-city-factory/**"
+      - "kombo-city-factory/inbox/**/scene_*.jpg"
   workflow_dispatch:
     inputs:
       action:
@@ -13,9 +12,10 @@ on:
         required: true
         type: choice
         options:
-          - generate_and_publish
+          - prepare_images
+          - render_pending
           - publish_latest
-        default: generate_and_publish
+        default: prepare_images
   schedule:
     # Four independent production slots per day; no exact-clock guard.
     - cron: "0 6,10,14,18 * * *"
@@ -74,26 +74,26 @@ jobs:
       - name: Validate Python syntax
         run: python -m py_compile main.py manual_pipeline.py publish_youtube.py
 
-      - name: Generate and validate one video
-        id: build
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.action != 'publish_latest' }}
+      - name: Prepare script and Gemini image prompts
+        id: prepare
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action == 'prepare_images') }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: gemini-2.5-flash
-          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
-          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
-          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HF_IMAGE_MODEL: black-forest-labs/FLUX.1-schnell
         run: |
           test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets."; exit 1; }
+          python manual_pipeline.py --prepare
+
+      - name: Render video from uploaded Gemini images
+        id: render
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
+        env:
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+        run: |
           test -n "$FISH_API_KEY" || { echo "::error::Add FISH_API_KEY in Actions secrets."; exit 1; }
           test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
-          if [ -z "$HF_TOKEN" ] && [ -z "$POLLINATIONS_API_KEY" ]; then
-            echo "::error::Add HF_TOKEN or POLLINATIONS_API_KEY in Actions secrets to enable image generation."
-            exit 1
-          fi
-          python main.py --one
+          python manual_pipeline.py --render-pending
 
       - name: Select latest saved video for publishing
         id: latest
@@ -139,7 +139,7 @@ jobs:
           cd ..
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add kombo-city-factory/used.txt kombo-city-factory/output/
+          git add -A kombo-city-factory/used.txt kombo-city-factory/output/ kombo-city-factory/pending/
           if git diff --cached --quiet; then
             echo "No generated output to commit."
           else
