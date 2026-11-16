@@ -27,6 +27,9 @@ def prepare():
     data = factory.gemini_json(idea["idea"])
     folder = PENDING / f"idea_{idea['id']}"
     folder.mkdir(parents=True, exist_ok=False)
+    inbox_folder = INBOX / folder.name
+    inbox_folder.mkdir(parents=True, exist_ok=True)
+    (inbox_folder / ".gitkeep").write_text("", encoding="utf-8")
     (folder / "script.json").write_text(
         json.dumps({"idea": idea, "content": data}, ensure_ascii=False, indent=2), encoding="utf-8")
     lines = [f"# كومبو — الفكرة رقم {idea['id']}", "",
