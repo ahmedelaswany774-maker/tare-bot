@@ -116,10 +116,10 @@ def gemini_json(idea: str) -> dict:
                 raise ValueError(f"Gemini returned no candidates: {str(data.get('promptFeedback', {}))[:300]}")
             candidate = candidates[0]
             parts = (candidate.get("content") or {}).get("parts") or []
-            text = "\\n".join(part.get("text", "") for part in parts if part.get("text")).strip()
+            text = "\n".join(part.get("text", "") for part in parts if part.get("text")).strip()
             if not text:
                 raise ValueError(f"Gemini returned empty text (finishReason={candidate.get('finishReason')}).")
-            text = re.sub(r"^\\s*```(?:json)?\\s*|\\s*```\\s*$", "", text, flags=re.I)
+            text = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", text, flags=re.I)
             result = json.loads(text)
             required = ("script", "image1", "image2", "image3", "image4", "image5", "image6", "title", "caption", "srt_parts")
             missing = [key for key in required if
