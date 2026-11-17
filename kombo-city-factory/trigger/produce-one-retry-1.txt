@@ -1,0 +1,1 @@
+Retry one new Kombo City Short after Gemini structured-output fix. Generate exactly one new unused idea and publish only after successful render and validation.
