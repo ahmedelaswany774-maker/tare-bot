@@ -34,11 +34,11 @@ def prepare():
         f"# كومبو — الفكرة رقم {idea['id']}", '',
         f"**الفكرة:** {idea['idea']}", '',
         '## المطلوب من تطبيق Gemini',
-        'انسخ النص التالي كاملًا إلى تطبيق Gemini. احفظ الناتج JSON باسم content.json داخل مجلد pending/idea_{idea['id']}/. لا تضع Markdown أو شرحًا خارج JSON.',
+        f"انسخ النص التالي كاملًا إلى تطبيق Gemini. احفظ الناتج JSON باسم content.json داخل مجلد pending/idea_{idea['id']}/. لا تضع Markdown أو شرحًا خارج JSON.",
         '', '```text', prompt, '```', '',
         '## الصور الستة',
         'استخدم أوصاف image1 إلى image6 لتوليد ست صور منفصلة عمودية 9:16، بدون كتابة أو شعارات أو كولاج.',
-        'ارفع الصور إلى kombo-city-factory/inbox/idea_{idea['id']}/ بالأسماء scene_1.jpg إلى scene_6.jpg.',
+        f"ارفع الصور إلى kombo-city-factory/inbox/idea_{idea['id']}/ بالأسماء scene_1.jpg إلى scene_6.jpg.",
         '', 'بعد رفع content.json والصور الستة، يبدأ التصيير والصوت تلقائيًا عند وصول الصور.'
     ]
     (folder / 'prompt.md').write_text('\n'.join(instructions), encoding='utf-8')
