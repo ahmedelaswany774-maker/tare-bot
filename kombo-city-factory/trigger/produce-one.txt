@@ -1,0 +1,1 @@
+One-time production trigger. Generate exactly one new unused Kombo City Short using the current local Pillow scene generator, configured Fish Audio voice, and publish it publicly to the verified @RowatAlwaqe channel. Do not reuse an existing video.
