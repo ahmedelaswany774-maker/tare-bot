@@ -32,7 +32,7 @@ FISH_API_KEY = os.getenv("FISH_API_KEY", "").strip()
 FISH_VOICE_ID = os.getenv("FISH_VOICE_ID", "").strip()
 FISH_TTS_URL = "https://api.fish.audio/v1/tts"
 FISH_MODEL = "s2.1-pro-free"
-MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.getenv("GEMINI_SCRIPT_MODEL", os.getenv("GEMINI_MODEL", "gemini-2.5-flash"))
 IMAGE_BASE = "https://gen.pollinations.ai/image/"
 POLLINATIONS_API_KEY = os.getenv("POLLINATIONS_API_KEY", "").strip()
 HF_TOKEN = os.getenv("HF_TOKEN", "").strip()
@@ -123,222 +123,93 @@ def gemini_json(idea: str) -> dict:
 
 
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
-    """Generate premium cinematic 3D frames; fail closed instead of publishing primitive placeholders."""
-    global HF_PROVIDER_DISABLED
+    """Generate one vertical cinematic scene with Gemini Nano Banana; no paid third-party fallback."""
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY غير موجود في GitHub Secrets.")
+    image_model = os.getenv("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image").strip()
     palette = (
-        "ONE SINGLE FULL-FRAME CINEMATIC STILL, one continuous camera shot, vertical 9:16 composition. "
-        "This is ONE image for ONE moment in a film, NOT a storyboard, NOT a contact sheet, NOT a collage. "
-        "No split screen, no panels, no grids, no triptych, no stacked frames, no repeated subject, no duplicated people. "
-        "High-end cinematic 3D animated feature film still, art-directed professional studio quality, "
-        "physically based rendering, detailed realistic materials, sophisticated global illumination, "
-        "volumetric key light and rim light, atmospheric depth, cinematic color grading, "
-        "clearly exposed subject with readable face and object details, balanced midtones, visible shadow detail, "
-        "bright cyan practical lights and warm gold fill light, never underexposed or crushed blacks, "
-        "deep midnight navy, electric cyan and restrained warm gold palette, "
-        "visually rich but uncluttered composition, no text, no letters, no typography, no logos, no watermark. "
+        "Create ONE single full-frame cinematic 3D animated feature-film still, vertical 9:16. "
+        "One continuous camera shot, not a storyboard, collage, grid, split screen, or contact sheet. "
+        "Premium studio-quality 3D rendering, detailed materials, global illumination, cinematic color grading, "
+        "bright readable exposure, clear subject details, atmospheric depth, no text, no letters, no logos, no watermark. "
     )
     host_identity = (
-        "Show EXACTLY ONE presenter, appearing ONCE in the entire image. "
-        "One head, one face, one torso, one pair of arms, one body. "
-        "Young adult male cartoon presenter, warm approachable face, expressive brown eyes, "
-        "thick dark wavy hair with a defined silhouette, thin round glasses, "
-        "navy tailored hoodie with one small cyan geometric chest mark. "
-        "Keep this same character design across separate generated images, but NEVER show multiple copies "
-        "or multiple poses of him inside this single image. Premium feature-animation character sculpt, "
-        "detailed skin shading, expressive natural hand gesture. "
+        "If this is a presenter shot, show exactly one young adult male cartoon presenter, once only: "
+        "warm approachable face, expressive brown eyes, thick dark wavy hair, thin round glasses, "
+        "navy hoodie with a small cyan geometric chest mark. Keep his design consistent between presenter shots. "
     )
     if scene in (1, 3, 5):
-        fixed = palette + host_identity + (
-            "Single-subject presenter portrait, medium shot from waist or chest up, "
-            "one clear readable silhouette centered in one uninterrupted studio environment. "
-            "No screens, mirrors, posters, background people, picture-in-picture, or character portraits. "
-            "Use a distinct camera angle or gesture for this shot while keeping only one presenter visible. "
-        )
+        composition = host_identity + "Medium waist-up presenter shot in one uncluttered cinematic studio environment. "
     else:
-        fixed = palette + (
-            "CINEMATIC EXPLANATORY CUTAWAY. Absolutely no people, no presenter, no faces, no characters, "
-            "no human silhouettes, and no reflections of people. Show only the actual subject or mechanism "
-            "as one hero object in one uninterrupted environment, with physically plausible detail, "
-            "layered depth, dramatic macro or wide lens composition. "
+        composition = (
+            "Cinematic explanatory cutaway showing only the story subject or mechanism as a hero object. "
+            "No people, faces, characters, human silhouettes, or reflections of people. "
         )
-    full_prompt = fixed + prompt + (
-        " STRICT NEGATIVE COMPOSITION RULES: no collage, no triptych, no storyboard, no comic panels, "
-        "no tiled layout, no vertical or horizontal strips, no repeated character, no cloned subject, "
-        "no before-and-after layout, no multiple views of the same person, no inset images. "
-        "Avoid flat vector art, simple geometric icons, childish clipart, crude drawings, generic robot mascots, "
-        "flat lighting, plastic low-detail faces, duplicated limbs, distorted hands, illegible text."
+    full_prompt = palette + composition + prompt + (
+        " Strictly avoid multiple panels, repeated subjects, duplicated people, borders, inset images, "
+        "illegible writing, crude clipart, flat vector art, dark underexposed scenes, and distorted anatomy."
     )
-    if not HF_TOKEN and not POLLINATIONS_API_KEY:
-        raise RuntimeError(
-            "أضف HF_TOKEN أو POLLINATIONS_API_KEY في GitHub Actions Secrets لتفعيل توليد الصور."
-        )
-    headers = {"Authorization": f"Bearer {POLLINATIONS_API_KEY}"} if POLLINATIONS_API_KEY else {}
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{image_model}:generateContent"
+    delays = (20, 45, 90, 120)
     last_error = None
-    for attempt in range(3):
+    for attempt in range(len(delays) + 1):
         try:
-            attempt_prompt = full_prompt
-            if attempt > 0:
-                attempt_prompt += (
-                    " CORRECTIVE RETRY: create a completely different single-camera composition. "
-                    "One uninterrupted scene filling the entire vertical frame edge-to-edge. "
-                    "Absolutely no divider lines, borders, split-screen, panels, frames, or multiple views. "
-                    "Do not place a straight vertical or horizontal line through the center. "
+            payload = {
+                "contents": [{"role": "user", "parts": [{"text": full_prompt}]}],
+                "generationConfig": {
+                    "responseModalities": ["IMAGE"],
+                    "imageConfig": {"aspectRatio": "9:16"}
+                }
+            }
+            response = SESSION.post(url, params={"key": api_key}, json=payload, timeout=240)
+            if response.status_code in (429, 500, 502, 503, 504):
+                raise RuntimeError(f"Gemini Nano Banana HTTP {response.status_code}: {response.text[:500]}")
+            response.raise_for_status()
+            data = response.json()
+            image_part = None
+            for candidate in data.get("candidates", []):
+                for part in candidate.get("content", {}).get("parts", []):
+                    inline = part.get("inlineData") or part.get("inline_data")
+                    if inline and inline.get("data"):
+                        image_part = inline
+                        break
+                if image_part:
+                    break
+            if not image_part:
+                raise RuntimeError(
+                    "Gemini image model returned no image bytes. Check that GEMINI_IMAGE_MODEL "
+                    "supports image generation for this API key/project."
                 )
-            image_bytes = None
-            image_source = ""
-            if HF_TOKEN and not HF_PROVIDER_DISABLED:
-                try:
-                    from huggingface_hub import InferenceClient
-                    hf_client = InferenceClient(provider="auto", api_key=HF_TOKEN, timeout=180)
-                    hf_image = hf_client.text_to_image(
-                        attempt_prompt,
-                        model=HF_IMAGE_MODEL,
-                        width=1024,
-                        height=1792,
-                    )
-                    buffer = io.BytesIO()
-                    hf_image.save(buffer, format="JPEG", quality=95)
-                    image_bytes = buffer.getvalue()
-                    image_source = f"Hugging Face ({HF_IMAGE_MODEL})"
-                except Exception as hf_error:
-                    hf_status = getattr(getattr(hf_error, "response", None), "status_code", None)
-                    if hf_status == 402 or "402 Payment Required" in str(hf_error):
-                        HF_PROVIDER_DISABLED = True
-                        print("Hugging Face returned HTTP 402; disabling it for the rest of this run to avoid repeated billing-blocked requests.")
-                    if not POLLINATIONS_API_KEY:
-                        raise RuntimeError(f"Hugging Face image generation failed: {hf_error}") from hf_error
-                    print(f"Hugging Face unavailable; falling back to Pollinations: {hf_error}")
-
-            if image_bytes is None:
-                if not POLLINATIONS_API_KEY:
-                    raise RuntimeError("Hugging Face did not return an image and no Pollinations fallback key is configured.")
-                url = IMAGE_BASE + quote(attempt_prompt, safe="") + "?model=zimage&width=1024&height=1792"
-                response = SESSION.get(url, headers=headers, timeout=150)
-                if response.status_code == 402:
-                    raise RuntimeError(
-                        "Pollinations HTTP 402: رصيد الحساب أو ميزانية المفتاح غير كافية. "
-                        "تحقق من الرصيد وحدود المفتاح لدى المزود."
-                    )
-                if response.status_code in (401, 403):
-                    raise RuntimeError(
-                        f"Pollinations HTTP {response.status_code}: مفتاح API غير صالح أو لا يملك صلاحية توليد الصور."
-                    )
-                response.raise_for_status()
-                image_bytes = response.content
-                image_content_type = response.headers.get("content-type", "")
-                image_source = "Pollinations"
-                if not image_content_type.startswith("image/"):
-                    raise ValueError("Pollinations returned a non-image response.")
-
-            if len(image_bytes) < 25_000:
-                raise ValueError(f"{image_source} returned a low-quality or invalid image payload.")
-            destination.write_bytes(image_bytes)
-            with Image.open(destination) as image_file:
-                image_file.verify()
-            # The current image endpoint may ignore requested dimensions and return 580x1015.
-            # Accept a valid portrait master, then upscale once with a high-quality resampler.
-            with Image.open(destination) as image_file:
-                image_file = image_file.convert("RGB")
-                if image_file.width < 512 or image_file.height < 900:
-                    raise ValueError(f"Image resolution too low even for safe upscale: {image_file.width}x{image_file.height}")
-                # Analyze a small normalized copy. Initialize both objects explicitly:
-                # the seam detector reads px, and the luminance gate reads probe.
-                probe = image_file.resize((96, 160), Image.Resampling.LANCZOS)
-                px = probe.load()
-                # Detect only narrow, near-continuous separator lines. Pixel variation alone
-                # is not evidence of a collage: ordinary object edges and lighting changes are common.
-                def separator_clusters(axis: str) -> list[tuple[int, int]]:
-                    candidates = []
-                    if axis == "vertical":
-                        positions = range(2, 94)
-                        span = 152
-                        for pos in positions:
-                            jumps = 0
-                            for yy in range(4, 156):
-                                a, b = px[pos - 1, yy], px[pos, yy]
-                                if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 125:
-                                    jumps += 1
-                            if jumps >= int(span * 0.88):
-                                candidates.append(pos)
-                    else:
-                        positions = range(2, 158)
-                        span = 88
-                        for pos in positions:
-                            jumps = 0
-                            for xx in range(4, 92):
-                                a, b = px[xx, pos - 1], px[xx, pos]
-                                if sum(abs(int(a[c]) - int(b[c])) for c in range(3)) >= 125:
-                                    jumps += 1
-                            if jumps >= int(span * 0.88):
-                                candidates.append(pos)
-                    clusters = []
-                    for pos in candidates:
-                        if not clusters or pos - clusters[-1][1] > 2:
-                            clusters.append([pos, pos])
-                        else:
-                            clusters[-1][1] = pos
-                    return [(a, b) for a, b in clusters]
-
-                vertical_clusters = separator_clusters("vertical")
-                horizontal_clusters = separator_clusters("horizontal")
-
-                def has_center_divider(clusters: list[tuple[int, int]], extent: int) -> bool:
-                    # A single divider is suspicious only when it is thin, almost continuous,
-                    # and placed in the central region typical of a split-screen layout.
-                    for left, right in clusters:
-                        center = (left + right) / 2
-                        if right - left <= 3 and extent * 0.25 <= center <= extent * 0.75:
-                            return True
-                    return False
-
-                if (len(vertical_clusters) >= 2 or len(horizontal_clusters) >= 2
-                        or has_center_divider(vertical_clusters, 96)
-                        or has_center_divider(horizontal_clusters, 160)):
-                    raise ValueError(
-                        f"رفض فاصل لوحات واضح: horizontal_clusters={len(horizontal_clusters)}, "
-                        f"vertical_clusters={len(vertical_clusters)}"
-                    )
-                gray = probe.convert("L")
-                histogram = gray.histogram()
-                near_black_pixels = sum(histogram[:8])
-                mean_luminance = sum(i * n for i, n in enumerate(histogram)) / (96 * 160)
-                # Dark navy is intentional in the brand palette; reject only genuinely unusable near-black frames.
-                if near_black_pixels / (96 * 160) > 0.82 or mean_luminance < 12:
-                    raise ValueError(
-                        f"رفض إطار شبه أسود فعلًا: near_black={near_black_pixels / (96 * 160):.0%}, "
-                        f"mean_luminance={mean_luminance:.1f}"
-                    )
-                ratio = image_file.width / image_file.height
+            import base64
+            raw = base64.b64decode(image_part["data"])
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(raw)
+            with Image.open(destination) as image:
+                image.verify()
+            with Image.open(destination) as image:
+                if image.width < 512 or image.height < 900:
+                    raise RuntimeError(f"Gemini image resolution too small: {image.width}x{image.height}.")
+                ratio = image.width / image.height
                 if not 0.52 <= ratio <= 0.62:
-                    raise ValueError(f"Image is not portrait 9:16: {image_file.width}x{image_file.height}")
-                # Center-crop the provider frame to the exact Shorts 9:16 ratio before resizing.
-                # This avoids stretching a 580x1015 (or similar) source into a different aspect ratio.
-                target_ratio = WIDTH / HEIGHT
-                source_ratio = image_file.width / image_file.height
-                if source_ratio > target_ratio:
-                    crop_width = int(round(image_file.height * target_ratio))
-                    left = (image_file.width - crop_width) // 2
-                    image_file = image_file.crop((left, 0, left + crop_width, image_file.height))
-                elif source_ratio < target_ratio:
-                    crop_height = int(round(image_file.width / target_ratio))
-                    top = (image_file.height - crop_height) // 2
-                    image_file = image_file.crop((0, top, image_file.width, top + crop_height))
-                image_file = image_file.resize((WIDTH, HEIGHT), Image.Resampling.LANCZOS)
-                image_file = image_file.filter(ImageFilter.UnsharpMask(radius=1.4, percent=115, threshold=3))
-                image_file.save(destination, format="JPEG", quality=94, optimize=True)
-            print(f"Scene {scene}: accepted portrait frame from {image_source} and normalized to 1080x1920.")
+                    raise RuntimeError(f"Gemini image is not vertical 9:16: {image.width}x{image.height}.")
+                image.convert("RGB").save(destination, "JPEG", quality=94, optimize=True)
+            print(f"Gemini Nano Banana: المشهد {scene}/6 جاهز ({image_model}).")
             return
         except Exception as exc:
             last_error = exc
-            if attempt < 2 and not (isinstance(exc, RuntimeError) and ("HTTP 402" in str(exc) or "HTTP 401" in str(exc) or "HTTP 403" in str(exc))):
-                time.sleep(4 * (attempt + 1))
-            elif isinstance(exc, RuntimeError) and ("HTTP 402" in str(exc) or "HTTP 401" in str(exc) or "HTTP 403" in str(exc)):
+            retryable = (
+                isinstance(exc, (requests.exceptions.Timeout, requests.exceptions.ConnectionError))
+                or (isinstance(exc, RuntimeError) and any(
+                    f"Gemini Nano Banana HTTP {code}" in str(exc) for code in (408, 429, 500, 502, 503, 504)
+                ))
+            )
+            if not retryable or attempt >= len(delays):
                 break
-    raise RuntimeError(
-        f"تعذر إنتاج مشهد سينمائي صالح رقم {scene}: {last_error}. "
-        "أوقفنا الإنتاج بدل استخدام رسمة احتياطية بدائية أو نشر فيديو ضعيف."
-    )
-
+            delay = delays[attempt]
+            print(f"Gemini Nano Banana temporary error; retry {attempt + 1}/{len(delays)} in {delay}s: {exc}")
+            time.sleep(delay)
+    raise RuntimeError(f"فشل توليد الصورة السينمائية رقم {scene} عبر Gemini Nano Banana: {last_error}")
 
 def make_tts(text: str, output: Path) -> None:
     """Generate narration with the configured Fish Audio cloned voice; never silently fall back."""
@@ -568,7 +439,7 @@ def main() -> int:
         "caption": data["caption"], "script": data["script"], "duration_seconds": TARGET_SECONDS,
         "voice": "Fish Audio configured voice", "presenter": "Kombo - consistent young male 3D cartoon host",
         "visual_style": "6-shot cinematic 3D sequence; presenter/cutaway alternation; high-resolution fail-closed image quality gate",
-        "image_provider": "Pollinations high-resolution; fail-closed quality gate"
+        "image_provider": os.getenv("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image")
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     gh_output = os.getenv("GITHUB_OUTPUT")
     if gh_output:
