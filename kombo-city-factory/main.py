@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import csv
 import io
+import math
 import json
 import os
 import random
@@ -123,93 +124,121 @@ def gemini_json(idea: str) -> dict:
 
 
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
-    """Generate one vertical cinematic scene with Gemini Nano Banana; no paid third-party fallback."""
-    api_key = os.getenv("GEMINI_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY غير موجود في GitHub Secrets.")
-    image_model = os.getenv("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image").strip()
-    palette = (
-        "Create ONE single full-frame cinematic 3D animated feature-film still, vertical 9:16. "
-        "One continuous camera shot, not a storyboard, collage, grid, split screen, or contact sheet. "
-        "Premium studio-quality 3D rendering, detailed materials, global illumination, cinematic color grading, "
-        "bright readable exposure, clear subject details, atmospheric depth, no text, no letters, no logos, no watermark. "
-    )
-    host_identity = (
-        "If this is a presenter shot, show exactly one young adult male cartoon presenter, once only: "
-        "warm approachable face, expressive brown eyes, thick dark wavy hair, thin round glasses, "
-        "navy hoodie with a small cyan geometric chest mark. Keep his design consistent between presenter shots. "
-    )
-    if scene in (1, 3, 5):
-        composition = host_identity + "Medium waist-up presenter shot in one uncluttered cinematic studio environment. "
+    """Create a polished, topic-aware vertical motion-graphics scene locally; no image API or paid provider."""
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    w, h = WIDTH, HEIGHT
+    seed = sum(ord(ch) for ch in (prompt or "")) + scene * 7919
+    rng = random.Random(seed)
+    # Deep cinematic gradient with a restrained cyan/amber lighting palette.
+    top = (7, 14, 34)
+    bottom = (15, 35, 62)
+    image = Image.new("RGB", (w, h))
+    px = image.load()
+    for y in range(h):
+        t = y / max(1, h - 1)
+        glow = max(0.0, 1.0 - abs(t - (0.35 + scene * 0.035)) / 0.48)
+        row = tuple(int(top[c] * (1-t) + bottom[c] * t + (10, 35, 48)[c] * glow) for c in range(3))
+        for x in range(w):
+            px[x, y] = row
+    # Large soft light source behind the hero object.
+    glow_layer = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    gd = ImageDraw.Draw(glow_layer)
+    cx, cy = w // 2, int(h * (0.43 + (scene % 3) * 0.035))
+    for radius, alpha in ((430, 10), (330, 14), (230, 20), (140, 25)):
+        gd.ellipse((cx-radius, cy-radius, cx+radius, cy+radius), fill=(30, 190, 230, alpha))
+    glow_layer = glow_layer.filter(ImageFilter.GaussianBlur(75))
+    image = Image.alpha_composite(image.convert("RGBA"), glow_layer)
+    d = ImageDraw.Draw(image, "RGBA")
+    # Perspective floor/grid and subtle technical framing.
+    horizon = int(h * 0.70)
+    for k in range(-8, 9):
+        x0 = cx + k * 28
+        d.line((cx + k * 8, horizon, x0 * 3 - cx * 2, h), fill=(60, 180, 220, 35), width=2)
+    for j in range(1, 9):
+        yy = horizon + int((h-horizon) * (j/9) ** 1.7)
+        d.line((0, yy, w, yy), fill=(60, 180, 220, 25), width=2)
+    # Floating particles add depth without looking like placeholder clipart.
+    for _ in range(95):
+        x, y = rng.randrange(35, w-35), rng.randrange(100, h-120)
+        r = rng.choice((2, 3, 4, 6))
+        d.ellipse((x-r, y-r, x+r, y+r), fill=(105, 220, 245, rng.randrange(35, 115)))
+    # Determine the visual family from the scene prompt and idea vocabulary.
+    words = (prompt or "").lower()
+    is_cpu = any(k in words for k in ("cpu", "processor", "معالج", "بروسيسور", "كمبيوتر", "computer"))
+    is_phone = any(k in words for k in ("phone", "mobile", "smartphone", "موبايل", "هاتف"))
+    is_network = any(k in words for k in ("internet", "network", "شبكة", "اتصال", "بيانات", "data"))
+    is_energy = any(k in words for k in ("energy", "power", "طاقة", "كهرب", "بطارية", "battery"))
+    # Alternate camera composition across the six shots while keeping one coherent visual identity.
+    if is_cpu:
+        size = 430 if scene % 2 else 360
+        x1, y1 = cx-size//2, cy-size//2
+        x2, y2 = cx+size//2, cy+size//2
+        # CPU pins and ceramic substrate.
+        for q in range(-5, 6):
+            off = q * 38
+            d.line((x1+off+size//2, y1-58, x1+off+size//2, y1), fill=(120, 210, 235, 210), width=12)
+            d.line((x1+off+size//2, y2, x1+off+size//2, y2+58), fill=(120, 210, 235, 210), width=12)
+            d.line((x1-58, y1+off+size//2, x1, y1+off+size//2), fill=(120, 210, 235, 210), width=12)
+            d.line((x2, y1+off+size//2, x2+58, y1+off+size//2), fill=(120, 210, 235, 210), width=12)
+        d.rounded_rectangle((x1-20,y1-20,x2+20,y2+20), radius=42, fill=(18,38,62,245), outline=(65,205,235,230), width=8)
+        d.rounded_rectangle((x1+35,y1+35,x2-35,y2-35), radius=28, fill=(7,18,37,255), outline=(225,165,82,230), width=5)
+        for q in range(5):
+            yy = y1+90+q*58
+            d.line((x1+85,yy,x2-85,yy), fill=(50,170,215,100), width=3)
+        d.rounded_rectangle((cx-95,cy-95,cx+95,cy+95), radius=24, fill=(23,76,104,255), outline=(110,230,245,255), width=7)
+        d.rectangle((cx-50,cy-50,cx+50,cy+50), fill=(38,130,157,255), outline=(225,190,110,255), width=4)
+        for q in range(7):
+            xx = x1 + 70 + q*48
+            d.line((xx,y1+12,xx,y1-105-rng.randrange(0,45)), fill=(80,205,230,140), width=3)
+    elif is_phone:
+        pw, ph = 360, 690
+        x1, y1 = cx-pw//2, cy-ph//2
+        d.rounded_rectangle((x1-18,y1-18,x1+pw+18,y1+ph+18), radius=70, fill=(135,170,190,255), outline=(215,235,245,255), width=8)
+        d.rounded_rectangle((x1,y1,x1+pw,y1+ph), radius=58, fill=(5,18,36,255), outline=(55,190,220,255), width=6)
+        d.rounded_rectangle((x1+22,y1+35,x1+pw-22,y1+ph-35), radius=35, fill=(13,55,78,255))
+        for q in range(5):
+            yy = y1+150+q*88
+            d.rounded_rectangle((x1+55,yy,x1+pw-55,yy+42), radius=18, fill=(35+q*7,125+q*8,155+q*8,220))
+        d.ellipse((cx-30,y1+ph-65,cx+30,y1+ph-5), outline=(140,225,240,220), width=5)
+    elif is_network or is_energy:
+        nodes = []
+        for q in range(11):
+            angle = (q/11)*6.283 + scene*0.2
+            radius = rng.randint(180, 360)
+            nx = cx + int(math.cos(angle)*radius)
+            ny = cy + int(math.sin(angle)*radius*0.82)
+            nodes.append((nx,ny))
+        for q, (nx,ny) in enumerate(nodes):
+            for mx,my in nodes[q+1:]:
+                if (nx-mx)**2+(ny-my)**2 < 170000:
+                    d.line((nx,ny,mx,my), fill=(65,190,225,85), width=4)
+        for nx,ny in nodes:
+            d.ellipse((nx-25,ny-25,nx+25,ny+25), fill=(30,125,160,230), outline=(135,230,245,255), width=5)
+        d.ellipse((cx-125,cy-125,cx+125,cy+125), fill=(20,78,105,245), outline=(240,185,100,255), width=9)
+        d.ellipse((cx-65,cy-65,cx+65,cy+65), fill=(70,180,195,255))
     else:
-        composition = (
-            "Cinematic explanatory cutaway showing only the story subject or mechanism as a hero object. "
-            "No people, faces, characters, human silhouettes, or reflections of people. "
-        )
-    full_prompt = palette + composition + prompt + (
-        " Strictly avoid multiple panels, repeated subjects, duplicated people, borders, inset images, "
-        "illegible writing, crude clipart, flat vector art, dark underexposed scenes, and distorted anatomy."
-    )
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{image_model}:generateContent"
-    delays = (20, 45, 90, 120)
-    last_error = None
-    for attempt in range(len(delays) + 1):
-        try:
-            payload = {
-                "contents": [{"role": "user", "parts": [{"text": full_prompt}]}],
-                "generationConfig": {
-                    "responseModalities": ["IMAGE"],
-                    "imageConfig": {"aspectRatio": "9:16"}
-                }
-            }
-            response = SESSION.post(url, params={"key": api_key}, json=payload, timeout=240)
-            if response.status_code in (429, 500, 502, 503, 504):
-                raise RuntimeError(f"Gemini Nano Banana HTTP {response.status_code}: {response.text[:500]}")
-            response.raise_for_status()
-            data = response.json()
-            image_part = None
-            for candidate in data.get("candidates", []):
-                for part in candidate.get("content", {}).get("parts", []):
-                    inline = part.get("inlineData") or part.get("inline_data")
-                    if inline and inline.get("data"):
-                        image_part = inline
-                        break
-                if image_part:
-                    break
-            if not image_part:
-                raise RuntimeError(
-                    "Gemini image model returned no image bytes. Check that GEMINI_IMAGE_MODEL "
-                    "supports image generation for this API key/project."
-                )
-            import base64
-            raw = base64.b64decode(image_part["data"])
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_bytes(raw)
-            with Image.open(destination) as image:
-                image.verify()
-            with Image.open(destination) as image:
-                if image.width < 512 or image.height < 900:
-                    raise RuntimeError(f"Gemini image resolution too small: {image.width}x{image.height}.")
-                ratio = image.width / image.height
-                if not 0.52 <= ratio <= 0.62:
-                    raise RuntimeError(f"Gemini image is not vertical 9:16: {image.width}x{image.height}.")
-                image.convert("RGB").save(destination, "JPEG", quality=94, optimize=True)
-            print(f"Gemini Nano Banana: المشهد {scene}/6 جاهز ({image_model}).")
-            return
-        except Exception as exc:
-            last_error = exc
-            retryable = (
-                isinstance(exc, (requests.exceptions.Timeout, requests.exceptions.ConnectionError))
-                or (isinstance(exc, RuntimeError) and any(
-                    f"Gemini Nano Banana HTTP {code}" in str(exc) for code in (408, 429, 500, 502, 503, 504)
-                ))
-            )
-            if not retryable or attempt >= len(delays):
-                break
-            delay = delays[attempt]
-            print(f"Gemini Nano Banana temporary error; retry {attempt + 1}/{len(delays)} in {delay}s: {exc}")
-            time.sleep(delay)
-    raise RuntimeError(f"فشل توليد الصورة السينمائية رقم {scene} عبر Gemini Nano Banana: {last_error}")
+        # A cinematic abstract "idea core": layered glass rings and luminous centerpiece.
+        for q, radius in enumerate((330,270,205,135)):
+            bbox=(cx-radius,cy-radius,cx+radius,cy+radius)
+            d.ellipse(bbox, outline=(65+q*25,185+q*10,225,150+q*20), width=8 if q<2 else 5)
+        d.ellipse((cx-115,cy-115,cx+115,cy+115), fill=(20,95,125,245), outline=(145,235,245,255), width=8)
+        d.ellipse((cx-62,cy-62,cx+62,cy+62), fill=(230,170,85,255))
+        for q in range(8):
+            angle=q*math.pi/4
+            ex=cx+int(math.cos(angle)*390); ey=cy+int(math.sin(angle)*320)
+            d.line((cx,cy,ex,ey), fill=(75,190,220,80), width=4)
+            d.ellipse((ex-13,ey-13,ex+13,ey+13), fill=(125,225,240,220))
+    # Shot-specific HUD accents and cinematic frame.
+    d.rounded_rectangle((38,45,w-38,h-45), radius=34, outline=(110,205,225,65), width=3)
+    d.line((70,125,260,125), fill=(235,175,90,220), width=7)
+    d.line((w-260,h-125,w-70,h-125), fill=(65,205,230,180), width=7)
+    # Slight bloom and grain-like texture keep the render polished after video zoom.
+    image = image.convert("RGB").filter(ImageFilter.GaussianBlur(0.25))
+    image.save(destination, "JPEG", quality=94, optimize=True)
+    with Image.open(destination) as check:
+        if check.size != (WIDTH, HEIGHT):
+            raise RuntimeError(f"Local scene has wrong dimensions: {check.size}.")
+    print(f"Local motion-graphics scene {scene}/6 ready (Pillow; no image API).")
 
 def make_tts(text: str, output: Path) -> None:
     """Generate narration with the configured Fish Audio cloned voice; never silently fall back."""
@@ -439,7 +468,7 @@ def main() -> int:
         "caption": data["caption"], "script": data["script"], "duration_seconds": TARGET_SECONDS,
         "voice": "Fish Audio configured voice", "presenter": "Kombo - consistent young male 3D cartoon host",
         "visual_style": "6-shot cinematic 3D sequence; presenter/cutaway alternation; high-resolution fail-closed image quality gate",
-        "image_provider": os.getenv("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image")
+        "image_provider": "Local Pillow cinematic motion graphics (no image API)"
     }, ensure_ascii=False, indent=2), encoding="utf-8")
     gh_output = os.getenv("GITHUB_OUTPUT")
     if gh_output:
