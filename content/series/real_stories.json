@@ -1295,7 +1295,7 @@
           "url": "https://gate.ahram.org.eg/daily/News/202594/29/643265/المحافظات/قصص--كفاح-أمهات-لا-تعرفن-المستحيل.aspx"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1307,8 +1307,10 @@
       "script_path": "content/drafts/verified_real/episode-48.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4043,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-17T18:06:21+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-17T18:06:21+00:00",
+      "youtube_video_id": "fOkmlqixgbM",
+      "published_at": "2026-11-17T18:06:26+00:00"
     },
     {
       "episode_id": "social-49-story-49",
