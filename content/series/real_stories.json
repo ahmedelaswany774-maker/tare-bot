@@ -1266,7 +1266,9 @@
       ],
       "script_path": "content/drafts/verified_real/episode-47.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 4258
+      "draft_word_count": 4258,
+      "upload_status": "uploading",
+      "upload_started_at": "2026-11-17T13:34:09+00:00"
     },
     {
       "episode_id": "social-48-story-48",
