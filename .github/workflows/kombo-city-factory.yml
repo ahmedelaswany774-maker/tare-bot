@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "kombo-city-factory/inbox/**/scene_*.jpg"
+      - "kombo-city-factory/trigger/**"
   workflow_dispatch:
     inputs:
       action:
@@ -82,15 +83,16 @@ jobs:
 
       - name: Render video from uploaded Gemini images
         id: render
-        if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[auto-generate]') || contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/trigger/'))) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_SCRIPT_MODEL: ${{ vars.GEMINI_SCRIPT_MODEL || 'gemini-2.5-flash' }}
+          AUTO_GENERATE: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[auto-generate]') }}
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
         run: |
           set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ] || [ "$AUTO_GENERATE" = "true" ]; then
             test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets. Gemini API key is required for script generation; visual scenes are generated locally for free."; exit 1; }
             test -n "$FISH_API_KEY" || { echo "::error::Add FISH_API_KEY in Actions secrets."; exit 1; }
             test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
