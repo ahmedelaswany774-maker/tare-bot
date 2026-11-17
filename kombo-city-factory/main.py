@@ -78,9 +78,27 @@ def gemini_json(idea: str) -> dict:
     template = PROMPT_FILE.read_text(encoding="utf-8")
     prompt = template.replace("{idea}", idea)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
+    response_schema = {
+        "type": "OBJECT",
+        "properties": {
+            "script": {"type": "STRING"},
+            "image1": {"type": "STRING"}, "image2": {"type": "STRING"},
+            "image3": {"type": "STRING"}, "image4": {"type": "STRING"},
+            "image5": {"type": "STRING"}, "image6": {"type": "STRING"},
+            "title": {"type": "STRING"}, "caption": {"type": "STRING"},
+            "srt_parts": {"type": "ARRAY", "items": {"type": "STRING"}}
+        },
+        "required": ["script", "image1", "image2", "image3", "image4", "image5", "image6",
+                     "title", "caption", "srt_parts"]
+    }
     payload = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "temperature": 0.75}
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "responseSchema": response_schema,
+            "temperature": 0.55,
+            "maxOutputTokens": 8192
+        }
     }
     last_error = None
     # Gemini 503/429 are transient capacity/rate-limit errors. Give the service
@@ -93,12 +111,24 @@ def gemini_json(idea: str) -> dict:
                 raise RuntimeError(f"Gemini HTTP {response.status_code}: {response.text[:300]}")
             response.raise_for_status()
             data = response.json()
-            text = data["candidates"][0]["content"]["parts"][0]["text"].strip()
-            text = re.sub(r"^\s*```(?:json)?|\s*```\s*$", "", text, flags=re.I)
+            candidates = data.get("candidates") or []
+            if not candidates:
+                raise ValueError(f"Gemini returned no candidates: {str(data.get('promptFeedback', {}))[:300]}")
+            candidate = candidates[0]
+            parts = (candidate.get("content") or {}).get("parts") or []
+            text = "\\n".join(part.get("text", "") for part in parts if part.get("text")).strip()
+            if not text:
+                raise ValueError(f"Gemini returned empty text (finishReason={candidate.get('finishReason')}).")
+            text = re.sub(r"^\\s*```(?:json)?\\s*|\\s*```\\s*$", "", text, flags=re.I)
             result = json.loads(text)
             required = ("script", "image1", "image2", "image3", "image4", "image5", "image6", "title", "caption", "srt_parts")
-            if any(not result.get(k) for k in required) or len(result["srt_parts"]) != 6:
-                raise ValueError("Gemini returned incomplete JSON fields.")
+            missing = [key for key in required if
+                       (not isinstance(result.get(key), list if key == "srt_parts" else str))
+                       or (len(result.get(key, [])) != 6 if key == "srt_parts" else not result.get(key).strip())]
+            if missing:
+                raise ValueError(f"Gemini JSON missing/invalid fields: {', '.join(missing)}")
+            if any(not isinstance(part, str) or not part.strip() for part in result["srt_parts"]):
+                raise ValueError("Gemini returned empty or invalid subtitle segments.")
             words = result["script"].split()
             if not 65 <= len(words) <= 115:
                 raise ValueError(f"طول النص غير مناسب: {len(words)} كلمة (المطلوب 65–115).")
