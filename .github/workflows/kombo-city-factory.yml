@@ -85,15 +85,14 @@ jobs:
         if: ${{ github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          GEMINI_SCRIPT_MODEL: ${{ vars.GEMINI_SCRIPT_MODEL || 'gemini-2.5-flash' }}
+          GEMINI_IMAGE_MODEL: ${{ vars.GEMINI_IMAGE_MODEL || 'gemini-2.5-flash-image' }}
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
         run: |
           set -euo pipefail
           if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
-            test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets."; exit 1; }
+            test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets. Gemini API key is required for both text and Nano Banana image generation."; exit 1; }
             test -n "$FISH_API_KEY" || { echo "::error::Add FISH_API_KEY in Actions secrets."; exit 1; }
             test -n "$FISH_VOICE_ID" || { echo "::error::Add FISH_VOICE_ID in Actions secrets."; exit 1; }
             python main.py --one
