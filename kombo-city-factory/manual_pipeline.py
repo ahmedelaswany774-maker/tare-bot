@@ -14,37 +14,38 @@ PENDING, INBOX = ROOT / "pending", ROOT / "inbox"
 def prepare():
     PENDING.mkdir(parents=True, exist_ok=True)
     used = factory.load_used()
-    pending_ids = {p.name.removeprefix("idea_") for p in PENDING.iterdir()
-                   if p.is_dir() and p.name.startswith("idea_")}
-    with factory.IDEAS_FILE.open("r", encoding="utf-8-sig", newline="") as f:
+    pending_ids = {p.name.removeprefix('idea_') for p in PENDING.iterdir()
+                   if p.is_dir() and p.name.startswith('idea_')}
+    with factory.IDEAS_FILE.open('r', encoding='utf-8-sig', newline='') as f:
         rows = list(csv.DictReader(f))
-    choices = [r for r in rows if r.get("id") and r["id"] not in used
-               and r["id"] not in pending_ids and r.get("status", "unused") != "used"]
+    choices = [r for r in rows if r.get('id') and r['id'] not in used
+               and r['id'] not in pending_ids and r.get('status', 'unused') != 'used']
     if not choices:
-        raise RuntimeError("لا توجد فكرة جديدة غير مستخدمة أو قيد تجهيز الصور.")
-    idea = sorted(choices, key=lambda r: int(r["id"]))[0]
-    print(f"Preparing idea #{idea['id']}: {idea['idea']}")
-    data = factory.gemini_json(idea["idea"])
+        raise RuntimeError('لا توجد فكرة جديدة غير مستخدمة أو قيد التجهيز.')
+    idea = sorted(choices, key=lambda r: int(r['id']))[0]
     folder = PENDING / f"idea_{idea['id']}"
     folder.mkdir(parents=True, exist_ok=False)
     inbox_folder = INBOX / folder.name
     inbox_folder.mkdir(parents=True, exist_ok=True)
-    (inbox_folder / ".gitkeep").write_text("", encoding="utf-8")
-    (folder / "script.json").write_text(
-        json.dumps({"idea": idea, "content": data}, ensure_ascii=False, indent=2), encoding="utf-8")
-    lines = [f"# كومبو — الفكرة رقم {idea['id']}", "",
-             f"الفكرة: {idea['idea']}", f"العنوان المقترح: {data['title']}", "",
-             "ولّد ست صور منفصلة، كل صورة عمودية 9:16، مشهد سينمائي واحد، بلا كتابة أو شعارات أو كولاج.",
-             "حافظ على نفس شكل المقدم في المشاهد 1 و3 و5. احفظ الصور باسم scene_1.jpg حتى scene_6.jpg.", ""]
-    for n in range(1, 7):
-        lines += [f"## المشهد {n}", "", str(data[f"image{n}"]), ""]
-    lines += [f"ارفع الصور إلى المجلد: kombo-city-factory/inbox/idea_{idea['id']}/",
-              "الأسماء المطلوبة: scene_1.jpg وscene_2.jpg وscene_3.jpg وscene_4.jpg وscene_5.jpg وscene_6.jpg.",
-              "بعد رفع الصور إلى GitHub يبدأ التصيير والصوت والنشر تلقائيًا."]
-    (folder / "prompt.md").write_text("\n".join(lines), encoding="utf-8")
-    print(f"Prompts saved: {folder / 'prompt.md'}")
+    (inbox_folder / '.gitkeep').write_text('', encoding='utf-8')
+    template = factory.PROMPT_FILE.read_text(encoding='utf-8')
+    prompt = template.replace('{idea}', idea['idea'])
+    instructions = [
+        f"# كومبو — الفكرة رقم {idea['id']}", '',
+        f"**الفكرة:** {idea['idea']}", '',
+        '## المطلوب من تطبيق Gemini',
+        'انسخ النص التالي كاملًا إلى تطبيق Gemini. احفظ الناتج JSON باسم content.json داخل مجلد pending/idea_{idea['id']}/. لا تضع Markdown أو شرحًا خارج JSON.',
+        '', '```text', prompt, '```', '',
+        '## الصور الستة',
+        'استخدم أوصاف image1 إلى image6 لتوليد ست صور منفصلة عمودية 9:16، بدون كتابة أو شعارات أو كولاج.',
+        'ارفع الصور إلى kombo-city-factory/inbox/idea_{idea['id']}/ بالأسماء scene_1.jpg إلى scene_6.jpg.',
+        '', 'بعد رفع content.json والصور الستة، يبدأ التصيير والصوت تلقائيًا عند وصول الصور.'
+    ]
+    (folder / 'prompt.md').write_text('\n'.join(instructions), encoding='utf-8')
+    print(f"Gemini app prompt ready: {folder / 'prompt.md'}")
+    print(f"Save Gemini JSON as: {folder / 'content.json'}")
+    print(f"Upload six images to: kombo-city-factory/inbox/{folder.name}/")
     return 0
-
 def normalize_image(source, destination, scene):
     try:
         with Image.open(source) as original:
@@ -75,14 +76,20 @@ def render_pending():
     selected = None
     for folder in folders:
         inbox = INBOX / folder.name
-        if (folder / "script.json").exists() and all((inbox / f"scene_{n}.jpg").exists() for n in range(1, 7)):
+        if (folder / "content.json").exists() and all((inbox / f"scene_{n}.jpg").exists() for n in range(1, 7)):
             selected = folder, inbox
             break
     if not selected:
-        raise RuntimeError("لم أجد حزمة مكتملة. ارفع scene_1.jpg إلى scene_6.jpg في مجلد inbox/idea_<ID> المطابق.")
+        raise RuntimeError("لم أجد content.json مع الصور الستة. ارفع JSON إلى pending/idea_<ID>/content.json والصور إلى inbox/idea_<ID>/.")
     folder, inbox = selected
-    bundle = json.loads((folder / "script.json").read_text(encoding="utf-8"))
-    idea, data = bundle["idea"], bundle["content"]
+    with factory.IDEAS_FILE.open("r", encoding="utf-8-sig", newline="") as f:
+        idea = next(r for r in csv.DictReader(f) if r["id"] == folder.name.removeprefix("idea_"))
+    data = json.loads((folder / "content.json").read_text(encoding="utf-8"))
+    required = ("script", "image1", "image2", "image3", "image4", "image5", "image6", "title", "caption", "srt_parts")
+    if any(not data.get(k) for k in required) or len(data["srt_parts"]) != 6:
+        raise RuntimeError("content.json ناقص أو لا يحتوي المفاتيح العشرة المطلوبة.")
+    if not 65 <= len(data["script"].split()) <= 115:
+        raise RuntimeError("طول السيناريو يجب أن يكون بين 65 و115 كلمة.")
     print(f"Rendering idea #{idea['id']}: {idea['idea']}")
     factory.require_tools()
     factory.WORK_DIR.mkdir(parents=True, exist_ok=True)
