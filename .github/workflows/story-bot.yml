@@ -1,4 +1,5 @@
 name: Story Bot - Episode Video Production and YouTube Publishing
+# Manual production trigger: this commit intentionally starts the next eligible saved real-story episode.
 # Restored to the last proven production path: use saved, reviewed scripts; no Gemini API calls.
 # Four daily production slots (Egypt winter time: 10:00, 13:00, 16:00, 19:00).
 # One approved, sourced episode per run; Fish Audio voice; public YouTube upload.
