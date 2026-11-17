@@ -1,0 +1,12 @@
+{
+  "idea_id": "16",
+  "idea": "إيه وظيفة CPU جوه الكمبيوتر والموبايل؟",
+  "title": "الـ CPU: عقل جهازك الخارق!",
+  "caption": "اكتشف إيه هو الـ CPU وليه هو أهم جزء في موبايلك وكمبيوترك! خليك فاهم جهازك صح. #كومبو_سيتي #تكنولوجيا #CPU #المعلومات_التقنية #عقل_الجهاز",
+  "script": "تخيل إن الكمبيوتر أو الموبايل بتاعك ده زي جسمك بالظبط. قلب الجسم مين؟ المخ طبعًا! هو ده بالظبط اللي بيعمله الـ CPU، أو 'وحدة المعالجة المركزية'. الـ CPU ده هو عقل الجهاز بتاعك، المسؤول عن تنفيذ كل الأوامر اللي بتديها له. يعني لما بتفتح تطبيق، بتلعب لعبة، أو حتى بتكتب رسالة، الـ CPU هو اللي بياخد الأوامر دي، بيحللها، وينفذها بسرعة خرافية عشان تشوف النتيجة قدامك. هو اللي بيخلي كل حاجة تشتغل بسلاسة ومن غير تهنيج. كل ما كان الـ CPU أقوى، كل ما جهازك كان أسرع وأذكى. فكر كده، إيه أكتر حاجة بتستخدمها في جهازك والـ CPU بتاعها لازم يكون قوي؟",
+  "duration_seconds": 45,
+  "voice": "Fish Audio configured voice",
+  "presenter": "Kombo - consistent young male 3D cartoon host",
+  "visual_style": "6-shot cinematic 3D sequence; presenter/cutaway alternation; high-resolution fail-closed image quality gate",
+  "image_provider": "Local Pillow cinematic motion graphics (no image API)"
+}
