@@ -77,11 +77,7 @@ jobs:
       - name: Prepare script and Gemini image prompts
         id: prepare
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action == 'prepare_images') }}
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash
         run: |
-          test -n "$GEMINI_API_KEY" || { echo "::error::Add GEMINI_API_KEY in Actions secrets."; exit 1; }
           python manual_pipeline.py --prepare
 
       - name: Render video from uploaded Gemini images
