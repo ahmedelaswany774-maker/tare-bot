@@ -1,0 +1,1 @@
+Produce one fresh Kombo City Short after the script length validation fix; publish publicly after validation.
