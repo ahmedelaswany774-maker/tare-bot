@@ -1374,7 +1374,7 @@
           "url": "https://www.youm7.com/story/2021/10/3/قصة-كفاح-أم-مصرية-نجلاء-16-عاما-أمام-نار-شوى/5482977"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1385,8 +1385,10 @@
       "script_path": "content/drafts/verified_real/episode-50.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 2464,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-18T23:45:40+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-18T23:45:40+00:00",
+      "youtube_video_id": "w5BEBF_0IvA",
+      "published_at": "2026-11-18T23:45:44+00:00"
     },
     {
       "episode_id": "social-51-story-51",
