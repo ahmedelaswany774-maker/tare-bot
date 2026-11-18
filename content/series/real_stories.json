@@ -1335,7 +1335,7 @@
           "url": "https://www.cairo24.com/1536595"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1346,8 +1346,10 @@
       "script_path": "content/drafts/verified_real/episode-49.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4656,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-18T17:47:56+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-18T17:47:56+00:00",
+      "youtube_video_id": "_LF3z6QRzGM",
+      "published_at": "2026-11-18T17:48:04+00:00"
     },
     {
       "episode_id": "social-50-story-50",
