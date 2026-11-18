@@ -130,8 +130,8 @@ def gemini_json(idea: str) -> dict:
             if any(not isinstance(part, str) or not part.strip() for part in result["srt_parts"]):
                 raise ValueError("Gemini returned empty or invalid subtitle segments.")
             words = result["script"].split()
-            if not 65 <= len(words) <= 115:
-                raise ValueError(f"طول النص غير مناسب: {len(words)} كلمة (المطلوب 65–115).")
+            if not 65 <= len(words) <= 130:
+                raise ValueError(f"طول النص غير مناسب: {len(words)} كلمة (المطلوب 65–130).")
             return result
         except Exception as exc:
             last_error = exc
