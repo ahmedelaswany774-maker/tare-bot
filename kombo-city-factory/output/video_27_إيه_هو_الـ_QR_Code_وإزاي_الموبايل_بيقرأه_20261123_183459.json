@@ -1,0 +1,12 @@
+{
+  "idea_id": "27",
+  "idea": "إيه هو QR Code وإزاي الموبايل بيقرأه؟",
+  "title": "إيه هو الـ QR Code وإزاي الموبايل بيقرأه؟",
+  "caption": "اكتشف سر المربعات الغريبة دي! من تخزين المعلومات لقراءة الموبايل ليها في ثواني، هنعرف كل حاجة عن الـ QR Code. #كومبو_سيتي #QR_Code #تكنولوجيا #معلومات #موبايل",
+  "script": "عمرك سألت نفسك إيه المربعات الغريبة دي اللي بنشوفها في كل حتة؟ ده يا سيدي الـ QR Code، اختصار لـ \"Quick Response\" يعني استجابة سريعة. هو باركود متطور بيخزن معلومات كتير، زي لينك لموقع أو تفاصيل منتج. الموبايل بيقرأه إزاي؟ الكاميرا بتشوف الكود كشبكة من المربعات البيضا والسودا. كل مربع بيمثل جزء من المعلومة، زي الصفر والواحد في لغة الكمبيوتر. السوفت وير في الموبايل بيحلل الأنماط دي فورًا ويحولها للمعلومة الأصلية. في ثواني بتكون المعلومة عندك! تكنولوجيا بسيطة بتسهل حياتنا، مش كده؟",
+  "duration_seconds": 45,
+  "voice": "Fish Audio configured voice",
+  "presenter": "Kombo - consistent young male 3D cartoon host",
+  "visual_style": "6-shot cinematic 3D sequence; presenter/cutaway alternation; high-resolution fail-closed image quality gate",
+  "image_provider": "Local Pillow cinematic motion graphics (no image API)"
+}
