@@ -198,6 +198,15 @@ jobs:
           raw = os.environ.get("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; stopping before video rendering.")
+          if raw.lower().startswith("base64:"):
+              raw = raw.split(":", 1)[1].strip()
+          if not raw.startswith(("{", "[", "`", "HTTP/")):
+              try:
+                  decoded = base64.b64decode(raw + "=" * (-len(raw) % 4), validate=True).decode("utf-8-sig").strip()
+                  if decoded.startswith(("{", "`", "HTTP/")):
+                      raw = decoded
+              except Exception:
+                  pass
           if raw.startswith("HTTP/"):
               match = re.search(r"\r?\n\r?\n", raw)
               if match:
