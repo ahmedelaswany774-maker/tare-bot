@@ -65,6 +65,9 @@ def load_youtube_token_info(raw):
     missing = [k for k in ("client_id", "client_secret", "refresh_token", "token") if not info.get(k)]
     if missing:
         raise RuntimeError("OAuth JSON is missing: " + ", ".join(missing) + ".")
+    # OAuth Playground responses omit expiry; force refresh from refresh_token.
+    if not info.get("expiry"):
+        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
     return info
 
 
@@ -685,52 +688,7 @@ save_json(
 )
 
 
-def load_youtube_token_info(raw):
-    # Match Kombo City Factory: accept OAuth Playground JSON plus separate
-    # GitHub client credentials, or a complete authorized-user JSON.
-    candidate = raw.lstrip("\ufeff").strip()
-    if candidate.startswith("HTTP/"):
-        boundary = re.search(r"\r?\n\r?\n", candidate)
-        if boundary:
-            candidate = candidate[boundary.end():].strip()
-    if candidate.startswith("```"):
-        candidate = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", candidate, flags=re.I).strip()
-    try:
-        info = json.loads(candidate)
-        if isinstance(info, str):
-            info = json.loads(info)
-    except json.JSONDecodeError as first_error:
-        start, end = candidate.find("{"), candidate.rfind("}")
-        if start < 0 or end <= start:
-            raise RuntimeError(f"YT_TOKEN_JSON is not a JSON object (parse error at line {first_error.lineno}, column {first_error.colno}). Copy the complete OAuth JSON response body; the secret value was not printed.") from first_error
-        try:
-            info = json.loads(candidate[start:end + 1])
-        except json.JSONDecodeError as second_error:
-            raise RuntimeError(f"YT_TOKEN_JSON is malformed JSON (line {second_error.lineno}, column {second_error.colno}). Replace it with the complete OAuth JSON body; the secret value was not printed.") from second_error
-    if not isinstance(info, dict):
-        raise RuntimeError("YT_TOKEN_JSON must contain a JSON object, not a plain token string.")
-    if not info.get("token") and info.get("access_token"):
-        info["token"] = info["access_token"]
-    info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
-    info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
-    info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
-    if not info.get("scopes") and info.get("scope"):
-        info["scopes"] = info["scope"].split()
-    missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not info.get(key)]
-    if missing:
-        raise RuntimeError("YouTube OAuth data missing: " + ", ".join(missing))
-    # OAuth Playground responses omit an absolute expiry; force a refresh so an old access token is never trusted.
-    if not info.get("expiry"):
-        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
-    return info
-
-
-SCOPES = [
-    "https://www.googleapis.com/auth/youtube.upload",
-    "https://www.googleapis.com/auth/youtube.readonly",
-]
-token_info = load_youtube_token_info(os.environ["YT_TOKEN_JSON"])
-creds = Credentials.from_authorized_user_info(token_info, SCOPES)
+entials.from_authorized_user_info(token_info, SCOPES)
 if creds.expired and creds.refresh_token:
     creds.refresh(Request())
 if not creds.valid:
