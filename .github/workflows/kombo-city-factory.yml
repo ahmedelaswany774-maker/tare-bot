@@ -51,7 +51,7 @@ jobs:
 
       - name: Compile Kombo Python before OAuth checks
         if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.action == 'prepare_images') }}
-        run: python -m py_compile publish_youtube.py kombo_city_factory.py
+        run: python -m py_compile main.py manual_pipeline.py publish_youtube.py
 
       - name: Validate YouTube OAuth JSON before installing dependencies
         id: oauth_payload
