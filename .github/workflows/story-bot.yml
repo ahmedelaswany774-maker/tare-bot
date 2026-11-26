@@ -120,15 +120,15 @@ jobs:
         run: |
           python - <<'PY'
           import json, os, re
-          raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\\ufeff").strip()
+          raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; add the complete OAuth JSON response as a repository secret.")
           if raw.startswith("HTTP/"):
-              match = re.search(r"\\r?\\n\\r?\\n", raw)
+              match = re.search(r"\r?\n\r?\n", raw)
               if match:
                   raw = raw[match.end():].strip()
           if raw.startswith("```"):
-              raw = re.sub(r"\\A```(?:json)?\\s*|\\s*```\\Z", "", raw, flags=re.I).strip()
+              raw = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", raw, flags=re.I).strip()
           try:
               info = json.loads(raw)
               if isinstance(info, str):
@@ -170,21 +170,31 @@ jobs:
           from google.auth.transport.requests import Request
           from googleapiclient.discovery import build
 
-          raw = os.environ.get("YT_TOKEN_JSON", "").strip()
+          raw = os.environ.get("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; stopping before video rendering.")
-          # Accept either the raw OAuth Playground JSON body or its HTTP response.
-          candidate = re.split(r"\r?\n\r?\n", raw, maxsplit=1)[-1].strip() if raw.startswith("HTTP/") else raw
+          if raw.startswith("HTTP/"):
+              match = re.search(r"\r?\n\r?\n", raw)
+              if match:
+                  raw = raw[match.end():].strip()
+          if raw.startswith("```"):
+              raw = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", raw, flags=re.I).strip()
           try:
-              info = json.loads(candidate)
-          except Exception:
-              raise SystemExit("YT_TOKEN_JSON is not valid OAuth JSON; stopping before video rendering.")
+              info = json.loads(raw)
+              if isinstance(info, str):
+                  info = json.loads(info)
+          except json.JSONDecodeError as first:
+              start, end = raw.find("{"), raw.rfind("}")
+              if start < 0 or end <= start:
+                  raise SystemExit(f"YT_TOKEN_JSON is malformed JSON (line {first.lineno}, column {first.colno}); secret content was not printed.")
+              try:
+                  info = json.loads(raw[start:end + 1])
+              except json.JSONDecodeError as second:
+                  raise SystemExit(f"YT_TOKEN_JSON is malformed JSON (line {second.lineno}, column {second.colno}); secret content was not printed.")
           if not isinstance(info, dict):
               raise SystemExit("YT_TOKEN_JSON must be a JSON object.")
           if not info.get("token") and info.get("access_token"):
               info["token"] = info["access_token"]
-          info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
-          info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
           info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
           if not info.get("scopes") and info.get("scope"):
               info["scopes"] = info["scope"].split()
