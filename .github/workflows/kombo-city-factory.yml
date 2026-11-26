@@ -58,10 +58,19 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
         run: |
           python - <<'PY'
-          import json, os, re
+          import json, os, re, base64
           raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; stop before installing packages or calling Gemini/Fish.")
+          if raw.lower().startswith("base64:"):
+              raw = raw.split(":", 1)[1].strip()
+          if not raw.startswith(("{", "[", "`", "HTTP/")):
+              try:
+                  decoded = base64.b64decode(raw + "=" * (-len(raw) % 4), validate=True).decode("utf-8-sig").strip()
+                  if decoded.startswith(("{", "`", "HTTP/")):
+                      raw = decoded
+              except Exception:
+                  pass
           if raw.startswith("HTTP/"):
               match = re.search(r"\r?\n\r?\n", raw)
               if match:
