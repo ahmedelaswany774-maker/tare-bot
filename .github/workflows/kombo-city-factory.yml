@@ -150,7 +150,7 @@ jobs:
 
       - name: Render video from uploaded Gemini images
         id: render
-        if: ${{ (github.event_name == 'schedule' && steps.pending.outputs.video == '') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[auto-generate]') && steps.pending.outputs.video == '') || (github.event_name == 'push' && contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/inbox/')) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
+        if: ${{ (github.event_name == 'schedule' && steps.pending.outputs.video == '') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[auto-generate]') && steps.pending.outputs.video == '') || (github.event_name == 'push' && (contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/inbox/') || contains(toJSON(github.event.commits.*.modified), 'kombo-city-factory/inbox/'))) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_SCRIPT_MODEL: ${{ vars.GEMINI_SCRIPT_MODEL || 'gemini-2.5-flash' }}
