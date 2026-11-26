@@ -7,7 +7,7 @@ import re
 import os
 import base64
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from google.auth.transport.requests import Request
@@ -74,7 +74,7 @@ def load_token_info(raw: str) -> dict:
         raise RuntimeError("YT_TOKEN_JSON is missing access_token (or token). Re-authorize the YouTube account.")
     # OAuth Playground responses omit absolute expiry; force refresh using the refresh token.
     if not info.get("expiry"):
-        info["expiry"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
     return info
 
 
