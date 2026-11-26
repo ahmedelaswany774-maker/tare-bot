@@ -337,7 +337,7 @@ jobs:
           else:
               lines.append("- YouTube upload: **not confirmed in this run**")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
-              f.write("\\n".join(lines) + "\\n")
+              f.write("\n".join(lines) + "\n")
           PY
 
       - name: Notify owner through a deduplicated GitHub issue
