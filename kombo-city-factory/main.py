@@ -153,6 +153,89 @@ def gemini_json(idea: str) -> dict:
     raise RuntimeError(f"تعذر توليد السيناريو بعد إعادة المحاولة الذكية: {last_error}")
 
 
+def _gemini_request(prompt: str, schema: dict, validate) -> dict:
+    """Shared Gemini call with the same transient-error retry policy as gemini_json (used by the explainer path)."""
+    api_key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY غير موجود في GitHub Secrets.")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
+    payload = {"contents": [{"role": "user", "parts": [{"text": prompt}]}],
+               "generationConfig": {"responseMimeType": "application/json", "responseSchema": schema,
+                                    "temperature": 0.55, "maxOutputTokens": 8192}}
+    last_error = None
+    retry_delays = (15, 30, 60, 90, 120)
+    for attempt in range(len(retry_delays) + 1):
+        try:
+            response = SESSION.post(url, params={"key": api_key}, json=payload, timeout=120)
+            if response.status_code in (429, 500, 502, 503, 504):
+                raise RuntimeError(f"Gemini HTTP {response.status_code}: {response.text[:300]}")
+            response.raise_for_status()
+            candidates = response.json().get("candidates") or []
+            if not candidates:
+                raise ValueError("Gemini returned no candidates.")
+            parts = (candidates[0].get("content") or {}).get("parts") or []
+            text = "\n".join(part.get("text", "") for part in parts if part.get("text")).strip()
+            text = re.sub(r"^\s*```(?:json)?\s*|\s*```\s*$", "", text, flags=re.I)
+            return validate(json.loads(text))
+        except Exception as exc:
+            last_error = exc
+            retryable = (isinstance(exc, (requests.exceptions.Timeout, requests.exceptions.ConnectionError))
+                         or (isinstance(exc, RuntimeError) and "Gemini HTTP" in str(exc)))
+            if not retryable or attempt >= len(retry_delays):
+                break
+            print(f"Gemini temporary error; retry {attempt + 1}/{len(retry_delays)} in {retry_delays[attempt]}s: {exc}")
+            time.sleep(retry_delays[attempt])
+    raise RuntimeError(f"تعذر توليد المشاهد: {last_error}")
+
+
+def gemini_beats(idea: str) -> dict:
+    from explainer import beats as B
+    template = (ROOT / "prompts" / "beats_prompt.txt").read_text(encoding="utf-8")
+    return _gemini_request(template.replace("{idea}", idea), B.gemini_schema(), B.validate)
+
+
+def build_explainer_video(data: dict, audio: Path, output: Path) -> None:
+    from explainer import beats as B, timing as T, render as R
+    words, firsts, ends = B.caption_words(data["beats"])
+    timed, dur = T.best_align(words, ends, str(audio))
+    (WORK_DIR / "word_timing.json").write_text(json.dumps([[w, round(s, 3), round(e, 3)] for w, s, e in timed], ensure_ascii=False), encoding="utf-8")
+    R.render(data["beats"], timed, firsts, str(audio), dur, str(output))
+
+
+def main_explainer(args) -> int:
+    from explainer import beats as B
+    require_tools()
+    OUTPUT_DIR.mkdir(exist_ok=True); WORK_DIR.mkdir(exist_ok=True)
+    idea = choose_idea()
+    print(f"الفكرة #{idea['id']}: {idea['idea']}")
+    data = gemini_beats(idea["idea"])
+    (WORK_DIR / "beats.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    script = " ".join(B.clean(b["narration"]) for b in data["beats"])
+    data["script"] = script
+    audio = WORK_DIR / "audio.mp3"
+    make_tts(B.tts_text(data["beats"]), audio)   # Fish inline style tags: [excited] hook, [energetic] body, [serious] danger
+    stamp = datetime.now(ZoneInfo("Africa/Cairo")).strftime("%Y%m%d_%H%M%S")
+    out_dir = WORK_DIR if args.dry_run else OUTPUT_DIR
+    output = out_dir / f"{'dryrun' if args.dry_run else 'video'}_{int(idea['id']):02d}_{safe_slug(data['title'])}_{stamp}.mp4"
+    build_explainer_video(data, audio, output)
+    meta = {"idea_id": idea["id"], "idea": idea["idea"], "title": data["title"], "caption": data["caption"], "script": script,
+            "duration_seconds": round(media_duration(output), 1), "voice": "Fish Audio configured voice (explainer style tags)",
+            "visual_style": "explainer beats: blueprint stage, glossy objects, one-word captions, chips, stickers, danger flash",
+            "beats": data["beats"]}
+    (out_dir / (output.stem + ".json")).write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    if args.dry_run:
+        print(f"DRY RUN ok (idea not consumed, nothing uploaded): {output} ({output.stat().st_size} bytes)")
+        return 0
+    mark_used(idea["id"])
+    gh_output = os.getenv("GITHUB_OUTPUT")
+    if gh_output:
+        with open(gh_output, "a", encoding="utf-8") as gh:
+            gh.write(f"video=kombo-city-factory/output/{output.name}\n")
+            gh.write(f"metadata=kombo-city-factory/output/{output.stem}.json\n")
+    print(f"نجاح: {output} ({output.stat().st_size} bytes)")
+    return 0
+
+
 def generate_image(prompt: str, destination: Path, scene: int) -> None:
     """Create a polished, topic-aware vertical motion-graphics scene locally; no image API or paid provider."""
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -414,9 +497,9 @@ def build_video(images: list[Path], audio: Path, script: str, captions: Path, ou
     subtitle_path = captions.as_posix().replace(":", r"\:")
     font_dir = "/usr/share/fonts/truetype"
     vf_sub = (f"subtitles='{subtitle_path}':fontsdir='{font_dir}':"
-              "force_style='FontName=DejaVu Sans,FontSize=20,Bold=1,"
+              "original_size=1080x1920:force_style='FontName=DejaVu Sans,FontSize=62,Bold=1,"
               "PrimaryColour=&H0000D7FF,OutlineColour=&H00101010,BorderStyle=1,"
-              "Outline=3,Shadow=1,Alignment=2,MarginV=235'")
+              "Outline=5,Shadow=1,Alignment=2,MarginV=260'")
     music = ROOT / "assets" / "music.mp3"
     cmd = ["ffmpeg", "-y", "-i", str(joined), "-i", str(audio)]
     if music.exists():
@@ -470,7 +553,11 @@ def mark_used(idea_id: str) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--one", action="store_true", help="Generate one unused idea.")
+    parser.add_argument("--dry-run", action="store_true", help="Explainer style only: render to .work/, no upload, idea not consumed.")
     args = parser.parse_args()
+    # Explainer is the default style; KOMBO_STYLE=legacy keeps the old image/zoompan path.
+    if os.getenv("KOMBO_STYLE", "explainer").lower() != "legacy":
+        return main_explainer(args)
     require_tools()
     OUTPUT_DIR.mkdir(exist_ok=True)
     WORK_DIR.mkdir(exist_ok=True)
