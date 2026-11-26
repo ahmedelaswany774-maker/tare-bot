@@ -31,7 +31,8 @@ def validate(data):
             c["text"] = c["text"].strip()[:28]
         s = b.get("sticker") or {}
         b["sticker"] = {"text": str(s.get("text", "")).strip()[:30], "kind": s.get("kind") if s.get("kind") in KINDS else "q"}
-        b["danger"] = bool(b.get("danger"))
+        # red flash only for a real warning: needs a danger chip or a bad sticker (the model over-flags protective beats)
+        b["danger"] = bool(b.get("danger")) and (any(c["tone"] == "danger" for c in b["chips"]) or b["sticker"]["kind"] == "bad")
     words = sum(len(b["narration"].split()) for b in beats)
     if not 60 <= words <= 135: raise ValueError(f"narration length {words} words (need 60-135)")
     return data
