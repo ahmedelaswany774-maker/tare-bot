@@ -18,8 +18,8 @@ on:
           - publish_latest
         default: prepare_images
   schedule:
-    # Four independent production slots per day; no exact-clock guard.
-    - cron: "0 6,10,14,18 * * *"
+    # Four Egypt-time slots (08:37, 12:37, 16:37, 20:37), offset from the hour to reduce schedule congestion.
+    - cron: "37 6,10,14,18 * * *"
 
 permissions:
   contents: write
@@ -150,7 +150,7 @@ jobs:
 
       - name: Render video from uploaded Gemini images
         id: render
-        if: ${{ (github.event_name == 'schedule' && steps.pending.outputs.video == '') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[auto-generate]') || contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/trigger/'))) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
+        if: ${{ (github.event_name == 'schedule' && steps.pending.outputs.video == '') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[auto-generate]') && steps.pending.outputs.video == '') || (github.event_name == 'push' && contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/inbox/')) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_SCRIPT_MODEL: ${{ vars.GEMINI_SCRIPT_MODEL || 'gemini-2.5-flash' }}
@@ -172,7 +172,7 @@ jobs:
 
       - name: Select pending video before new scheduled generation
         id: pending
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action == 'publish_latest') }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action == 'publish_latest') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[auto-generate]')) }}
         working-directory: .
         run: |
           python - <<'PY'
