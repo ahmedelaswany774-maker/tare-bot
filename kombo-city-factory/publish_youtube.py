@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import os
+import base64
 import sys
 from pathlib import Path
 
@@ -18,6 +19,15 @@ def load_token_info(raw: str) -> dict:
     # Accept either the JSON body copied from OAuth Playground or its complete
     # HTTP response (status line + headers + JSON body). Never log token content.
     candidate = raw.lstrip("\ufeff").strip()
+    if candidate.lower().startswith("base64:"):
+        candidate = candidate.split(":", 1)[1].strip()
+    if not candidate.startswith(("{", "[", "`", "HTTP/")):
+        try:
+            decoded = base64.b64decode(candidate + "=" * (-len(candidate) % 4), validate=True).decode("utf-8-sig").strip()
+            if decoded.startswith(("{", "`", "HTTP/")):
+                candidate = decoded
+        except Exception:
+            pass
     if candidate.startswith("HTTP/"):
         boundary = re.search(r"\r?\n\r?\n", candidate)
         if boundary:
