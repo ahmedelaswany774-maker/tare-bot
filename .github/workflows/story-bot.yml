@@ -2,20 +2,18 @@ name: Story Bot - Episode Video Production and YouTube Publishing
 # Owner-requested one-time recovery run after OAuth HTTP-response parser fix (2026-11-26).
 # Manual production trigger: this commit intentionally starts the next eligible saved real-story episode.
 # Restored to the last proven production path: use saved, reviewed scripts; no Gemini API calls.
-# Four daily production slots (Egypt winter time: 10:00, 13:00, 16:00, 19:00).
+# Four daily production slots (Egypt winter time: 10:13, 13:13, 16:13, 19:13; offset from the hour to reduce schedule congestion).
 # One approved, sourced episode per run; Fish Audio voice; public YouTube upload.
 # A missing approval or incomplete script is a safe skip.
 
 on:
   schedule:
-    - cron: '0 8,11,14,17 * * *'
+    - cron: '13 8,11,14,17 * * *'
   push:
     branches: [main]
     paths:
-      - ".github/workflows/story-bot.yml"
-      - "story_youtube_uploader.py"
       - "content/drafts/**"
-      - "content/series/real_stories.json"
+      - "content/trigger/**"
   workflow_dispatch:
     inputs:
       episode_mode:
