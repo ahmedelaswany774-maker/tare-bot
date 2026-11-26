@@ -719,6 +719,9 @@ def load_youtube_token_info(raw):
     missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not info.get(key)]
     if missing:
         raise RuntimeError("YouTube OAuth data missing: " + ", ".join(missing))
+    # OAuth Playground responses omit an absolute expiry; force a refresh so an old access token is never trusted.
+    if not info.get("expiry"):
+        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
     return info
 
 
