@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 import math
 import time
 import re
@@ -29,6 +30,42 @@ STATE_PATH = "upload_state.json"
 SERIES_MANIFEST_PATH = os.environ.get("SERIES_MANIFEST_PATH", "content/series/real_stories.json")
 GROWTH_POLICY_PATH = os.environ.get("GROWTH_POLICY_PATH", "content/strategy/growth_policy.json")
 EPISODE_SELECTOR = os.environ.get("EPISODE_NUMBER", "1").strip().lower()
+
+
+def load_youtube_token_info(raw):
+    """Parse authorized-user JSON or OAuth Playground JSON, optionally base64-wrapped."""
+    candidate = (raw or "").lstrip("\\ufeff").strip()
+    if candidate.lower().startswith("base64:"):
+        candidate = candidate.split(":", 1)[1].strip()
+    if candidate.startswith("HTTP/"):
+        match = re.search(r"\\r?\\n\\r?\\n", candidate)
+        if match:
+            candidate = candidate[match.end():].strip()
+    if candidate.startswith("```"):
+        candidate = re.sub(r"\\A```(?:json)?\\s*|\\s*```\\Z", "", candidate, flags=re.I).strip()
+    try:
+        info = json.loads(candidate)
+        if isinstance(info, str):
+            info = json.loads(info)
+    except json.JSONDecodeError:
+        try:
+            decoded = base64.b64decode(candidate + "=" * (-len(candidate) % 4), validate=True).decode("utf-8-sig").strip()
+            info = json.loads(decoded)
+        except Exception as exc:
+            raise RuntimeError("YT_TOKEN_JSON is neither valid OAuth JSON nor base64-encoded OAuth JSON; secret contents were not printed.") from exc
+    if not isinstance(info, dict):
+        raise RuntimeError("YT_TOKEN_JSON must contain an OAuth JSON object.")
+    if not info.get("token") and info.get("access_token"):
+        info["token"] = info["access_token"]
+    info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
+    info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
+    info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
+    if not info.get("scopes") and info.get("scope"):
+        info["scopes"] = info["scope"].split()
+    missing = [k for k in ("client_id", "client_secret", "refresh_token", "token") if not info.get(k)]
+    if missing:
+        raise RuntimeError("OAuth JSON is missing: " + ", ".join(missing) + ".")
+    return info
 
 
 def save_json(path, payload):
