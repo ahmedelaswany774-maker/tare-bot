@@ -150,7 +150,7 @@ jobs:
 
       - name: Render video from uploaded Gemini images
         id: render
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[auto-generate]') || contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/trigger/'))) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
+        if: ${{ (github.event_name == 'schedule' && steps.pending.outputs.video == '') || (github.event_name == 'push' && (contains(github.event.head_commit.message, '[auto-generate]') || contains(toJSON(github.event.commits.*.added), 'kombo-city-factory/trigger/'))) || (github.event_name == 'workflow_dispatch' && inputs.action == 'render_pending') }}
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_SCRIPT_MODEL: ${{ vars.GEMINI_SCRIPT_MODEL || 'gemini-2.5-flash' }}
@@ -170,40 +170,49 @@ jobs:
             python manual_pipeline.py --render-pending
           fi
 
-      - name: Select latest saved video for publishing
-        id: latest
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'publish_latest' }}
+      - name: Select pending video before new scheduled generation
+        id: pending
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action == 'publish_latest') }}
         working-directory: .
         run: |
           python - <<'PY'
           from pathlib import Path
-          import os
+          import os, re
           out = Path("kombo-city-factory/output")
-          candidates = sorted(out.glob("*.mp4"), key=lambda p: p.name, reverse=True)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("video=\\nmetadata=\\n")
+          candidates = list(out.glob("*.mp4"))
+          def timestamp(path):
+              match = re.search(r"_(\\d{8}_\\d{6})\\.mp4$", path.name)
+              return match.group(1) if match else path.name
+          # Scheduled runs drain the oldest pending upload first. Manual publish_latest
+          # selects the newest pending video, matching the action's label.
+          newest_first = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
+          candidates.sort(key=timestamp, reverse=newest_first)
           for video in candidates:
-              meta = video.with_suffix(".json")
+              metadata = video.with_suffix(".json")
               receipt = video.with_suffix(".youtube.json")
-              if meta.exists() and not receipt.exists():
+              if metadata.is_file() and not receipt.exists():
                   with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-                      f.write(f"video={video.as_posix()}\n")
-                      f.write(f"metadata={meta.as_posix()}\n")
-                  print(f"Selected saved video (newest filename timestamp, no YouTube receipt): {video}")
+                      f.write(f"video={video.as_posix()}\\n")
+                      f.write(f"metadata={metadata.as_posix()}\\n")
+                  print(f"Pending upload selected: {video.name}")
                   break
           else:
-              raise SystemExit("No unpublished saved MP4 with matching metadata was found.")
+              print("No pending rendered video found; scheduled runs may generate the next idea.")
           PY
 
       - name: Publish Short to رواة الواقع on YouTube
         id: publish
-        if: ${{ !cancelled() && (steps.render.outcome == 'success' || steps.latest.outcome == 'success') }}
+        if: ${{ !cancelled() && (steps.render.outcome == 'success' || steps.pending.outputs.video != '') }}
         working-directory: .
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YOUTUBE_EXPECTED_HANDLE: RowatAlwaqe
-          VIDEO_PATH: ${{ steps.render.outputs.video || steps.latest.outputs.video }}
-          METADATA_PATH: ${{ steps.render.outputs.metadata || steps.latest.outputs.metadata }}
+          VIDEO_PATH: ${{ steps.pending.outputs.video || steps.render.outputs.video }}
+          METADATA_PATH: ${{ steps.pending.outputs.metadata || steps.render.outputs.metadata }}
         run: |
           set -euo pipefail
           test -n "$YT_TOKEN_JSON" || { echo "::error::Add YT_TOKEN_JSON (Google OAuth token JSON for @RowatAlwaqe) to repository Actions secrets."; exit 1; }
@@ -245,7 +254,7 @@ jobs:
           PY
 
       - name: Commit generated video and used-idea ledger
-        if: always() && (steps.prepare.outcome == 'success' || steps.render.outcome == 'success' || steps.latest.outcome == 'success')
+        if: always() && (steps.prepare.outcome == 'success' || steps.render.outcome == 'success' || steps.pending.outputs.video != '')
         run: |
           cd ..
           git config user.name "github-actions[bot]"
