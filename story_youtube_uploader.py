@@ -34,15 +34,15 @@ EPISODE_SELECTOR = os.environ.get("EPISODE_NUMBER", "1").strip().lower()
 
 def load_youtube_token_info(raw):
     """Parse authorized-user JSON or OAuth Playground JSON, optionally base64-wrapped."""
-    candidate = (raw or "").lstrip("\\ufeff").strip()
+    candidate = (raw or "").lstrip("\ufeff").strip()
     if candidate.lower().startswith("base64:"):
         candidate = candidate.split(":", 1)[1].strip()
     if candidate.startswith("HTTP/"):
-        match = re.search(r"\\r?\\n\\r?\\n", candidate)
+        match = re.search(r"\r?\n\r?\n", candidate)
         if match:
             candidate = candidate[match.end():].strip()
     if candidate.startswith("```"):
-        candidate = re.sub(r"\\A```(?:json)?\\s*|\\s*```\\Z", "", candidate, flags=re.I).strip()
+        candidate = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", candidate, flags=re.I).strip()
     try:
         info = json.loads(candidate)
         if isinstance(info, str):
