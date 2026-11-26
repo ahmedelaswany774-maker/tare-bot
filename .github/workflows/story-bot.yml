@@ -112,6 +112,7 @@ jobs:
         run: |
           echo "::notice::No episode meets the production gate (verified facts and a complete 2400+ word script). Rendering and publishing are skipped."
       - name: Validate YouTube OAuth JSON before installing production packages
+        id: oauth_payload
         if: steps.preflight.outputs.ready == 'true'
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
@@ -156,6 +157,7 @@ jobs:
         if: steps.preflight.outputs.ready == 'true'
         run: python -m pip install --disable-pip-version-check -r requirements-story.txt
       - name: Live YouTube OAuth smoke test (before rendering)
+        id: oauth_smoke
         if: steps.preflight.outputs.ready == 'true'
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
@@ -263,6 +265,7 @@ jobs:
           VOICE_REFERENCE_PATH: voice_reference.wav
           XTTS_LANGUAGE: ar
           PUBLISH_DELAY_MINUTES: '0'
+          YOUTUBE_EXPECTED_HANDLE: RowatAlwaqe
         run: python story_youtube_uploader.py
       - name: Persist episode history to prevent repeats
         if: success()
@@ -290,6 +293,53 @@ jobs:
             upload_state.json
           if-no-files-found: ignore
           retention-days: 7
+      - name: Write Story Bot production and upload report
+        if: always()
+        env:
+          PREFLIGHT_OUTCOME: ${{ steps.preflight.outcome }}
+          OAUTH_JSON_OUTCOME: ${{ steps.oauth_payload.outcome }}
+          OAUTH_LIVE_OUTCOME: ${{ steps.oauth_smoke.outcome }}
+          BUILD_OUTCOME: ${{ steps.build_draft.outcome }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          lines = ["## Story Bot — production report", ""]
+          for label, key in [
+              ("Script preflight", "PREFLIGHT_OUTCOME"),
+              ("OAuth JSON validation", "OAUTH_JSON_OUTCOME"),
+              ("Live YouTube channel check", "OAUTH_LIVE_OUTCOME"),
+              ("Render and upload", "BUILD_OUTCOME"),
+          ]:
+              lines.append(f"- {label}: **{os.getenv(key, 'not run')}**")
+          metadata_path = Path("story_metadata.json")
+          state_path = Path("upload_state.json")
+          video_path = Path("story.mp4")
+          if metadata_path.is_file():
+              meta = json.loads(metadata_path.read_text(encoding="utf-8"))
+              lines += [
+                  f"- Episode: **{meta.get('episode_number', 'unknown')} — {meta.get('title', 'unknown')}**",
+                  f"- Script length: **{meta.get('story_word_count', 'unknown')} words**",
+                  f"- Target duration: **{meta.get('target_duration_minutes', 'unknown')} minutes**",
+                  f"- Voice engine: **{meta.get('tts_backend', 'unknown')}**",
+                  f"- Sources attached: **{len(meta.get('sources', []))}**",
+              ]
+          if video_path.is_file():
+              lines.append(f"- Rendered MP4: **{video_path.stat().st_size / 1048576:.2f} MB**")
+          if state_path.is_file():
+              state = json.loads(state_path.read_text(encoding="utf-8"))
+              lines += [
+                  f"- YouTube verification: **{state.get('verification', state.get('status', 'unknown'))}**",
+                  f"- Video ID: **{state.get('youtube_video_id', 'unknown')}**",
+                  f"- URL: {state.get('youtube_url', 'not available')}",
+                  f"- Privacy: **{state.get('privacy_status', 'unknown')}**",
+              ]
+          else:
+              lines.append("- YouTube upload: **not confirmed in this run**")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\\n".join(lines) + "\\n")
+          PY
+
       - name: Notify owner through a deduplicated GitHub issue
         if: failure()
         env:
