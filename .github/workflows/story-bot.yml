@@ -118,10 +118,19 @@ jobs:
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
         run: |
           python - <<'PY'
-          import json, os, re
+          import json, os, re, base64
           raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; add the complete OAuth JSON response as a repository secret.")
+          if raw.lower().startswith("base64:"):
+              raw = raw.split(":", 1)[1].strip()
+          if not raw.startswith(("{", "[", "`", "HTTP/")):
+              try:
+                  decoded = base64.b64decode(raw + "=" * (-len(raw) % 4), validate=True).decode("utf-8-sig").strip()
+                  if decoded.startswith(("{", "`", "HTTP/")):
+                      raw = decoded
+              except Exception:
+                  pass
           if raw.startswith("HTTP/"):
               match = re.search(r"\r?\n\r?\n", raw)
               if match:
@@ -176,7 +185,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
-          import json, os, re, sys
+          import json, os, re, sys, base64
           from google.oauth2.credentials import Credentials
           from google.auth.transport.requests import Request
           from googleapiclient.discovery import build
