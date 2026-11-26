@@ -49,6 +49,48 @@ jobs:
           cache: pip
           cache-dependency-path: kombo-city-factory/requirements.txt
 
+      - name: Validate YouTube OAuth JSON before installing dependencies
+        id: oauth_payload
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.action == 'prepare_images') }}
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+        run: |
+          python - <<'PY'
+          import json, os, re
+          raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
+          if not raw:
+              raise SystemExit("YT_TOKEN_JSON is empty; stop before installing packages or calling Gemini/Fish.")
+          if raw.startswith("HTTP/"):
+              match = re.search(r"\r?\n\r?\n", raw)
+              if match:
+                  raw = raw[match.end():].strip()
+          if raw.startswith("```"):
+              raw = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", raw, flags=re.I).strip()
+          try:
+              info = json.loads(raw)
+              if isinstance(info, str):
+                  info = json.loads(info)
+          except json.JSONDecodeError as first:
+              start, end = raw.find("{"), raw.rfind("}")
+              if start < 0 or end <= start:
+                  raise SystemExit(f"YT_TOKEN_JSON is not valid JSON (line {first.lineno}, column {first.colno}); replace it with the full OAuth JSON response body. Secret content was not printed.")
+              try:
+                  info = json.loads(raw[start:end + 1])
+              except json.JSONDecodeError as second:
+                  raise SystemExit(f"YT_TOKEN_JSON is malformed JSON (line {second.lineno}, column {second.colno}); secret content was not printed.")
+          if not isinstance(info, dict):
+              raise SystemExit("YT_TOKEN_JSON must be a JSON object, not a plain token.")
+          if not info.get("token") and info.get("access_token"):
+              info["token"] = info["access_token"]
+          info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
+          info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
+          missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not info.get(key)]
+          if missing:
+              raise SystemExit("OAuth JSON is missing: " + ", ".join(missing) + ". Secret content was not printed.")
+          print("OAuth JSON structure: PASS (secret values hidden)")
+          PY
       - name: Install and verify media tools
         run: |
           set -euo pipefail
@@ -76,6 +118,7 @@ jobs:
         run: python -m py_compile main.py manual_pipeline.py publish_youtube.py
 
       - name: Live YouTube OAuth smoke test before Gemini/Fish generation
+        id: oauth_smoke
         if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.action == 'prepare_images') }}
         env:
           YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
@@ -225,6 +268,8 @@ jobs:
           METADATA_PATH: ${{ steps.pending.outputs.metadata || steps.render.outputs.metadata }}
           PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
           RENDER_OUTCOME: ${{ steps.render.outcome }}
+          OAUTH_JSON_OUTCOME: ${{ steps.oauth_payload.outcome }}
+          OAUTH_LIVE_OUTCOME: ${{ steps.oauth_smoke.outcome }}
         run: |
           python - <<'PY'
           import json, os
@@ -233,6 +278,8 @@ jobs:
           metadata = Path(os.getenv("METADATA_PATH", ""))
           receipt = video.with_suffix(".youtube.json") if str(video) not in ("", ".") else None
           lines = ["## Kombo City Factory — production report", ""]
+          lines.append(f"- OAuth JSON validation: **{os.getenv('OAUTH_JSON_OUTCOME', 'not run')}**")
+          lines.append(f"- Live YouTube channel check: **{os.getenv('OAUTH_LIVE_OUTCOME', 'not run')}**")
           lines.append(f"- Render step: **{os.getenv('RENDER_OUTCOME', 'not run')}**")
           lines.append(f"- Publish step: **{os.getenv('PUBLISH_OUTCOME', 'not run')}**")
           if metadata and metadata.is_file():
