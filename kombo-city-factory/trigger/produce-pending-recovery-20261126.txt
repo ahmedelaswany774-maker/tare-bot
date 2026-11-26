@@ -1,0 +1,1 @@
+Owner-approved one-time recovery trigger: publish the oldest saved MP4 without a YouTube receipt before generating anything new.
