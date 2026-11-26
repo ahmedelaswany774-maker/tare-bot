@@ -109,6 +109,10 @@ jobs:
         if: steps.preflight.outputs.ready != 'true'
         run: |
           echo "::notice::No episode meets the production gate (verified facts and a complete 2400+ word script). Rendering and publishing are skipped."
+      - name: Compile production Python before OAuth checks
+        if: steps.preflight.outputs.ready == 'true'
+        run: python -m py_compile story_youtube_uploader.py
+
       - name: Validate YouTube OAuth JSON before installing production packages
         id: oauth_payload
         if: steps.preflight.outputs.ready == 'true'
