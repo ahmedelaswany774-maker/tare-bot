@@ -89,15 +89,15 @@ jobs:
           from google.auth.transport.requests import Request
           from googleapiclient.discovery import build
 
-          raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\\ufeff").strip()
+          raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\ufeff").strip()
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; generation stopped before Gemini/Fish usage.")
           if raw.startswith("HTTP/"):
-              match = re.search(r"\\r?\\n\\r?\\n", raw)
+              match = re.search(r"\r?\n\r?\n", raw)
               if match:
                   raw = raw[match.end():].strip()
           if raw.startswith("```"):
-              raw = re.sub(r"\\A```(?:json)?\\s*|\\s*```\\Z", "", raw, flags=re.I).strip()
+              raw = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", raw, flags=re.I).strip()
           try:
               info = json.loads(raw)
               if isinstance(info, str):
