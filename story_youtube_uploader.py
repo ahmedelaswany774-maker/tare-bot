@@ -67,7 +67,7 @@ def load_youtube_token_info(raw):
         raise RuntimeError("OAuth JSON is missing: " + ", ".join(missing) + ".")
     # OAuth Playground responses omit expiry; force refresh from refresh_token.
     if not info.get("expiry"):
-        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
+        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     return info
 
 
