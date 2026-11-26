@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import os
 import sys
 from pathlib import Path
@@ -16,23 +17,27 @@ from googleapiclient.http import MediaFileUpload
 def load_token_info(raw: str) -> dict:
     # Accept either the JSON body copied from OAuth Playground or its complete
     # HTTP response (status line + headers + JSON body). Never log token content.
-    candidate = raw.strip()
+    candidate = raw.lstrip("\ufeff").strip()
     if candidate.startswith("HTTP/"):
-        separator = "\r\n\r\n"
-        if separator in candidate:
-            candidate = candidate.split(separator, 1)[1].strip()
-        elif "\n\n" in candidate:
-            candidate = candidate.split("\n\n", 1)[1].strip()
+        boundary = re.search(r"\r?\n\r?\n", candidate)
+        if boundary:
+            candidate = candidate[boundary.end():].strip()
+    if candidate.startswith("```"):
+        candidate = re.sub(r"\A```(?:json)?\s*|\s*```\Z", "", candidate, flags=re.I).strip()
     try:
         info = json.loads(candidate)
-    except json.JSONDecodeError as exc:
-        raise RuntimeError(
-            "YT_TOKEN_JSON is not valid OAuth JSON. In OAuth Playground Step 2, copy the "
-            "complete JSON response body (including its opening { and closing }), not only "
-            "the access token. Do not include Markdown fences or explanatory text."
-        ) from exc
+        if isinstance(info, str):
+            info = json.loads(info)
+    except json.JSONDecodeError as first_error:
+        start, end = candidate.find("{"), candidate.rfind("}")
+        if start < 0 or end <= start:
+            raise RuntimeError(f"YT_TOKEN_JSON is not a JSON object (parse error at line {first_error.lineno}, column {first_error.colno}). Copy the complete OAuth JSON response body; the secret value was not printed.") from first_error
+        try:
+            info = json.loads(candidate[start:end + 1])
+        except json.JSONDecodeError as second_error:
+            raise RuntimeError(f"YT_TOKEN_JSON is malformed JSON (line {second_error.lineno}, column {second_error.colno}). Replace it with the complete OAuth JSON body; the secret value was not printed.") from second_error
     if not isinstance(info, dict):
-        raise RuntimeError("YT_TOKEN_JSON must be a JSON object.")
+        raise RuntimeError("YT_TOKEN_JSON must contain a JSON object, not a plain token string.")
 
     # OAuth Playground returns access_token; google-auth's user-credentials
     # format expects the same value under the key 'token'.
