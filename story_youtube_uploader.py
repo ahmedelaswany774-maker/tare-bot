@@ -653,10 +653,10 @@ def load_youtube_token_info(raw):
     # GitHub client credentials, or a complete authorized-user JSON.
     candidate = raw.strip()
     if candidate.startswith("HTTP/"):
-        if "\\r\\n\\r\\n" in candidate:
-            candidate = candidate.split("\\r\\n\\r\\n", 1)[1].strip()
-        elif "\\n\\n" in candidate:
-            candidate = candidate.split("\\n\\n", 1)[1].strip()
+        if "\r\n\r\n" in candidate:
+            candidate = candidate.split("\r\n\r\n", 1)[1].strip()
+        elif "\n\n" in candidate:
+            candidate = candidate.split("\n\n", 1)[1].strip()
     info = json.loads(candidate)
     if not isinstance(info, dict):
         raise RuntimeError("YT_TOKEN_JSON must be a JSON object.")
