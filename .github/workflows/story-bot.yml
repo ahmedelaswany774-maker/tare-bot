@@ -151,6 +151,17 @@ jobs:
               raise SystemExit("OAuth JSON is missing: " + ", ".join(missing) + ". Secret content was not printed.")
           print("OAuth JSON structure: PASS (secret values hidden)")
           PY
+      - name: Validate Fish Audio and Pexels credentials before installing packages
+        if: steps.preflight.outputs.ready == 'true'
+        env:
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$FISH_API_KEY" || { echo "::error::FISH_API_KEY is missing; no production packages or paid API calls were started."; exit 1; }
+          test -n "$FISH_VOICE_ID" || { echo "::error::FISH_VOICE_ID is missing; no production packages or paid API calls were started."; exit 1; }
+          test -n "$PEXELS_API_KEY" || { echo "::error::PEXELS_API_KEY is missing; no production packages or paid API calls were started."; exit 1; }
       - name: Install cached production dependencies
         if: steps.preflight.outputs.ready == 'true'
         run: python -m pip install --disable-pip-version-check -r requirements-story.txt
@@ -240,9 +251,6 @@ jobs:
           command -v ffprobe
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
-      - name: Install production dependencies
-        if: steps.preflight.outputs.ready == 'true'
-        run: pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib moviepy edge-tts requests kaggle fish-audio-sdk pillow arabic-reshaper python-bidi
       - name: Build episode and publish automatically
         if: steps.preflight.outputs.ready == 'true'
         id: build_draft
