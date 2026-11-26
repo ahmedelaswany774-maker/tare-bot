@@ -74,7 +74,7 @@ def load_token_info(raw: str) -> dict:
         raise RuntimeError("YT_TOKEN_JSON is missing access_token (or token). Re-authorize the YouTube account.")
     # OAuth Playground responses omit absolute expiry; force refresh using the refresh token.
     if not info.get("expiry"):
-        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
+        info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
     return info
 
 
