@@ -22,7 +22,7 @@ def load_token_info(raw: str) -> dict:
         if separator in candidate:
             candidate = candidate.split(separator, 1)[1].strip()
         elif "\n\n" in candidate:
-            candidate = candidate.split("\\n\\n", 1)[1].strip()
+            candidate = candidate.split("\n\n", 1)[1].strip()
     try:
         info = json.loads(candidate)
     except json.JSONDecodeError as exc:
