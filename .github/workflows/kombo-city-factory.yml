@@ -180,10 +180,10 @@ jobs:
           import os, re
           out = Path("kombo-city-factory/output")
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-              f.write("video=\\nmetadata=\\n")
+              f.write("video=\nmetadata=\n")
           candidates = list(out.glob("*.mp4"))
           def timestamp(path):
-              match = re.search(r"_(\\d{8}_\\d{6})\\.mp4$", path.name)
+              match = re.search(r"_(\d{8}_\d{6})\.mp4$", path.name)
               return match.group(1) if match else path.name
           # Scheduled runs drain the oldest pending upload first. Manual publish_latest
           # selects the newest pending video, matching the action's label.
@@ -194,8 +194,8 @@ jobs:
               receipt = video.with_suffix(".youtube.json")
               if metadata.is_file() and not receipt.exists():
                   with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
-                      f.write(f"video={video.as_posix()}\\n")
-                      f.write(f"metadata={metadata.as_posix()}\\n")
+                      f.write(f"video={video.as_posix()}\n")
+                      f.write(f"metadata={metadata.as_posix()}\n")
                   print(f"Pending upload selected: {video.name}")
                   break
           else:
@@ -221,8 +221,8 @@ jobs:
       - name: Write production and publishing report
         if: always()
         env:
-          VIDEO_PATH: ${{ steps.render.outputs.video || steps.latest.outputs.video }}
-          METADATA_PATH: ${{ steps.render.outputs.metadata || steps.latest.outputs.metadata }}
+          VIDEO_PATH: ${{ steps.pending.outputs.video || steps.render.outputs.video }}
+          METADATA_PATH: ${{ steps.pending.outputs.metadata || steps.render.outputs.metadata }}
           PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
           RENDER_OUTCOME: ${{ steps.render.outcome }}
         run: |
