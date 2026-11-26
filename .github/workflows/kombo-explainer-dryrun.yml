@@ -40,7 +40,7 @@ jobs:
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
         run: python main.py --one --dry-run
       - name: Upload preview
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: explainer-dryrun
           path: |
