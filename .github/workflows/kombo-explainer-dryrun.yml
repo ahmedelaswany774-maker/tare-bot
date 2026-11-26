@@ -1,0 +1,51 @@
+name: Kombo Explainer DRY RUN
+
+# Branch-only preview of the explainer style. Renders ONE video to a downloadable artifact.
+# No YouTube/Facebook upload, the idea is not marked used, nothing is committed back.
+on:
+  push:
+    branches: [explainer-style]
+    paths:
+      - "kombo-city-factory/trigger-dryrun/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dryrun:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: kombo-city-factory
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Set up Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.11"
+      - name: Media tools
+        run: |
+          command -v ffmpeg >/dev/null 2>&1 || (sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg)
+          ffmpeg -version | head -n 1
+      - name: Install Python dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Render dry run (no upload)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_SCRIPT_MODEL: ${{ vars.GEMINI_SCRIPT_MODEL || 'gemini-2.5-flash' }}
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+        run: python main.py --one --dry-run
+      - name: Upload preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: explainer-dryrun
+          path: |
+            kombo-city-factory/.work/dryrun_*.mp4
+            kombo-city-factory/.work/dryrun_*.json
+            kombo-city-factory/.work/beats.json
+            kombo-city-factory/.work/word_timing.json
+            kombo-city-factory/.work/audio.mp3
