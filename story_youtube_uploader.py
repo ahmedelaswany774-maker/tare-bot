@@ -451,7 +451,7 @@ def _make_audio_fish():
 
 def _split_edge_text(text, max_chars=1800):
     """Split long Arabic narration at sentence/word boundaries for Edge TTS."""
-    sentences = re.split(r"(?<=[.!؟?])\\s+|\\n+", text.strip())
+    sentences = re.split(r"(?<=[.!؟?])\s+|\n+", text.strip())
     chunks, current = [], ""
     for sentence in sentences:
         sentence = sentence.strip()
