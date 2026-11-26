@@ -70,10 +70,77 @@ jobs:
           ffmpeg -version | head -n 1
 
       - name: Install Python dependencies
-        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
 
       - name: Validate Python syntax
         run: python -m py_compile main.py manual_pipeline.py publish_youtube.py
+
+      - name: Live YouTube OAuth smoke test before Gemini/Fish generation
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.action == 'prepare_images') }}
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YOUTUBE_EXPECTED_HANDLE: RowatAlwaqe
+        run: |
+          python - <<'PY'
+          import json, os, re
+          from google.oauth2.credentials import Credentials
+          from google.auth.transport.requests import Request
+          from googleapiclient.discovery import build
+
+          raw = os.getenv("YT_TOKEN_JSON", "").lstrip("\\ufeff").strip()
+          if not raw:
+              raise SystemExit("YT_TOKEN_JSON is empty; generation stopped before Gemini/Fish usage.")
+          if raw.startswith("HTTP/"):
+              match = re.search(r"\\r?\\n\\r?\\n", raw)
+              if match:
+                  raw = raw[match.end():].strip()
+          if raw.startswith("```"):
+              raw = re.sub(r"\\A```(?:json)?\\s*|\\s*```\\Z", "", raw, flags=re.I).strip()
+          try:
+              info = json.loads(raw)
+              if isinstance(info, str):
+                  info = json.loads(info)
+          except json.JSONDecodeError as first:
+              start, end = raw.find("{"), raw.rfind("}")
+              if start < 0 or end <= start:
+                  raise SystemExit(f"YT_TOKEN_JSON is malformed JSON (line {first.lineno}, column {first.colno}); secret content was not printed.")
+              try:
+                  info = json.loads(raw[start:end + 1])
+              except json.JSONDecodeError as second:
+                  raise SystemExit(f"YT_TOKEN_JSON is malformed JSON (line {second.lineno}, column {second.colno}); secret content was not printed.")
+          if not isinstance(info, dict):
+              raise SystemExit("YT_TOKEN_JSON must be a JSON object.")
+          if not info.get("token") and info.get("access_token"):
+              info["token"] = info["access_token"]
+          info.setdefault("client_id", os.getenv("YT_CLIENT_ID", "").strip())
+          info.setdefault("client_secret", os.getenv("YT_CLIENT_SECRET", "").strip())
+          info.setdefault("token_uri", "https://oauth2.googleapis.com/token")
+          if not info.get("scopes") and info.get("scope"):
+              info["scopes"] = info["scope"].split()
+          missing = [key for key in ("client_id", "client_secret", "refresh_token", "token") if not info.get(key)]
+          if missing:
+              raise SystemExit("OAuth JSON is missing: " + ", ".join(missing) + ". Secret content was not printed.")
+          scopes = ["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.readonly"]
+          creds = Credentials.from_authorized_user_info(info, scopes=scopes)
+          if creds.expired and creds.refresh_token:
+              creds.refresh(Request())
+          if not creds.valid:
+              raise SystemExit("YouTube OAuth credentials are invalid; generation stopped before Gemini/Fish usage.")
+          youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
+          result = youtube.channels().list(part="id,snippet", mine=True, maxResults=1).execute()
+          channels = result.get("items", [])
+          if not channels:
+              raise SystemExit("OAuth returned no YouTube channel; generation stopped.")
+          channel = channels[0]
+          actual = channel.get("snippet", {}).get("customUrl", "").lstrip("@").casefold()
+          expected = os.getenv("YOUTUBE_EXPECTED_HANDLE", "RowatAlwaqe").lstrip("@").casefold()
+          if not actual or actual != expected:
+              raise SystemExit("OAuth channel identity does not match @RowatAlwaqe; generation stopped.")
+          print("YOUTUBE_OAUTH_SMOKE_TEST=PASS")
+          print("YOUTUBE_CHANNEL_TITLE=" + channel.get("snippet", {}).get("title", "unknown"))
+          PY
 
       - name: Prepare script and Gemini image prompts
         id: prepare
