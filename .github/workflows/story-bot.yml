@@ -225,6 +225,8 @@ jobs:
               "https://www.googleapis.com/auth/youtube.upload",
               "https://www.googleapis.com/auth/youtube.readonly",
           ]
+          if not info.get("expiry"):
+              info["expiry"] = (datetime.now(timezone.utc) - timedelta(seconds=60)).isoformat()
           creds = Credentials.from_authorized_user_info(info, scopes=scopes)
           if creds.expired and creds.refresh_token:
               creds.refresh(Request())
