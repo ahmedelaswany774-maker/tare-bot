@@ -685,7 +685,10 @@ def load_youtube_token_info(raw):
     return info
 
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.readonly",
+]
 token_info = load_youtube_token_info(os.environ["YT_TOKEN_JSON"])
 creds = Credentials.from_authorized_user_info(token_info, SCOPES)
 if creds.expired and creds.refresh_token:
@@ -694,6 +697,15 @@ if not creds.valid:
     raise RuntimeError("YouTube OAuth credentials are invalid or expired.")
 
 youtube = build("youtube", "v3", credentials=creds, cache_discovery=False)
+channel_response = youtube.channels().list(part="id,snippet", mine=True, maxResults=1).execute()
+channels = channel_response.get("items", [])
+if not channels:
+    raise RuntimeError("OAuth token has no accessible YouTube channel.")
+channel = channels[0]
+channel_handle = channel.get("snippet", {}).get("customUrl", "").lstrip("@")
+expected_handle = os.getenv("YOUTUBE_EXPECTED_HANDLE", "RowatAlwaqe").lstrip("@").casefold()
+if not channel_handle or channel_handle.casefold() != expected_handle:
+    raise RuntimeError("Safety stop: OAuth token does not belong to the expected @RowatAlwaqe channel.")
 
 hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
 full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\nشاهد الحلقة التالية من قائمة التشغيل: {manifest['playlist_title']}\n\n{hashtags}"
@@ -745,16 +757,44 @@ if confirmed_privacy != privacy_status:
         f"YouTube upload status mismatch: requested={privacy_status}, returned={confirmed_privacy}. "
         "The upload may exist; episode remains locked to prevent a duplicate."
     )
+episode["youtube_video_id"] = video_id
+episode["upload_status"] = "uploaded"
+episode["upload_response_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+save_json(SERIES_MANIFEST_PATH, manifest)
+verification = youtube.videos().list(part="snippet,status", id=video_id).execute()
+verified_items = verification.get("items", [])
+if not verified_items:
+    save_json(STATE_PATH, {
+        "status": "uploaded_unverified", "youtube_video_id": video_id,
+        "video": "story.mp4", "metadata": METADATA_PATH,
+        "series_id": manifest["series_id"], "episode_id": episode["episode_id"],
+        "episode_number": episode["episode_number"], "privacy_status": privacy_status,
+    })
+    raise RuntimeError(f"YouTube returned video ID {video_id}, but it was not visible in the verification lookup. Duplicate upload is blocked.")
+verified_video = verified_items[0]
+verified_channel_id = verified_video.get("snippet", {}).get("channelId")
+verified_privacy = verified_video.get("status", {}).get("privacyStatus")
+if verified_channel_id != channel.get("id") or verified_privacy != privacy_status:
+    save_json(STATE_PATH, {
+        "status": "uploaded_unverified", "youtube_video_id": video_id,
+        "video": "story.mp4", "metadata": METADATA_PATH,
+        "series_id": manifest["series_id"], "episode_id": episode["episode_id"],
+        "episode_number": episode["episode_number"], "privacy_status": verified_privacy,
+    })
+    raise RuntimeError(f"YouTube upload verification mismatch (channel_matches={verified_channel_id == channel.get('id')}, privacy={verified_privacy}). Duplicate upload is blocked.")
 episode["published"] = True
 episode["upload_status"] = "published"
-episode["youtube_video_id"] = video_id
 episode["published_at"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 save_json(SERIES_MANIFEST_PATH, manifest)
 save_json(
     STATE_PATH,
     {
         "status": "uploaded",
+        "verification": "confirmed_public_on_expected_channel" if privacy_status == "public" else "confirmed_on_expected_channel",
         "youtube_video_id": video_id,
+        "youtube_url": f"https://youtube.com/watch?v={video_id}",
+        "channel_id": channel.get("id"),
+        "channel_title": channel.get("snippet", {}).get("title", ""),
         "video": "story.mp4",
         "metadata": METADATA_PATH,
         "series_id": manifest["series_id"],
@@ -765,6 +805,6 @@ save_json(
     },
 )
 if scheduled_publish_at:
-    print(f"تم رفع الفيديو كخاص ومجدول للنشر العام: {scheduled_publish_at}")
+    print(f"تم التحقق من رفع الفيديو وجدولته للنشر العام: {scheduled_publish_at}")
 else:
-    print(f"تم رفع الفيديو: https://youtube.com/watch?v={video_id}")
+    print(f"تم التحقق من نشر الفيديو على القناة: https://youtube.com/watch?v={video_id}")
