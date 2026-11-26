@@ -128,7 +128,7 @@ jobs:
           if not raw:
               raise SystemExit("YT_TOKEN_JSON is empty; stopping before video rendering.")
           # Accept either the raw OAuth Playground JSON body or its HTTP response.
-          candidate = re.split(r"\\r?\\n\\r?\\n", raw, maxsplit=1)[-1].strip() if raw.startswith("HTTP/") else raw
+          candidate = re.split(r"\r?\n\r?\n", raw, maxsplit=1)[-1].strip() if raw.startswith("HTTP/") else raw
           try:
               info = json.loads(candidate)
           except Exception:
