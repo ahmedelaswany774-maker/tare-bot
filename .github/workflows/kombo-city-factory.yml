@@ -194,6 +194,7 @@ jobs:
           PY
 
       - name: Publish Short to رواة الواقع on YouTube
+        id: publish
         if: ${{ !cancelled() && (steps.render.outcome == 'success' || steps.latest.outcome == 'success') }}
         working-directory: .
         env:
@@ -207,6 +208,41 @@ jobs:
           set -euo pipefail
           test -n "$YT_TOKEN_JSON" || { echo "::error::Add YT_TOKEN_JSON (Google OAuth token JSON for @RowatAlwaqe) to repository Actions secrets."; exit 1; }
           python kombo-city-factory/publish_youtube.py
+
+      - name: Write production and publishing report
+        if: always()
+        env:
+          VIDEO_PATH: ${{ steps.render.outputs.video || steps.latest.outputs.video }}
+          METADATA_PATH: ${{ steps.render.outputs.metadata || steps.latest.outputs.metadata }}
+          PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
+          RENDER_OUTCOME: ${{ steps.render.outcome }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          video = Path(os.getenv("VIDEO_PATH", ""))
+          metadata = Path(os.getenv("METADATA_PATH", ""))
+          receipt = video.with_suffix(".youtube.json") if str(video) not in ("", ".") else None
+          lines = ["## Kombo City Factory — production report", ""]
+          lines.append(f"- Render step: **{os.getenv('RENDER_OUTCOME', 'not run')}**")
+          lines.append(f"- Publish step: **{os.getenv('PUBLISH_OUTCOME', 'not run')}**")
+          if metadata and metadata.is_file():
+              data = json.loads(metadata.read_text(encoding="utf-8"))
+              lines += [f"- Idea: **#{data.get('idea_id', 'unknown')} — {data.get('idea', 'unknown')}**",
+                        f"- Title: **{data.get('title', 'unknown')}**",
+                        f"- Duration target: **{data.get('duration_seconds', 'unknown')} seconds**"]
+          if video and video.is_file():
+              lines.append(f"- MP4: **{video.name} ({video.stat().st_size / 1048576:.2f} MB)**")
+          if receipt and receipt.is_file():
+              data = json.loads(receipt.read_text(encoding="utf-8"))
+              lines += [f"- YouTube: **{data.get('verification', 'uploaded, not verified')}**",
+                        f"- Video ID: **{data.get('video_id', 'unknown')}**",
+                        f"- URL: {data.get('url', 'not available')}"]
+          else:
+              lines.append("- YouTube verification: **not confirmed in this run**")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
+              f.write("\n".join(lines) + "\n")
+          PY
 
       - name: Commit generated video and used-idea ledger
         if: always() && (steps.prepare.outcome == 'success' || steps.render.outcome == 'success' || steps.latest.outcome == 'success')
