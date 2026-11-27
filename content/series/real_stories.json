@@ -1465,7 +1465,9 @@
       ],
       "script_path": "content/drafts/verified_real/episode-52.md",
       "draft_status": "written_pending_editorial_and_source_review",
-      "draft_word_count": 4070
+      "draft_word_count": 4070,
+      "upload_status": "uploading",
+      "upload_started_at": "2026-11-27T01:29:19+00:00"
     },
     {
       "episode_id": "social-53-story-53",
