@@ -1,0 +1,66 @@
+name: Kombo backlog - publish oldest pending video (hourly)
+# Publishes ONE already-rendered Kombo video per run, oldest first. Never renders or generates anything new.
+# The regular Kombo schedule is paused while this runs. Safe to re-run: a video with a receipt is never uploaded twice.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7 * * * *"
+permissions:
+  contents: write
+concurrency:
+  group: kombo-city-factory-daily
+  cancel-in-progress: false
+jobs:
+  publish-oldest:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.11"
+      - name: Select oldest pending video
+        id: pending
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import os, re
+          out = Path("kombo-city-factory/output")
+          def ts(p):
+              m = re.search(r"_(\d{8}_\d{6})\.mp4$", p.name)
+              return m.group(1) if m else p.name
+          video = metadata = ""
+          for v in sorted(out.glob("*.mp4"), key=ts):
+              if v.with_suffix(".json").is_file() and not v.with_suffix(".youtube.json").exists():
+                  video, metadata = v.as_posix(), v.with_suffix(".json").as_posix()
+                  break
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write(f"video={video}\nmetadata={metadata}\n")
+          print("Selected:", video or "none pending (backlog empty)")
+          PY
+      - name: Install dependencies
+        if: steps.pending.outputs.video != ''
+        run: python -m pip install --disable-pip-version-check google-api-python-client google-auth
+      - name: Publish to YouTube
+        if: steps.pending.outputs.video != ''
+        env:
+          YT_TOKEN_JSON: ${{ secrets.YT_TOKEN_JSON }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YOUTUBE_EXPECTED_HANDLE: RowatAlwaqe
+          VIDEO_PATH: ${{ steps.pending.outputs.video }}
+          METADATA_PATH: ${{ steps.pending.outputs.metadata }}
+        run: python kombo-city-factory/publish_youtube.py
+      - name: Commit receipt
+        if: always() && steps.pending.outputs.video != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A kombo-city-factory/output/
+          if git diff --cached --quiet; then echo "nothing to commit"; else
+            git commit -m "chore(kombo): backlog publish receipt"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
