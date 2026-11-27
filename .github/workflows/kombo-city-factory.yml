@@ -17,9 +17,10 @@ on:
           - render_pending
           - publish_latest
         default: prepare_images
-  schedule:
-    # Four Egypt-time slots (08:37, 12:37, 16:37, 20:37), offset from the hour to reduce schedule congestion.
-    - cron: "37 6,10,14,18 * * *"
+  # schedule PAUSED while kombo-backlog.yml publishes the old backlog hourly (oldest first).
+  # Restore after the backlog is empty:
+  # schedule:
+  #   - cron: "37 6,10,14,18 * * *"
 
 permissions:
   contents: write
