@@ -688,7 +688,12 @@ save_json(
 )
 
 
-entials.from_authorized_user_info(token_info, SCOPES)
+SCOPES = [
+    "https://www.googleapis.com/auth/youtube.upload",
+    "https://www.googleapis.com/auth/youtube.readonly",
+]
+token_info = load_youtube_token_info(os.environ["YT_TOKEN_JSON"])
+creds = Credentials.from_authorized_user_info(token_info, SCOPES)
 if creds.expired and creds.refresh_token:
     creds.refresh(Request())
 if not creds.valid:
