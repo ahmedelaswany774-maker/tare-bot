@@ -20,6 +20,7 @@ jobs:
           FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
           FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
         run: |
+          sudo apt-get update -y
           sudo apt-get install -y ffmpeg
           pip install requests
           python audiobook/voice_sample.py "audiobook/${{ inputs.story }}.json"
