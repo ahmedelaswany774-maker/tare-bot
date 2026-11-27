@@ -1,0 +1,33 @@
+name: Voice sample (Fish voice, about 1 minute)
+on:
+  workflow_dispatch:
+    inputs:
+      story:
+        description: "story config under audiobook/ (without .json)"
+        required: true
+        default: talhama
+        type: string
+permissions:
+  contents: write
+jobs:
+  sample:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Make sample
+        env:
+          FISH_API_KEY: ${{ secrets.FISH_API_KEY }}
+          FISH_VOICE_ID: ${{ secrets.FISH_VOICE_ID }}
+        run: |
+          pip install requests
+          python audiobook/voice_sample.py "audiobook/${{ inputs.story }}.json"
+      - name: Publish sample to a separate branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan voice-sample
+          git rm -rf --cached . >/dev/null
+          git add -f audiobook/samples
+          git commit -m "voice sample"
+          git push -f origin voice-sample
