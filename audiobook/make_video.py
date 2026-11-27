@@ -76,7 +76,7 @@ for ci,(t,_) in enumerate(chs):
     print('chapter',ci,round(D))
 open(f'{W}/all.txt','w').write(''.join(f"file '{os.path.abspath(f)}'\n" for f in sorted(glob.glob(f'{W}/ch/c*.mp4'))))
 final=f"{W}/{cfg['slug']}.mp4";run(['ffmpeg','-y','-loglevel','error','-f','concat','-safe','0','-i',f'{W}/all.txt','-c','copy',final])
-th=cfg['thumb'];thumb(th['t1'],th['l1'],th['l2'],th['sub'],f'{W}/thumb.jpg')
+th=cfg['thumb'];thumb(th['t1'],th['l1'],th['l2'],th['sub'],f'{W}/thumb.jpg',th.get('theme'))
 total=dur(final);print('final',final,round(total/60,1),'min',os.path.getsize(final)>>20,'MB')
 if os.getenv('DRY_RUN','false').lower()=='true': sys.exit(0)
 # --- upload ---
