@@ -7,13 +7,14 @@ on:
     - cron: "7 * * * *"
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: kombo-city-factory-daily
   cancel-in-progress: false
 jobs:
   publish-oldest:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
@@ -63,4 +64,22 @@ jobs:
             git commit -m "chore(kombo): backlog publish receipt"
             git pull --rebase origin main
             git push origin HEAD:main
+          fi
+      - name: Chain the next hourly run
+        # GitHub's cron did not fire reliably, so each run schedules the next one ~1 hour after its own upload.
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git pull --rebase origin main || true
+          left=$(python - <<'PY'
+          from pathlib import Path
+          out = Path("kombo-city-factory/output")
+          print(sum(1 for v in out.glob("*.mp4") if v.with_suffix(".json").is_file() and not v.with_suffix(".youtube.json").exists()))
+          PY
+          )
+          echo "pending left: $left"
+          if [ "$left" -gt 0 ]; then
+            sleep 3000
+            gh workflow run kombo-backlog.yml --repo "$GITHUB_REPOSITORY" --ref main
           fi
