@@ -139,7 +139,7 @@ def main() -> int:
             "categoryId": "27",
             "tags": ["رواة الواقع", "كومبو سيتي", "تعليم", "معلومات تقنية", "Shorts"],
         },
-        "status": {"privacyStatus": "public"},
+        "status": {"privacyStatus": "public", "selfDeclaredMadeForKids": False, "containsSyntheticMedia": True},
     }
     media = MediaFileUpload(str(video_path), mimetype="video/mp4", chunksize=8 * 1024 * 1024, resumable=True)
     request = youtube.videos().insert(part="snippet,status", body=body, media_body=media)
