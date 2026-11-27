@@ -1495,7 +1495,7 @@
           "url": "https://www.elwatannews.com/news/details/7219429"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1507,8 +1507,11 @@
       "script_path": "content/drafts/verified_real/episode-53.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4166,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-27T15:28:17+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-27T15:28:17+00:00",
+      "youtube_video_id": "QXODIDRtkOc",
+      "upload_response_at": "2026-11-27T15:28:34+00:00",
+      "published_at": "2026-11-27T15:28:34+00:00"
     },
     {
       "episode_id": "social-54-story-54",
