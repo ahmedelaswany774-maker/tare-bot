@@ -710,6 +710,35 @@ expected_handle = os.getenv("YOUTUBE_EXPECTED_HANDLE", "RowatAlwaqe").lstrip("@"
 if not channel_handle or channel_handle.casefold() != expected_handle:
     raise RuntimeError("Safety stop: OAuth token does not belong to the expected @RowatAlwaqe channel.")
 
+# Duplicate-title guard: never upload a title that is already on the channel.
+def _norm_title(value):
+    return " ".join((value or "").split()).casefold()
+
+def existing_channel_titles(yt):
+    details = yt.channels().list(part="contentDetails", mine=True, maxResults=1).execute()
+    uploads_id = details["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    titles, page = set(), None
+    while True:
+        resp = yt.playlistItems().list(part="snippet", playlistId=uploads_id, maxResults=50, pageToken=page).execute()
+        for it in resp.get("items", []):
+            titles.add(_norm_title(it.get("snippet", {}).get("title", "")))
+        page = resp.get("nextPageToken")
+        if not page:
+            return titles
+
+if _norm_title(video_title[:100]) in existing_channel_titles(youtube):
+    print(f"::warning::Title already exists on the channel, skipping upload: {video_title[:100]}")
+    episode["disabled"] = True
+    episode["disabled_reason"] = "duplicate_title_on_channel"
+    save_json(SERIES_MANIFEST_PATH, manifest)
+    subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+    subprocess.run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=True)
+    subprocess.run(["git", "pull", "--rebase", "--autostash", "origin", "main"], check=True)
+    subprocess.run(["git", "add", SERIES_MANIFEST_PATH], check=True)
+    subprocess.run(["git", "commit", "-m", f"chore: skip episode {episode['episode_number']} (title already on channel)"], check=True)
+    subprocess.run(["git", "push"], check=True)
+    raise SystemExit(0)
+
 hashtags = "#" + " #".join(["قصص", "قصة", "قصص_عربية", "story"])
 full_description = f"{description}\n\nالمصادر:\n{sources_text}\n\nالحلقة {episode['episode_number']} من سلسلة: {manifest['series_title']}\n\nشاهد الحلقة التالية من قائمة التشغيل: {manifest['playlist_title']}\n\n{hashtags}"
 
