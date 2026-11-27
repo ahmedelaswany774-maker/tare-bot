@@ -1413,7 +1413,7 @@
           "url": "https://www.masrawy.com/news/news_regions/details/2024/3/18/2554353/اشتغلت-خياطة-علشان-تربي-بناتها-قصة-كفاح-الأم-المثالية-بسوهاج"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1425,8 +1425,11 @@
       "script_path": "content/drafts/verified_real/episode-51.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 2462,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-27T00:57:32+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-27T00:57:32+00:00",
+      "youtube_video_id": "LWeDyAg2qYc",
+      "upload_response_at": "2026-11-27T00:57:41+00:00",
+      "published_at": "2026-11-27T00:57:41+00:00"
     },
     {
       "episode_id": "social-52-story-52",
