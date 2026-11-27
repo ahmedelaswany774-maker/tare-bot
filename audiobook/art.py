@@ -54,20 +54,27 @@ def title_card(im,line1,line2=None,size=96):
         f2=ImageFont.truetype(FR,44)
         d.text((W/2,H/2+90),ar(line2),font=f2,fill=(255,200,120),anchor='mm',direction='rtl',language='ar')
     return im
-def thumb(t1='التهمة',l1='اتسجن 4 سنين',l2='وهو نايم في بيته',sub='البارت 1   رواية عربية مسموعة',out='thumbnail.jpg'):
-    im=bg(7,2).resize((1280,720));d=ImageDraw.Draw(im,'RGBA')
-    # bars + figure
-    d.rectangle([0,0,1280,720],fill=(0,0,0,60))
-    for x in range(760,1240,60): d.rectangle([x,0,x+10,720],fill=(10,10,10,235))
-    d.ellipse([930,300,1030,400],fill=(8,8,8,255))
-    d.rounded_rectangle([890,400,1070,720],40,fill=(8,8,8,255))
-    f=ImageFont.truetype(FB,190)
+def thumb(t1='التهمة',l1='اتسجن 4 سنين',l2='وهو نايم في بيته',sub='البارت 1   رواية عربية مسموعة',out='thumbnail.jpg',theme=None):
+    if theme:
+        from scenes import SC
+        im=SC[theme](7).resize((1280,720)).convert('RGB');d=ImageDraw.Draw(im,'RGBA')
+        d.rectangle([0,0,1280,720],fill=(0,0,0,20));d.rectangle([0,0,800,720],fill=(0,0,0,50))
+    else:
+        im=bg(7,2).resize((1280,720));d=ImageDraw.Draw(im,'RGBA')
+        # bars + figure
+        d.rectangle([0,0,1280,720],fill=(0,0,0,60))
+        for x in range(760,1240,60): d.rectangle([x,0,x+10,720],fill=(10,10,10,235))
+        d.ellipse([930,300,1030,400],fill=(8,8,8,255))
+        d.rounded_rectangle([890,400,1070,720],40,fill=(8,8,8,255))
+    sz=190
+    while sz>70 and d.textlength(ar(t1),font=ImageFont.truetype(FB,sz),direction='rtl',language='ar')>740: sz-=6
+    f=ImageFont.truetype(FB,sz)
     d.text((400,250),ar(t1),font=f,fill=(255,215,60),anchor='mm',direction='rtl',language='ar',stroke_width=8,stroke_fill=(0,0,0))
     f2=ImageFont.truetype(FB,62)
     d.text((400,420),ar(l1),font=f2,fill=(255,255,255),anchor='mm',direction='rtl',language='ar',stroke_width=5,stroke_fill=(0,0,0))
     d.text((400,500),ar(l2),font=f2,fill=(255,255,255),anchor='mm',direction='rtl',language='ar',stroke_width=5,stroke_fill=(0,0,0))
     f3=ImageFont.truetype(FR,44)
     d.text((400,620),ar(sub),font=f3,fill=(255,150,90),anchor='mm',direction='rtl',language='ar',stroke_width=3,stroke_fill=(0,0,0))
-    im.save(out,quality=92)
+    im.convert('RGB').save(out,quality=92)
 if __name__=='__main__':
     thumb()
