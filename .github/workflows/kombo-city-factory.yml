@@ -246,7 +246,7 @@ jobs:
               return match.group(1) if match else path.name
           # Scheduled runs drain the oldest pending upload first. Manual publish_latest
           # selects the newest pending video, matching the action's label.
-          newest_first = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
+          newest_first = True  # newest pending video first, so the latest explainer-style video goes out before old backlog
           candidates.sort(key=timestamp, reverse=newest_first)
           for video in candidates:
               metadata = video.with_suffix(".json")
