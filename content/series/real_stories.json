@@ -1577,7 +1577,7 @@
           "url": "https://www.youm7.com/story/2023/3/21/شالت-الحمل-22-سنة-الأم-المثالية-بالجيزة-اشتغلت-حارسة-عقار/6122713"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1589,8 +1589,11 @@
       "script_path": "content/drafts/verified_real/episode-55.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4987,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-28T17:39:43+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-28T17:39:43+00:00",
+      "youtube_video_id": "maSHk9KamEI",
+      "upload_response_at": "2026-11-28T17:39:50+00:00",
+      "published_at": "2026-11-28T17:39:50+00:00"
     },
     {
       "episode_id": "social-56-story-56",
