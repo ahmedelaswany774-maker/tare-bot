@@ -17,10 +17,8 @@ on:
           - render_pending
           - publish_latest
         default: prepare_images
-  # schedule PAUSED while kombo-backlog.yml publishes the old backlog hourly (oldest first).
-  # Restore after the backlog is empty:
-  # schedule:
-  #   - cron: "37 6,10,14,18 * * *"
+  schedule:
+    - cron: "37 6,10,14,18 * * *"
 
 permissions:
   contents: write
