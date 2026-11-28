@@ -1536,7 +1536,7 @@
           "url": "https://www.cairo24.com/1975272"
         }
       ],
-      "published": false,
+      "published": true,
       "content_type": "verified_real_story",
       "disabled": false,
       "disabled_reason": "",
@@ -1548,8 +1548,11 @@
       "script_path": "content/drafts/verified_real/episode-54.md",
       "draft_status": "written_pending_editorial_and_source_review",
       "draft_word_count": 4001,
-      "upload_status": "uploading",
-      "upload_started_at": "2026-11-28T01:03:14+00:00"
+      "upload_status": "published",
+      "upload_started_at": "2026-11-28T01:03:14+00:00",
+      "youtube_video_id": "Qo10ZSMByjM",
+      "upload_response_at": "2026-11-28T01:03:29+00:00",
+      "published_at": "2026-11-28T01:03:30+00:00"
     },
     {
       "episode_id": "social-55-story-55",
